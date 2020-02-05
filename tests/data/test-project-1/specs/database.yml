@@ -43,6 +43,12 @@ ps_app_alpha:
         type: int
         nullable: false
 
+    sport_league:
+      id:
+        type: bigint
+        nullable: false
+      name: string
+
 
   relations:
   # one-to-many
@@ -54,6 +60,17 @@ ps_app_alpha:
     to:
       table: user_iap
       field: user_id
+
+  # one-to-many
+  - forwardName: games
+    reverseName: league
+    # single: true
+    from:
+      table: sport_league
+      field: id
+    to:
+      table: sport_event
+      field: league_id
 
   # many-to-many
   - forwardName: tracking
@@ -68,3 +85,5 @@ ps_app_alpha:
     to:
       table: user
       field: id
+
+  # one-through

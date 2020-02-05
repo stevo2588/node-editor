@@ -9,13 +9,26 @@ export class {{this.className}} extends Model {
   {{/each}}
   {{#if this.hasRelations}}
 
+  {{#each this.relations}}
+  {{this.name}}?: {{this.relatedClass}}{{#if this.isArray}}[]{{/if}};
+  {{/each}}
+
   static get relationMappings() {
     return {
     {{#each this.relations}}
       {{this.name}}: {
         relation: Model.{{this.relationType}},
         modelClass: {{this.relatedClass}},
-        join: { from: `${User.tableName}.id`, to: `${UserIap.tableName}.user_id` },
+        join: {
+          from: `${ {{~../className}}.tableName}.{{this.fromField}}`,
+          {{#if this.through}}
+          through: {
+            from: `${ {{~this.throughClass}}.tableName}.{{this.throughFromField}}`,
+            to: `${ {{~this.throughClass}}.tableName}.{{this.throughToField}}`,
+          },
+          {{/if}}
+          to: `${ {{~this.relatedClass}}.tableName}.{{this.toField}}`,
+        },
       },
     {{/each}}
     };
