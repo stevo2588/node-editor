@@ -1,0 +1,12 @@
+
+events:
+  transaction:
+    payload:
+      receiptHandle: string
+      messageId: string
+      userId: string
+      amount: number
+      type: string
+      purchaseData:
+        price: number
+      betId: number

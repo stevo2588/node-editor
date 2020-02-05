@@ -1,0 +1,70 @@
+
+ps_app_alpha:
+  tables:
+    user:
+      id:
+        type: bigint
+        nullable: false
+      username:
+        type: string
+        nullable: false
+      email:
+        type: string
+        nullable: false
+      enabled: boolean
+
+    user_iap:
+      id:
+        type: bigint
+        nullable: false
+      user_id:
+        type: bigint
+        nullable: false
+      iap_item_id:
+        type: int
+        nullable: false
+    
+    user_tracking:
+      id:
+        type: bigint
+        nullable: false
+      user_id:
+        type: bigint
+        nullable: false
+      tracked_user_id:
+        type: bigint
+        nullable: false
+
+    sport_event:
+      id:
+        type: bigint
+        nullable: false
+      league_id:
+        type: int
+        nullable: false
+
+
+  relations:
+  # one-to-many
+  - forwardName: iaps
+    reverseName: user
+    from:
+      table: user
+      field: id
+    to:
+      table: user_iap
+      field: user_id
+
+  # many-to-many
+  - forwardName: tracking
+    reverseName: trackers
+    from:
+      table: user
+      field: id
+    through:
+      table: user_tracking
+      fromField: user_id
+      toField: tracked_user_id
+    to:
+      table: user
+      field: id

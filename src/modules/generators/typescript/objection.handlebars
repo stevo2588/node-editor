@@ -1,0 +1,26 @@
+import { Model } from 'objection';
+
+
+{{#each tables}}
+export class {{this.className}} extends Model {
+  public static readonly tableName = '{{this.tableName}}';
+  {{#each this.properties}}
+  {{this.name}}: {{this.type}};
+  {{/each}}
+  {{#if this.hasRelations}}
+
+  static get relationMappings() {
+    return {
+    {{#each this.relations}}
+      {{this.name}}: {
+        relation: Model.{{this.relationType}},
+        modelClass: {{this.relatedClass}},
+        join: { from: `${User.tableName}.id`, to: `${UserIap.tableName}.user_id` },
+      },
+    {{/each}}
+    };
+  }
+  {{/if}}
+}
+
+{{/each}}
