@@ -1,0 +1,161 @@
+{
+  "tables": [
+    {
+      "tableName": "user",
+      "className": "User",
+      "properties": [
+        {
+          "name": "id",
+          "type": "number"
+        },
+        {
+          "name": "username",
+          "type": "string"
+        },
+        {
+          "name": "email",
+          "type": "string"
+        },
+        {
+          "name": "enabled",
+          "type": "boolean"
+        }
+      ],
+      "relations": [
+        {
+          "name": "iaps",
+          "relatedClass": "UserIap",
+          "fromField": "id",
+          "toField": "user_id",
+          "through": false,
+          "relationType": "HasManyRelation",
+          "isArray": true
+        },
+        {
+          "name": "tracking",
+          "relatedClass": "User",
+          "fromField": "id",
+          "toField": "id",
+          "through": true,
+          "throughClass": "UserTracking",
+          "throughFromField": "user_id",
+          "throughToField": "tracked_user_id",
+          "relationType": "ManyToManyRelation",
+          "isArray": true
+        },
+        {
+          "name": "trackers",
+          "relatedClass": "User",
+          "fromField": "id",
+          "toField": "id",
+          "through": true,
+          "throughClass": "UserTracking",
+          "throughFromField": "tracked_user_id",
+          "throughToField": "user_id",
+          "relationType": "ManyToManyRelation",
+          "isArray": true
+        }
+      ],
+      "hasRelations": true
+    },
+    {
+      "tableName": "user_iap",
+      "className": "UserIap",
+      "properties": [
+        {
+          "name": "id",
+          "type": "number"
+        },
+        {
+          "name": "user_id",
+          "type": "number"
+        },
+        {
+          "name": "iap_item_id",
+          "type": "number"
+        }
+      ],
+      "relations": [
+        {
+          "name": "user",
+          "relatedClass": "User",
+          "fromField": "user_id",
+          "toField": "id",
+          "through": false,
+          "relationType": "BelongsToOneRelation"
+        }
+      ],
+      "hasRelations": true
+    },
+    {
+      "tableName": "user_tracking",
+      "className": "UserTracking",
+      "properties": [
+        {
+          "name": "id",
+          "type": "number"
+        },
+        {
+          "name": "user_id",
+          "type": "number"
+        },
+        {
+          "name": "tracked_user_id",
+          "type": "number"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "tableName": "sport_event",
+      "className": "SportEvent",
+      "properties": [
+        {
+          "name": "id",
+          "type": "number"
+        },
+        {
+          "name": "league_id",
+          "type": "number"
+        }
+      ],
+      "relations": [
+        {
+          "name": "league",
+          "relatedClass": "SportLeague",
+          "fromField": "league_id",
+          "toField": "id",
+          "through": false,
+          "relationType": "BelongsToOneRelation"
+        }
+      ],
+      "hasRelations": true
+    },
+    {
+      "tableName": "sport_league",
+      "className": "SportLeague",
+      "properties": [
+        {
+          "name": "id",
+          "type": "number"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "relations": [
+        {
+          "name": "games",
+          "relatedClass": "SportEvent",
+          "fromField": "id",
+          "toField": "league_id",
+          "through": false,
+          "relationType": "HasManyRelation",
+          "isArray": true
+        }
+      ],
+      "hasRelations": true
+    }
+  ]
+}

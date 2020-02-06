@@ -10,7 +10,6 @@ describe('UNIT-TESTS', (): void => {
 
   test('generates objection.js models', async (): Promise<void> => {
     const objModelsStr = toObjectionModels(databaseSpec);
-    console.log(objModelsStr);
 
     expect(objModelsStr).toEqual(objectionModels);
   });

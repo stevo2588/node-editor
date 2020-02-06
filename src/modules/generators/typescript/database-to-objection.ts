@@ -25,7 +25,7 @@ export const toObjectionModels = (databaseSpec: string) => {
         className: pascalCase(table),
         properties: [],
       });
-      
+
       const newTable = data.tables[data.tables.length - 1];
 
       for (const prop in tables[table]) {

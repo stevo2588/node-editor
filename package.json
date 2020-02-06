@@ -72,6 +72,7 @@
     "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
     "@types/jest": "^25.1.1",
     "@types/js-yaml": "^3.12.2",
+    "@types/ramda": "^0.26.40",
     "@types/reach__router": "^1.2.6",
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
@@ -108,11 +109,13 @@
     "mathjs": "^6.6.0",
     "pathfinding": "^0.4.18",
     "paths-js": "^0.4.10",
+    "ramda": "^0.27.0",
     "react": "^16.12.0",
     "react-dom": "npm:@hot-loader/react-dom",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.3.1",
     "regenerator-runtime": "^0.13.3",
-    "resize-observer-polyfill": "^1.5.1"
+    "resize-observer-polyfill": "^1.5.1",
+    "vm2": "^3.8.4"
   }
 }
