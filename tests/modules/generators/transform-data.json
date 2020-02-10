@@ -26,8 +26,10 @@
           "name": "iaps",
           "relatedClass": "UserIap",
           "fromField": "id",
+          "throughClass": null,
+          "throughFromField": null,
+          "throughToField": null,
           "toField": "user_id",
-          "through": false,
           "relationType": "HasManyRelation",
           "isArray": true
         },
@@ -36,7 +38,6 @@
           "relatedClass": "User",
           "fromField": "id",
           "toField": "id",
-          "through": true,
           "throughClass": "UserTracking",
           "throughFromField": "user_id",
           "throughToField": "tracked_user_id",
@@ -48,15 +49,13 @@
           "relatedClass": "User",
           "fromField": "id",
           "toField": "id",
-          "through": true,
           "throughClass": "UserTracking",
           "throughFromField": "tracked_user_id",
           "throughToField": "user_id",
           "relationType": "ManyToManyRelation",
           "isArray": true
         }
-      ],
-      "hasRelations": true
+      ]
     },
     {
       "tableName": "user_iap",
@@ -80,12 +79,14 @@
           "name": "user",
           "relatedClass": "User",
           "fromField": "user_id",
+          "throughClass": null,
+          "throughFromField": null,
+          "throughToField": null,
           "toField": "id",
-          "through": false,
-          "relationType": "BelongsToOneRelation"
+          "relationType": "BelongsToOneRelation",
+          "isArray": false
         }
-      ],
-      "hasRelations": true
+      ]
     },
     {
       "tableName": "user_tracking",
@@ -124,12 +125,14 @@
           "name": "league",
           "relatedClass": "SportLeague",
           "fromField": "league_id",
+          "throughClass": null,
+          "throughFromField": null,
+          "throughToField": null,
           "toField": "id",
-          "through": false,
-          "relationType": "BelongsToOneRelation"
+          "relationType": "BelongsToOneRelation",
+          "isArray": false
         }
-      ],
-      "hasRelations": true
+      ]
     },
     {
       "tableName": "sport_league",
@@ -149,13 +152,14 @@
           "name": "games",
           "relatedClass": "SportEvent",
           "fromField": "id",
+          "throughClass": null,
+          "throughFromField": null,
+          "throughToField": null,
           "toField": "league_id",
-          "through": false,
           "relationType": "HasManyRelation",
           "isArray": true
         }
-      ],
-      "hasRelations": true
+      ]
     }
   ]
 }

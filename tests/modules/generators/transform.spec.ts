@@ -5,13 +5,13 @@ import transformData from './transform-data.json';
 
 
 describe('UNIT-TESTS', (): void => {
+  const jqTransform = readFileSync(path.resolve(__dirname, '../../../static/transformers/database-to-objection.jq'), { encoding: 'utf8' });
+  const objectionTemplate = readFileSync(path.resolve(__dirname, '../../../static/templates/objection.handlebars'), { encoding: 'utf8' });
   const databaseSpec = readFileSync(path.resolve(__dirname, '../../data/test-project-1/specs/database.yml'), { encoding: 'utf8' });
-  const transformSpec = readFileSync(path.resolve(__dirname, '../../../src/modules/generators/typescript/database-transformer.yml'), { encoding: 'utf8' });
-  const objectionTemplate = readFileSync(path.resolve(__dirname, '../../../src/modules/generators/typescript/objection.handlebars'), { encoding: 'utf8' });
   const objectionModels = readFileSync(path.resolve(__dirname, '../../data/output/mysql-test-project-1/index.ts'), { encoding: 'utf8' });
 
   test('generates data from database transformer', async (): Promise<void> => {
-    const data = transform(databaseSpec, transformSpec);
+    const data = await transform(databaseSpec, jqTransform);
     console.log(data);
 
     expect(data).toEqual(transformData);

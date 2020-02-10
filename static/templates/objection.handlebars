@@ -7,7 +7,7 @@ export class {{this.className}} extends Model {
   {{#each this.properties}}
   {{this.name}}: {{this.type}};
   {{/each}}
-  {{#if this.hasRelations}}
+  {{#if this.relations}}
 
   {{#each this.relations}}
   {{this.name}}?: {{this.relatedClass}}{{#if this.isArray}}[]{{/if}};
@@ -21,7 +21,7 @@ export class {{this.className}} extends Model {
         modelClass: {{this.relatedClass}},
         join: {
           from: `${ {{~../className}}.tableName}.{{this.fromField}}`,
-          {{#if this.through}}
+          {{#if this.throughClass}}
           through: {
             from: `${ {{~this.throughClass}}.tableName}.{{this.throughFromField}}`,
             to: `${ {{~this.throughClass}}.tableName}.{{this.throughToField}}`,

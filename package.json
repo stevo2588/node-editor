@@ -107,6 +107,7 @@
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.15",
     "mathjs": "^6.6.0",
+    "node-jq": "^1.11.0",
     "pathfinding": "^0.4.18",
     "paths-js": "^0.4.10",
     "ramda": "^0.27.0",
@@ -115,7 +116,6 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.3.1",
     "regenerator-runtime": "^0.13.3",
-    "resize-observer-polyfill": "^1.5.1",
-    "vm2": "^3.8.4"
+    "resize-observer-polyfill": "^1.5.1"
   }
 }
