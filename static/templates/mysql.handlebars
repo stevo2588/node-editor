@@ -1,0 +1,15 @@
+{{#each this}}
+{{#each this.tables}}
+CREATE TABLE `{{@key}}` (
+  {{#each this}}
+  `{{@key}}` {{#if this.type}}{{this.type}}{{else}}{{this}}{{/if}}{{#unless @last}},{{/unless}}
+  {{/each}}
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+{{/each}}
+
+{{#each this.relations}}
+-- TODO
+
+{{/each}}
+{{/each}}
