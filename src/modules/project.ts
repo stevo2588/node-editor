@@ -28,6 +28,7 @@ export const generateCode = async (specPath: string, plugin: Plugin, fileManager
   const templateStr = fileManager.getTemplateFile(`templates/${plugin.template}`);
 
   const data = await transform(specStr, transformerStr);
+  console.log(JSON.stringify(data));
   return generate(data, templateStr);
 }
 

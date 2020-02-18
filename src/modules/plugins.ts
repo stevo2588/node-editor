@@ -17,6 +17,11 @@ const databaseSpec: Spec = {
   ext: 'yml',
 };
 
+const openapiSpec: Spec = {
+  name: 'openapi',
+  ext: 'yml',
+};
+
 const plugins: Plugin[] = [
   {
     spec: databaseSpec,
@@ -33,6 +38,22 @@ const plugins: Plugin[] = [
     // transformer: 'database-to-mysql',
     template: 'mysql',
     name: 'MySQL',
+  },
+  {
+    spec: openapiSpec,
+    language: 'Typescript',
+    outputExt: 'ts',
+    transformer: 'openapi',
+    template: 'typescript-api-aws-lambda-multi',
+    name: 'AWS Lambda API',
+  },
+  {
+    spec: openapiSpec,
+    language: 'Typescript',
+    outputExt: 'ts',
+    transformer: 'openapi',
+    template: 'typescript-api-client',
+    name: 'API Client',
   },
 ];
 

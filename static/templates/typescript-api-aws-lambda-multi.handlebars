@@ -1,0 +1,68 @@
+{{#* inline "property"}}
+{{#if this.isObject}}
+{{#each this.value}}
+{{@key}}: {{> property }}
+{{/each}}
+{{else}}
+{{this.value}}
+{{/if}}
+{{#if this.isArray}}[]{{/if}};
+{{/inline}}
+
+{{#each schemas}}
+export class {{this.name}} {
+  {{#unless this.isRef}}
+  {{#with this.properties}}
+  {{> property }}
+  {{/with}}
+  {{/unless}}
+}
+{{/each}}
+
+{{#each paths}}
+{{#each this.endpoints}}
+export class {{this.request.className}} {{#if this.request.isRef}}extends {{this.request.properties.value}} {{/if}} {
+  {{#unless this.request.isRef}}
+  {{#with this.request.properties}}
+  {{> property }}
+  {{/with}}
+  {{/unless}}
+  {{#if this.request.parameters}}
+  parameters: {
+    {{#each this.request.parameters}}
+    {{this.key}}: {{#with this.value}}{{> property }}{{/with}}
+    {{/each}}
+  };
+  {{/if}}
+}
+
+{{/each}}
+{{/each}}
+
+export interface Response {
+  description: string;
+}
+
+{{#each paths}}
+{{#each this.endpoints}}
+{{#each this.responses}}
+export class {{this.className}} {{#if this.isRef}}extends {{this.properties.value}} {{/if}}implements Response {
+  description = '{{this.description}}';
+  {{#unless this.isRef}}
+  {{#with this.properties}}
+  {{> property }}
+  {{/with}}
+  {{/unless}}
+}
+
+{{/each}}
+{{/each}}
+{{/each}}
+
+{{#each paths}}
+{{#each this.endpoints}}
+export const {{this.pascal}} = (req: {{this.request.className}}): {{#each this.responses}}{{this.className}}{{#unless @last}}|{{/unless}}{{/each}} => {
+
+};
+{{/each}}
+{{/each}}
