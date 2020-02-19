@@ -37,7 +37,7 @@ export class UsersUserIdGet404 implements Response {
 export class UsersMeTrackingGet200 implements Response {
   description = 'OK';
   tracking: User[];
-  recentlyTracked: User[];
+  recentlyTracked?: User[];
 }
 
 export class UsersMeTrackingGet400 implements Response {

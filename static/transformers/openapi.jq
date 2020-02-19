@@ -1,11 +1,20 @@
 def urlToPascal: gsub("{|}"; "") | gsub("/(?<a>[a-z])"; .a | ascii_upcase);
 def typeMapperTypescript:
   if . == null then null
-  elif .["$ref"] then { value: (.["$ref"] | capture("(?<a>#/components/schemas)/(?<n>(.*))") | .n // "any") }
-  elif .type == "object" and .properties then { value: .properties | to_entries | map({ key: .key, value: .value | typeMapperTypescript }) | from_entries, isObject: true }
-  elif .type == "object" then { value: "object" }
-  elif .type == "array" then { value: (.items | typeMapperTypescript), isArray: true }
-  else { value: "any" } end;
+  elif .["$ref"] then { type: (.["$ref"] | capture("(?<a>#/components/schemas)/(?<n>(.*))") | .n // "any") }
+  elif .type == "object" and .properties then (.required? // []) as $required | {
+    type: .properties | to_entries | map(.key as $key | {
+      key: .key,
+      value: ((.value | typeMapperTypescript) + { required: any($required; index($key) >= 0) }),
+    }) | from_entries,
+    isObject: true,
+  }
+  elif .type == "object" then { type: "object" }
+  elif .type == "array" then {
+    isArray: true,
+    items: (.items | typeMapperTypescript),
+  }
+  else { type: "any" } end;
 
 . | {
   paths: .paths | to_entries | map(.key as $path | {
@@ -16,7 +25,7 @@ def typeMapperTypescript:
         description: .requestBody.content.description?,
         properties: (.requestBody.content["application/json"].schema? // null) | typeMapperTypescript,
         isRef: (if .requestBody.content["application/json"].schema["$ref"]? then true else false end),
-        parameters: (.parameters? // []) | map({ key: .name, value: (.schema? // null) | typeMapperTypescript }),
+        parameters: (.parameters? // []) | map({ name: .name, type: ((.schema? // null) | typeMapperTypescript) }),
       },
       responses: .value.responses? | to_entries | map({
         className: (($ept | urlToPascal) + .key),

@@ -52,6 +52,8 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/User"
+                required:
+                  - tracking
         400:
           description: "Invalid id supplied"
         404:
@@ -72,6 +74,15 @@ paths:
       responses:
         200:
           description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    stuff:
+                      type: string
         400:
           description: "Invalid id supplied"
         404:

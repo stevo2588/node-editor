@@ -1,12 +1,13 @@
 {{#* inline "property"}}
 {{#if this.isObject}}
-{{#each this.value}}
-{{@key}}: {{> property }}
+{{#each this.type}}
+{{@key}}{{#unless this.required}}?{{/unless}}: {{> property }}
 {{/each}}
+{{else if this.isArray}}
+{{#with this.items}}{{> property }}{{/with}}[];
 {{else}}
-{{this.value}}
+{{this.type ~}}
 {{/if}}
-{{#if this.isArray}}[]{{/if}};
 {{/inline}}
 
 {{#each schemas}}
@@ -21,7 +22,7 @@ export class {{this.name}} {
 
 {{#each paths}}
 {{#each this.endpoints}}
-export class {{this.request.className}} {{#if this.request.isRef}}extends {{this.request.properties.value}} {{/if}} {
+export class {{this.request.className}} {{#if this.request.isRef}}extends {{this.request.properties.type}} {{/if}} {
   {{#unless this.request.isRef}}
   {{#with this.request.properties}}
   {{> property }}
@@ -30,7 +31,7 @@ export class {{this.request.className}} {{#if this.request.isRef}}extends {{this
   {{#if this.request.parameters}}
   parameters: {
     {{#each this.request.parameters}}
-    {{this.key}}: {{#with this.value}}{{> property }}{{/with}}
+    {{this.name}}: {{#with this.type}}{{> property }}{{/with}}
     {{/each}}
   };
   {{/if}}
@@ -46,7 +47,7 @@ export interface Response {
 {{#each paths}}
 {{#each this.endpoints}}
 {{#each this.responses}}
-export class {{this.className}} {{#if this.isRef}}extends {{this.properties.value}} {{/if}}implements Response {
+export class {{this.className}} {{#if this.isRef}}extends {{this.properties.type}} {{/if}}implements Response {
   description = '{{this.description}}';
   {{#unless this.isRef}}
   {{#with this.properties}}
