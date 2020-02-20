@@ -37,7 +37,7 @@ export class UsersUserIdGet404 implements Response {
 export class UsersMeTrackingGet200 implements Response {
   description = 'OK';
   tracking: User[];
-  recentlyTracked: User[];
+  recentlyTracked?: User[];
 }
 
 export class UsersMeTrackingGet400 implements Response {
@@ -62,7 +62,7 @@ export class UsersMeTrackingPost404 implements Response {
 
 export const UsersUserIdGet = async (req: UsersUserIdGetRequest): Promise<UsersUserIdGet200|UsersUserIdGet400|UsersUserIdGet404> => {
   try {
-    const res = await fetch(`https://example.come/users/${req.parameters.userId}`, {
+    const res = await fetch(`${apiRoot}/users/${req.parameters.userId}`, {
       method: 'GET',
     });
     const json = await res.json();
@@ -74,7 +74,7 @@ export const UsersUserIdGet = async (req: UsersUserIdGetRequest): Promise<UsersU
 
 export const UsersMeTrackingGet = async (req: UsersMeTrackingGetRequest): Promise<UsersMeTrackingGet200|UsersMeTrackingGet400|UsersMeTrackingGet404> => {
   try {
-    const res = await fetch(`https://example.come/users/me`, {
+    const res = await fetch(`${apiRoot}/users/me/tracking`, {
       method: 'GET',
     });
     const json = await res.json();
@@ -86,7 +86,7 @@ export const UsersMeTrackingGet = async (req: UsersMeTrackingGetRequest): Promis
 
 export const UsersMeTrackingPost = async (req: UsersMeTrackingPostRequest): Promise<UsersMeTrackingPost200|UsersMeTrackingPost400|UsersMeTrackingPost404> => {
   try {
-    const res = await fetch(`https://example.come/users/me`, {
+    const res = await fetch(`${apiRoot}/users/me/tracking`, {
       method: 'POST',
       body: JSON.stringify(req),
     });
@@ -95,4 +95,4 @@ export const UsersMeTrackingPost = async (req: UsersMeTrackingPostRequest): Prom
   } catch (err) {
     throw new Error("Error");
   }
-}
+};

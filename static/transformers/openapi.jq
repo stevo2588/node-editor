@@ -28,7 +28,9 @@ def typeMapper:
 
 . | {
   paths: .paths | to_entries | map(.key as $path | {
+    path: $path,
     endpoints: .value | to_entries | map(($path + "/" + .key) as $ept | {
+      method: .key | ascii_upcase,
       pascal: $ept | urlToPascal,
       request: .value | {
         className: (($ept | urlToPascal) + "Request"),

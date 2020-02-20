@@ -1,12 +1,13 @@
 {{#* inline "property"}}
 {{#if this.isObject}}
 {{#each this.type}}
-{{@key}}: {{> property }}
+{{@key}}{{#unless this.required}}?{{/unless}}: {{> property }}
 {{/each}}
-{{else}}
-{{this.type}}
+{{else if this.isArray ~}}
+{{#with this.items}}{{> property ~}}{{/with ~}}[]
+{{else~}}
+{{~this.typescriptType ~}}
 {{/if}}
-{{#if this.isArray}}[]{{/if}};
 {{/inline}}
 
 {{#each schemas}}
@@ -30,14 +31,14 @@ export class {{this.request.className}} {{#if this.request.isRef}}extends {{this
   {{#if this.request.parameters}}
   parameters: {
     {{#each this.request.parameters}}
-    {{this.key}}: {{#with this.type}}{{> property }}{{/with}}
+    {{this.name}}: {{#with this.type}}{{> property }}{{/with}}
     {{/each}}
   };
   {{/if}}
 }
 
 {{/each}}
-{{/each}}
+{{/each~}}
 
 export interface Response {
   description: string;
@@ -46,7 +47,7 @@ export interface Response {
 {{#each paths}}
 {{#each this.endpoints}}
 {{#each this.responses}}
-export class {{this.className}} {{#if this.isRef}}extends {{this.properties.type}} {{/if}}implements Response {
+export class {{this.className}} {{#if this.isRef}}extends {{this.properties.typescriptType}} {{/if}}implements Response {
   description = '{{this.description}}';
   {{#unless this.isRef}}
   {{#with this.properties}}
@@ -57,13 +58,18 @@ export class {{this.className}} {{#if this.isRef}}extends {{this.properties.type
 
 {{/each}}
 {{/each}}
-{{/each}}
+{{/each~}}
 
 {{#each paths}}
 {{#each this.endpoints}}
 export const {{this.pascal}} = async (req: {{this.request.className}}): Promise<{{#each this.responses}}{{this.className}}{{#unless @last}}|{{/unless}}{{/each}}> => {
   try {
-    const res = await fetch();
+    const res = await fetch(`${apiRoot}{{../this.path}}`, {
+      method: '{{this.method}}',
+      {{#if this.request}}
+      body: JSON.stringify(req),
+      {{/if}}
+    });
     const json = await res.json();
     return json as {{this.responses.[0].className}};
   } catch (err) {
