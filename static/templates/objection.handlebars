@@ -5,7 +5,7 @@ import { Model } from 'objection';
 export class {{this.className}} extends Model {
   public static readonly tableName = '{{this.tableName}}';
   {{#each this.properties}}
-  {{this.name}}: {{this.type}};
+  {{this.name}}: {{this.typescriptType}};
   {{/each}}
   {{#if this.relations}}
 

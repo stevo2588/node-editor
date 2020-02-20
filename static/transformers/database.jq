@@ -6,7 +6,11 @@ def snakeToPascal: ("_" + .) | gsub( "_(?<a>[a-z])"; .a | ascii_upcase);
     . as $root | [ .[].tables] | add | to_entries[] | .key as $tableName | {
       tableName: .key,
       className: .key | snakeToPascal,
-      properties: .value | to_entries | map({ name: .key, type: (.value.type? // .value) | typeMapper }),
+      properties: .value | to_entries | map({
+        name: .key,
+        type: (.value.type? // .value),
+        typescriptType: (.value.type? // .value) | typeMapper,
+      }),
       relations: $root[].relations | [
         map(select(.from.table == $tableName) | {
           name: .forwardName,
@@ -24,6 +28,7 @@ def snakeToPascal: ("_" + .) | gsub( "_(?<a>[a-z])"; .a | ascii_upcase);
         }),
         map(select(.to.table == $tableName) | {
           name: .reverseName,
+          # foreignKey: .to.field,
           relatedClass: .from.table | snakeToPascal,
           fromField: .to.field,
           toField: .from.field,

@@ -1,15 +1,23 @@
-{{#each this}}
 {{#each this.tables}}
-CREATE TABLE `{{@key}}` (
-  {{#each this}}
-  `{{@key}}` {{#if this.type}}{{this.type}}{{else}}{{this}}{{/if}}{{#unless @last}},{{/unless}}
+CREATE TABLE `{{this.tableName}}` (
+  {{#each this.properties}}
+  `{{this.name}}` {{#if this.type}}{{this.type}}{{else}}{{this}}{{/if}}{{#unless @last}},{{/unless}}
   {{/each}}
+  {{!-- {{#each this.properties}}
+  {{#if this.isPrimary}}PRIMARY KEY (`{{this.name}}`){{/if}}{{#unless @last}},{{/unless}}
+  {{#if this.isUnique}}UNIQUE KEY (`{{this.name}}`){{/if}}{{#unless @last}},{{/unless}}
+  how to do multiple keys?
+  UNIQUE KEY `user_tracked_ids` (`user_id`,`tracked_user_id`),
+  KEY `user_id` (`user_id`),
+  KEY `tracked_id` (`tracked_user_id`),
+  {{/each}}
+  {{#each this.relations}}
+  {{#if this.foreignKey}}
+  CONSTRAINT `fk_{{this.foreignKey}}` FOREIGN KEY (`{{this.foreignKey}}`)
+    REFERENCES `{{this.foreignTable}}` (`{{this.foreignField}}`)
+    ON DELETE NO ACTION ON UPDATE NO ACTION{{#unless @last}},{{/unless}}
+  {{/if}}
+  {{/each}} --}}
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-{{/each}}
-
-{{#each this.relations}}
--- TODO
-
-{{/each}}
 {{/each}}

@@ -6,19 +6,23 @@
       "properties": [
         {
           "name": "id",
-          "type": "number"
+          "type": "bigint",
+          "typescriptType": "number"
         },
         {
           "name": "username",
-          "type": "string"
+          "type": "string",
+          "typescriptType": "string"
         },
         {
           "name": "email",
-          "type": "string"
+          "type": "string",
+          "typescriptType": "string"
         },
         {
           "name": "enabled",
-          "type": "boolean"
+          "type": "boolean",
+          "typescriptType": "boolean"
         }
       ],
       "relations": [
@@ -63,15 +67,18 @@
       "properties": [
         {
           "name": "id",
-          "type": "number"
+          "type": "bigint",
+          "typescriptType": "number"
         },
         {
           "name": "user_id",
-          "type": "number"
+          "type": "bigint",
+          "typescriptType": "number"
         },
         {
           "name": "iap_item_id",
-          "type": "number"
+          "type": "int",
+          "typescriptType": "number"
         }
       ],
       "relations": [
@@ -94,15 +101,18 @@
       "properties": [
         {
           "name": "id",
-          "type": "number"
+          "type": "bigint",
+          "typescriptType": "number"
         },
         {
           "name": "user_id",
-          "type": "number"
+          "type": "bigint",
+          "typescriptType": "number"
         },
         {
           "name": "tracked_user_id",
-          "type": "number"
+          "type": "bigint",
+          "typescriptType": "number"
         }
       ],
       "relations": []
@@ -113,11 +123,13 @@
       "properties": [
         {
           "name": "id",
-          "type": "number"
+          "type": "bigint",
+          "typescriptType": "number"
         },
         {
           "name": "league_id",
-          "type": "number"
+          "type": "int",
+          "typescriptType": "number"
         }
       ],
       "relations": [
@@ -140,11 +152,13 @@
       "properties": [
         {
           "name": "id",
-          "type": "number"
+          "type": "bigint",
+          "typescriptType": "number"
         },
         {
           "name": "name",
-          "type": "string"
+          "type": "string",
+          "typescriptType": "string"
         }
       ],
       "relations": [

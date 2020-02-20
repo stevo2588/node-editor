@@ -5,7 +5,7 @@ import transformData from '../../data/transform-data.json';
 
 
 describe('UNIT-TESTS', (): void => {
-  const jqTransform = readFileSync(path.resolve(__dirname, '../../../static/transformers/database-to-objection.jq'), { encoding: 'utf8' });
+  const jqTransform = readFileSync(path.resolve(__dirname, '../../../static/transformers/database.jq'), { encoding: 'utf8' });
   const objectionTemplate = readFileSync(path.resolve(__dirname, '../../../static/templates/objection.handlebars'), { encoding: 'utf8' });
   const databaseSpec = readFileSync(path.resolve(__dirname, '../../data/test-project-1/specs/database.yml'), { encoding: 'utf8' });
   const objectionModels = readFileSync(path.resolve(__dirname, '../../data/output/database-to-objection.ts'), { encoding: 'utf8' });

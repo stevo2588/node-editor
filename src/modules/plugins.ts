@@ -22,12 +22,17 @@ const openapiSpec: Spec = {
   ext: 'yml',
 };
 
+const pubsubSpec: Spec = {
+  name: 'pubsub',
+  ext: 'yml',
+};
+
 const plugins: Plugin[] = [
   {
     spec: databaseSpec,
     language: 'Typescript',
     outputExt: 'ts',
-    transformer: 'database-to-objection',
+    transformer: 'database',
     template: 'objection',
     name: 'Objection.js',
   },
@@ -35,7 +40,7 @@ const plugins: Plugin[] = [
     spec: databaseSpec,
     language: 'MySQL',
     outputExt: 'sql',
-    // transformer: 'database-to-mysql',
+    transformer: 'database',
     template: 'mysql',
     name: 'MySQL',
   },
@@ -54,6 +59,14 @@ const plugins: Plugin[] = [
     transformer: 'openapi',
     template: 'typescript-api-client',
     name: 'API Client',
+  },
+  {
+    spec: pubsubSpec,
+    language: 'Typescript',
+    outputExt: 'ts',
+    transformer: 'pubsub',
+    template: 'typescript-sns',
+    name: 'AWS SNS',
   },
 ];
 

@@ -27,10 +27,3 @@ CREATE TABLE `sport_league` (
   `name` string
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-
--- TODO
-
--- TODO
-
--- TODO
-
