@@ -71,6 +71,8 @@ paths:
               properties:
                 userId:
                   type: integer
+              required:
+                - userId
       responses:
         200:
           description: OK

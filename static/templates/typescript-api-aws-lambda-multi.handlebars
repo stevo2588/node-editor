@@ -3,10 +3,10 @@
 {{#each this.type}}
 {{@key}}{{#unless this.required}}?{{/unless}}: {{> property }}
 {{/each}}
-{{else if this.isArray}}
-{{#with this.items}}{{> property }}{{/with}}[];
-{{else}}
-{{this.type ~}}
+{{else if this.isArray ~}}
+{{#with this.items}}{{> property ~}}{{/with ~}}[]
+{{else~}}
+{{~this.typescriptType ~}}
 {{/if}}
 {{/inline}}
 
@@ -38,7 +38,7 @@ export class {{this.request.className}} {{#if this.request.isRef}}extends {{this
 }
 
 {{/each}}
-{{/each}}
+{{/each~}}
 
 export interface Response {
   description: string;
@@ -47,7 +47,7 @@ export interface Response {
 {{#each paths}}
 {{#each this.endpoints}}
 {{#each this.responses}}
-export class {{this.className}} {{#if this.isRef}}extends {{this.properties.type}} {{/if}}implements Response {
+export class {{this.className}} {{#if this.isRef}}extends {{this.properties.typescriptType}} {{/if}}implements Response {
   description = '{{this.description}}';
   {{#unless this.isRef}}
   {{#with this.properties}}
@@ -58,12 +58,13 @@ export class {{this.className}} {{#if this.isRef}}extends {{this.properties.type
 
 {{/each}}
 {{/each}}
-{{/each}}
+{{/each~}}
 
 {{#each paths}}
 {{#each this.endpoints}}
-export const {{this.pascal}} = (req: {{this.request.className}}): {{#each this.responses}}{{this.className}}{{#unless @last}}|{{/unless}}{{/each}} => {
+export const {{this.pascal}} = async (req: {{this.request.className}}): Promise<{{#each this.responses}}{{this.className}}{{#unless @last}}|{{/unless}}{{/each}}> => {
 
 };
+
 {{/each}}
 {{/each}}
