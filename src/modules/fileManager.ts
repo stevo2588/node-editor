@@ -9,14 +9,6 @@ export default class FileManager {
     return readFileSync(`${filename}.yml`, { encoding: 'utf8' });
   }
 
-  getTemplateFile (filename: string) {
-    return readFileSync(path.resolve(staticDir, `./${filename}.handlebars`), { encoding: 'utf8' });
-  }
-
-  getTransformerFile (filename: string) {
-    return readFileSync(path.resolve(staticDir, `./${filename}.jq`), { encoding: 'utf8' });
-  }
-
   getSpecFile (filename: string) {
     return readFileSync(filename, { encoding: 'utf8' });
   }

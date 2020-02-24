@@ -55,4 +55,8 @@ module.exports = rules = [
             name: "[path][name].[ext]",
         },
     },
+    {
+        test: /\.(yml|yaml)$/,
+        loader: "raw-loader",
+    },
 ];

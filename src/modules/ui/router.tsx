@@ -3,9 +3,9 @@ import { Router, createMemorySource, createHistory, LocationProvider } from "@re
 import Interfaces from './interfaces';
 
 
-export default ({ stuff, interfaces }: { stuff: string, interfaces: { addProject: () => void } }) => (
+export default ({ title, interfaces }: { title: string, interfaces: { graph: Record<string, any>, actions: { addProject: () => void } } }) => (
   <>
-  <div>{stuff}</div>
+  <h1>{title}</h1>
   <LocationProvider history={createHistory(createMemorySource('/'))}>
     <Router>
       <Interfaces path="/" {...interfaces} />
