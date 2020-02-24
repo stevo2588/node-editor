@@ -38,6 +38,14 @@ module.exports = rules = [
         }
     },
     {
+        test: /\.js$/,
+        include: /node_modules\/spec-codegen\/src/,
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env', '@babel/preset-typescript']
+        }
+    },
+    {
         test: /\.(scss|css)$/,
         use: ["style-loader", "css-loader", "sass-loader"],
     },

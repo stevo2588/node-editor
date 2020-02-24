@@ -8,6 +8,8 @@ import ReactDOM from 'react-dom';
 import { load, validate } from './modules/project';
 import UI from './modules/ui';
 import exampleProject from '../static/exampleProject.yml';
+import { generateCode } from 'spec-codegen/src/modules/generate';
+import plugins from 'spec-codegen/src/modules/plugins';
 // import createUI from './modules/ui';
 
 
@@ -15,6 +17,8 @@ import exampleProject from '../static/exampleProject.yml';
 
 const project = load(exampleProject);
 const issues = validate(project);
+
+// generateCode('', plugins[0], fileManager);
 
 // Would prefer to use UI like this...
 // createUI({ stuff: 'stuff' });
