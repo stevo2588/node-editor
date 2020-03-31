@@ -25,6 +25,10 @@ projects:
   test-project-1:
     path: $PROJECT_ROOT/tests/test-project-1
     modulePath: src/modules
+    links:
+      services:
+      - test-project-1
+      - test-project-2
   test-project-2:
     path: $PROJECT_ROOT/tests/test-project-2
     modulePath: src/lib
@@ -34,10 +38,6 @@ interfaces:
     spec:
       project: test-project-1
       path: specs/api.yml
-    links:
-      projects:
-      - test-project-1
-      - test-project-2
 
   mysql:
     spec:
