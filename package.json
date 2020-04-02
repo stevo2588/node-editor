@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "electron-forge start",
     "package": "electron-forge package",
-    "make": "electron-forge make",
+    "build": "electron-forge make",
     "publish": "electron-forge publish",
     ".deploy": "run(){ aws s3 cp ./out/make/deb/x64/archie*.deb s3://$AWS_S3_BUCKET_PATH/archie.deb; }; run",
     "deploy": "run(){ dotenv -e .env.$1 -- yarn .deploy; }; run",
