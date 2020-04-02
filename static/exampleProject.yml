@@ -1,3 +1,4 @@
+name: Continuouss Architecture
 
 environments:
   prod:
@@ -22,32 +23,53 @@ providers:
       password: HEROKU_PASSWORD
 
 projects:
-  test-project-1:
+  api-server:
     path: $PROJECT_ROOT/tests/test-project-1
     modulePath: src/modules
-    links:
-      services:
-      - test-project-1
-      - test-project-2
-  test-project-2:
+    interfaces:
+    - name: files
+    - name: messaging
+    - name: database
+    - name: rpc
+  customer-mobile-app:
     path: $PROJECT_ROOT/tests/test-project-2
     modulePath: src/lib
+    interfaces:
+    - name: rpc
+  admin-web-app:
+    path: $PROJECT_ROOT/tests/test-project-2
+    modulePath: src/lib
+    interfaces:
+    - name: rpc
 
 interfaces:
-  api:
-    spec:
-      project: test-project-1
-      path: specs/api.yml
+  files:
+    name: 'File bucket'
+    apis:
+    - name: system-file-api
+    - name: user-file-api
 
-  mysql:
-    spec:
-      project: test-project-1
+  messaging:
+    name: 'PubSub'
+    apis:
+    - name: default
+
+  database:
+    name: 'Database'
+    apis:
+    - name: database
       path: specs/mysql.yml
     links:
       projects:
       - test-project-1
       services:
       - mysql
+
+  rpc:
+    name: 'API'
+    apis:
+    - name: rpc
+      path: specs/api.yml
 
 services:
   http:

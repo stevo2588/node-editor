@@ -1,57 +1,58 @@
 import React from 'react';
-import createEngine, { DefaultLinkModel, DiagramModel, DefaultNodeModel, PortModelAlignment, DefaultPortModel } from '@projectstorm/react-diagrams';
+import createEngine, { DefaultLinkModel, DiagramModel } from '@projectstorm/react-diagrams';
 import NodeCanvas from './node-canvas';
-import { DiamondNodeModel, DiamondNodeFactory, SimplePortFactory, DiamondPortModel } from './node-custom';
+import { IntegrationNodeModel, IntegrationNodeFactory } from './node-integration';
+import { ProjectNodeFactory, ProjectNodeModel } from './node-project';
 
 
 export default ({ graph }: { graph: Record<string, any> }) => {
   const engine = createEngine();
-  engine.getPortFactories().registerFactory(new SimplePortFactory('diamond', config => new DiamondPortModel(PortModelAlignment.LEFT)));
-  engine.getNodeFactories().registerFactory(new DiamondNodeFactory());
-
+  // engine.getPortFactories().registerFactory(new SimplePortFactory('diamond', config => new DiamondPortModel(PortModelAlignment.LEFT)));
+  engine.getNodeFactories().registerFactory(new IntegrationNodeFactory());
+  engine.getNodeFactories().registerFactory(new ProjectNodeFactory());
   const model = new DiagramModel();
 
-  let i = 1;
-  for (const proj in graph.projects) {
-    const node1 = new DefaultNodeModel({ color: 'rgb(0,120,255)', name: proj });
-    node1.addOutPort('Out');
-    node1.setPosition(i * 120, 50);
-    model.addNode(node1);
-    i++;
-  }
-
-  // const port1 = node1.getPort('Out') as DefaultPortModel;
-
-  i = 1;
+  const interfaceNodes: { [name: string]: IntegrationNodeModel } = {};
+  let i = 0;
   for (const interf in graph.interfaces) {
-    const node2 = new DefaultNodeModel({ color: 'rgb(0,192,255)', name: interf });
-    const port2 = node2.addInPort('In');
-    node2.setPosition(i * 120, 125);
-    model.addNode(node2);
+    const interfNode = new IntegrationNodeModel({
+      name: `${graph.interfaces[interf].name} (${interf})`,
+      apis: graph.interfaces[interf].apis?.map((a: any) => a.name) || [],
+    });
+    interfaceNodes[interf] = interfNode;
+    interfNode.setPosition(350, i * 130 + 15);
+    model.addNode(interfNode);
     i++;
   }
 
-  i = 1;
-  for (const service in graph.services) {
-    // var node3 = new DiamondNodeModel({ name: service });
-    const node3 = new DefaultNodeModel({ color: 'rgb(100,0,255)', name: service });
-    node3.setPosition(i * 120, 200);
-    node3.addInPort('In');
-    model.addNode(node3);
+  i = 0;
+  for (const proj in graph.projects) {
+    const projNode = new ProjectNodeModel({ name: proj });
+    projNode.setPosition(40, i * 180 + 30);
+
+    let j = 0;
+    for (const interf of graph.projects[proj].interfaces) {
+      const interfNode = interfaceNodes[interf.name];
+
+      const portProj = projNode.addOutPort(j.toString());
+      const portInterf = interfNode.addInPort(proj);
+      let link = portProj.link<DefaultLinkModel>(portInterf);
+      link.getOptions().testName = 'Test';
+      // link.addLabel('Hello World!');
+      model.addLink(link);
+      j++;
+    }
+
+    projNode.addOutPort('empty');
+    model.addNode(projNode);
     i++;
   }
 
-  // let link1 = port1.link<DefaultLinkModel>(port2);
-  // link1.getOptions().testName = 'Test';
-  // link1.addLabel('Hello World!');
-
-
-  // model.addAll(node1, node2, node3, link1);
-  // model.addAll(...elements);
+  for (const interf in interfaceNodes) {
+    interfaceNodes[interf].addInPort('empty');
+  }
 
   engine.setModel(model);
-
-  console.log(graph);
 
   return <NodeCanvas engine={engine} />;
 };

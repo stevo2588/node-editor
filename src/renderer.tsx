@@ -31,7 +31,7 @@ const UIView = hot(() => <UI
       // addInterface: () => {},
     }
   }}
-  title="My Architecture"
+  title={project.name}
 />);
 ReactDOM.render(<UIView/>, document.getElementById('root'));
 

@@ -5,10 +5,10 @@ import { CanvasWidget } from '@projectstorm/react-canvas-core';
 
 
 const Container = styled.div<{ color: string; background: string }>`
-	height: 500px;
 	background-color: rgb(60, 60, 60) !important;
 	background-size: 50px 50px;
 	display: flex;
+	flex-grow: 1;
 	> * {
 		height: 100%;
 		min-height: 100%;
@@ -43,7 +43,8 @@ const Container = styled.div<{ color: string; background: string }>`
 export default ({ background, color, engine }: { background?: string, color?: string, engine: DiagramEngine }) => (
   <Container
     background={background || 'rgb(60, 60, 60)'}
-    color={color || 'rgba(255,255,255, 0.05)'}>
+    color={color || 'rgba(255,255,255, 0.05)'}
+	>
     <CanvasWidget engine={engine} />
   </Container>
 );
