@@ -116,10 +116,12 @@
     "ramda": "^0.27.0",
     "react": "^16.12.0",
     "react-dom": "npm:@hot-loader/react-dom",
+    "react-pie-menu": "^0.2.5",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.3.1",
     "regenerator-runtime": "^0.13.3",
     "resize-observer-polyfill": "^1.5.1",
-    "spec-codegen": "git+ssh://git@gitlab.com:continuouss/arch/spec-codegen"
+    "spec-codegen": "git+ssh://git@gitlab.com:continuouss/arch/spec-codegen",
+    "styled-components": "^5.0.1"
   }
 }

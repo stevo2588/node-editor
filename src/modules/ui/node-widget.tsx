@@ -43,6 +43,7 @@ const Node = styled.div<{ background: string; selected: boolean }>`
   overflow: visible;
   font-size: 11px;
   border: solid 2px ${p => (p.selected ? 'rgb(0,192,255)' : 'black')};
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4);
 `;
 
 const Title = styled.div`

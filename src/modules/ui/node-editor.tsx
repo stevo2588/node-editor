@@ -20,15 +20,19 @@ export default ({ graph }: { graph: Record<string, any> }) => {
       apis: graph.interfaces[interf].apis?.map((a: any) => a.name) || [],
     });
     interfaceNodes[interf] = interfNode;
-    interfNode.setPosition(350, i * 130 + 15);
+    interfNode.setPosition(380, i * 130 + 85);
     model.addNode(interfNode);
     i++;
   }
 
   i = 0;
   for (const proj in graph.projects) {
-    const projNode = new ProjectNodeModel({ name: proj });
-    projNode.setPosition(40, i * 180 + 30);
+    const projNode = new ProjectNodeModel({
+      name: proj,
+      languages: graph.projects[proj].languages,
+      artifacts: graph.projects[proj].artifacts,
+    });
+    projNode.setPosition(40, i * 185 + 90);
 
     let j = 0;
     for (const interf of graph.projects[proj].interfaces) {

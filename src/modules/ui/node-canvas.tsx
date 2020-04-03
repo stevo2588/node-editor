@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import { DiagramEngine } from '@projectstorm/react-diagrams';
 import { CanvasWidget } from '@projectstorm/react-canvas-core';
+import ContextMenu from './context-menu';
 
 
 const Container = styled.div<{ color: string; background: string }>`
@@ -40,11 +41,44 @@ const Container = styled.div<{ color: string; background: string }>`
 		);
 `;
 
-export default ({ background, color, engine }: { background?: string, color?: string, engine: DiagramEngine }) => (
-  <Container
-    background={background || 'rgb(60, 60, 60)'}
-    color={color || 'rgba(255,255,255, 0.05)'}
-	>
-    <CanvasWidget engine={engine} />
-  </Container>
-);
+const Overlay = styled.div`
+  display: block;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+`;
+
+export default ({ background, color, engine }: { background?: string, color?: string, engine: DiagramEngine }) => {
+	const [mouseX, setMouseX] = useState(0);
+	const [mouseY, setMouseY] = useState(0);
+	const [showMenu, setShowMenu] = useState(false);
+
+	return (
+		<Container
+			background={background || 'rgb(60, 60, 60)'}
+			color={color || 'rgba(255,255,255, 0.05)'}
+			onContextMenu={e => e.preventDefault()}
+			onMouseDown={(e) => {
+				if (e.nativeEvent.which === 3) {
+					console.log(e.pageX);
+					setMouseX(e.pageX);
+					setMouseY(e.pageY);
+					setShowMenu(true);
+					e.preventDefault();
+					e.stopPropagation();
+				}
+			}}
+			onMouseUp={(e) => {
+				if (e.nativeEvent.which === 3) {
+					setShowMenu(false);
+					e.preventDefault();
+					e.stopPropagation();
+				}
+			}}
+		>
+			<CanvasWidget engine={engine} />
+			{/* <Overlay /> */}
+			{showMenu && <ContextMenu x={mouseX} y={mouseY} />}
+		</Container>
+	);
+}

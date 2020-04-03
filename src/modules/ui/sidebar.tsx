@@ -1,19 +1,39 @@
 import React from 'react';
 import styled from '@emotion/styled';
+import { css, keyframes } from '@emotion/core';
 
 
-const SideBar = styled.div`
+const slide = keyframes`
+  from {
+    transform: translate3d(0,0,0);
+  }
+
+  to {
+    transform: translate3d(150px,0,0);
+  }
+`;
+
+const SideBar = styled.div<{ open: boolean }>`
   width: 150px;
+  height: 100%;
+  overflow-x: hidden;
   display: flex;
   padding: 10px;
+  position: fixed;
+  top: 62px;
+  right: 0;
+  z-index: 1;
+  margin-right: ${p => p.open ? '0px' : '-170px'};
   flex-direction: column;
   background-color: rgb(50, 50, 50) !important;
-  border-right: solid 2px rgb(100, 100, 100);
+  border-left: solid 2px rgb(100,100,100);
+  transition: 0.5s;
+  transition-timing-function: ease-out;
 `;
 
 const Button = styled.button`
   padding: 3px 5px;
-  margin: 3px 0px;
+  margin: 3px 3px;
   display: inline-block;
   color: white;
   background-color: transparent;
@@ -31,9 +51,8 @@ const Button = styled.button`
   }
 `;
 
-export default () => (
-  <SideBar>
-    <Button>Generate Code</Button>
-    <Button>Provision</Button>
+export default ({ open }: { open: boolean }) => (
+  <SideBar open={open}>
+    <Button>Stuff</Button>
   </SideBar>
 );

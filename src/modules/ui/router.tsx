@@ -14,14 +14,8 @@ const Container = styled.div`
   background-color: rgb(50,50,50);
 `;
 
-const Title = styled.h1`
-  display: flex;
-  margin: 20px;
-`;
-
 export default ({ title, interfaces }: { title: string, interfaces: { graph: Record<string, any>, actions: { addProject: () => void } } }) => (
   <Container>
-    <Title>{title}</Title>
     <LocationProvider history={createHistory(createMemorySource('/'))}>
       <Router>
         <Interfaces path="/" {...interfaces} />
