@@ -127,7 +127,7 @@ export const BaseNodeWidget = (props: BaseNodeProps) => (
   >
     <Title>
       <TitleName>{props.node.getOptions().name}</TitleName>
-      <Config>&#9881;</Config>
+      {/* <Config>&#9881;</Config> */}
     </Title>
     <Content>
       <PortsContainer>

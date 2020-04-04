@@ -3,26 +3,26 @@ import PieMenu, { Slice } from 'react-pie-menu';
 import styled from '@emotion/styled';
 
 
-const Menu = styled(PieMenu)<{ xPos: number, yPos: number }>`
+const Menu = styled(PieMenu)<{ xPos: number, yPos: number, radiusPx: number }>`
   position: absolute;
-  top: ${p => p.yPos - 125}px;
-  left: ${p => p.xPos - 125}px;
+  top: ${p => p.yPos - p.radiusPx}px;
+  left: ${p => p.xPos - p.radiusPx}px;
 `;
 
 
-
-export default ({ x, y }: { x: number, y: number }) => (
+export default ({ x, y, addProject, addService }: { x: number, y: number, addProject: (p: any, pos: any) => void, addService: (s: any, pos: any) => void }) => (
   <Menu 
-    radius='125px' 
-    centerRadius='20px'
+    radius='80px' 
+    radiusPx={80}
+    centerRadius='10px'
     xPos={x}
     yPos={y}
   >
-    <Slice onSelect={() => console.log('thing 1')}>
-      <p>Add Project</p>
+    <Slice onSelect={() => addProject({ name: 'untitled' }, { x, y })}>
+      <p>Project</p>
     </Slice>
-    <Slice onSelect={() => console.log('thing 2')}>
-      <p>Add Integration</p>
+    <Slice onSelect={() => addService({ name: 'untitled' }, { x, y })}>
+      <p>Service</p>
     </Slice>
   </Menu>
 );

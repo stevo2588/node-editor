@@ -143,7 +143,14 @@ const Container = styled.div<{ color: string; background: string }>`
 		);
 `;
 
-export default ({ background, color, engine }: { background?: string, color?: string, engine: DiagramEngine }) => {
+export default ({
+	background, color, engine, onAddProjectNode, onAddIntegrationNode }: {
+		background?: string,
+		color?: string,
+		engine: DiagramEngine,
+		onAddProjectNode: (position: { x: number, y: number }) => void,
+		onAddIntegrationNode: (position: { x: number, y: number }) => void,
+}) => {
 	const [mouseX, setMouseX] = useState(0);
 	const [mouseY, setMouseY] = useState(0);
 	const [showMenu, setShowMenu] = useState(false);
@@ -173,7 +180,14 @@ export default ({ background, color, engine }: { background?: string, color?: st
 			}}
 		>
 			<CanvasWidget engine={engine}>
-				{showMenu && <ContextMenu x={mouseX} y={mouseY} />}
+				{showMenu && (
+					<ContextMenu
+						x={mouseX}
+						y={mouseY}
+						addProject={(node, pos) => onAddProjectNode(pos)}
+						addService={(node, pos) => onAddIntegrationNode(pos)}
+					/>
+				)}
 			</CanvasWidget>
 		</Container>
 	);

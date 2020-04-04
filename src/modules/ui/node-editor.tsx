@@ -31,7 +31,7 @@ export default ({ graph, onUpdateActiveNodes }: { graph: Record<string, any>, on
       });
       // @ts-ignore
       interfNode.registerListener({
-        selectionChanged(e) { onUpdateActiveNodes([e.isSelected]); },
+        selectionChanged(e) { onUpdateActiveNodes(model.getSelectedEntities()); },
       });
       interfaceNodes[interf] = interfNode;
       interfNode.setPosition(380, i * 130 + 85);
@@ -48,7 +48,7 @@ export default ({ graph, onUpdateActiveNodes }: { graph: Record<string, any>, on
       });
       // @ts-ignore
       projNode.registerListener({
-        selectionChanged(e) { onUpdateActiveNodes([e.isSelected]); },
+        selectionChanged(e) { onUpdateActiveNodes(model.getSelectedEntities()); },
       });
       projNode.setPosition(40, i * 185 + 90);
 
@@ -80,5 +80,15 @@ export default ({ graph, onUpdateActiveNodes }: { graph: Record<string, any>, on
 
   useEffect(() => buildEngine(), []);
 
-  return <NodeCanvas engine={engine} />;
+  return <NodeCanvas
+    engine={engine}
+    onAddProjectNode={({ x, y }: { x: number, y: number }) => {
+      const node = engine.getModel().addNode(new ProjectNodeModel({ name: 'untitled', languages: [], artifacts: [] }))
+      node.setPosition(x, y);
+    }}
+    onAddIntegrationNode={({ x, y }: { x: number, y: number }) => {
+      const node = engine.getModel().addNode(new IntegrationNodeModel({ name: 'untitled', apis: [] }))
+      node.setPosition(x, y);
+    }}
+  />;
 };

@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import NodeEditor from './node-editor';
 import TopBar from './topbar';
 import SideBar from './sidebar';
+import { BaseNodeModel } from './node-model';
 
 
 const Container = styled.div`
@@ -19,14 +20,14 @@ const InnerContainer = styled.div`
 `;
 
 export default ({ path, graph, actions }: { path: string, graph: Record<string, any>, actions: { addProject: () => void } }) => {
-  const [selectedNodes, setSelectedNodes] = useState<any[]>([]);
+  const [selectedNodes, setSelectedNodes] = useState<BaseNodeModel[]>([]);
 
   return (
     <Container>
       <TopBar />
       <InnerContainer>
         <NodeEditor graph={graph} onUpdateActiveNodes={setSelectedNodes} />
-        <SideBar open={true} activeNodes={selectedNodes} />
+        <SideBar activeNodes={selectedNodes} />
       </InnerContainer>
     </Container>
   );
