@@ -123,7 +123,8 @@ export const BaseNodeWidget = (props: BaseNodeProps) => (
   <Node
     data-default-node-name={props.node.getOptions().name}
     selected={props.node.isSelected()}
-    background={props.node.getOptions().color || '#ffffff'}>
+    background={props.node.getOptions().color || '#ffffff'}
+  >
     <Title>
       <TitleName>{props.node.getOptions().name}</TitleName>
       <Config>&#9881;</Config>

@@ -1,17 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { css, keyframes } from '@emotion/core';
 
-
-const slide = keyframes`
-  from {
-    transform: translate3d(0,0,0);
-  }
-
-  to {
-    transform: translate3d(150px,0,0);
-  }
-`;
 
 const SideBar = styled.div<{ open: boolean }>`
   width: 150px;
@@ -51,8 +40,11 @@ const Button = styled.button`
   }
 `;
 
-export default ({ open }: { open: boolean }) => (
+export default ({ open, activeNodes }: { open: boolean, activeNodes: any }) => (
   <SideBar open={open}>
     <Button>Stuff</Button>
+    <div>
+      {JSON.stringify(activeNodes)}
+    </div>
   </SideBar>
 );

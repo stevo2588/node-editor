@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
-import { DiagramEngine, NodeModelGenerics } from '@projectstorm/react-diagrams-core';
+import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { BasePositionModelOptions, AbstractReactFactory } from '@projectstorm/react-canvas-core';
 import { BaseNodeWidget } from './node-widget';
 import { BaseNodeModel } from './node-model';
@@ -12,11 +12,6 @@ const Text = styled.p`
   font-size: 1em;
   display: block;
 `;
-
-const List = styled.ul`
-  padding: 0 15px;
-  margin: 0px;
-`
 
 const Artifact = styled.button`
   padding: 3px 5px;

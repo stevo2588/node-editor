@@ -22,7 +22,7 @@ const issues = validate(project);
 
 // Would prefer to use UI like this...
 // createUI({ stuff: 'stuff' });
-const UIView = hot(() => <UI
+const UIView = hot(() => (<UI
   interfaces={{
     graph: project,
     actions: {
@@ -32,7 +32,7 @@ const UIView = hot(() => <UI
     }
   }}
   title={project.name}
-/>);
+/>));
 ReactDOM.render(<UIView/>, document.getElementById('root'));
 
 serviceWorker.register();

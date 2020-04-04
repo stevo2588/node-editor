@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import NodeEditor from './node-editor';
 import TopBar from './topbar';
@@ -18,12 +18,16 @@ const InnerContainer = styled.div`
   flex-direction: row;
 `;
 
-export default ({ path, graph, actions }: { path: string, graph: Record<string, any>, actions: { addProject: () => void } }) => (
-  <Container>
-    <TopBar />
-    <InnerContainer>
-      <NodeEditor graph={graph} />
-      <SideBar open={true} />
-    </InnerContainer>
-  </Container>
-);
+export default ({ path, graph, actions }: { path: string, graph: Record<string, any>, actions: { addProject: () => void } }) => {
+  const [selectedNodes, setSelectedNodes] = useState<any[]>([]);
+
+  return (
+    <Container>
+      <TopBar />
+      <InnerContainer>
+        <NodeEditor graph={graph} onUpdateActiveNodes={setSelectedNodes} />
+        <SideBar open={true} activeNodes={selectedNodes} />
+      </InnerContainer>
+    </Container>
+  );
+};

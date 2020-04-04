@@ -104,11 +104,7 @@ interfaces:
     apis:
     - name: database
       path: specs/mysql.yml
-    links:
-      projects:
-      - test-project-1
-      services:
-      - mysql
+    service: mysql
 
   rpc:
     name: 'API'
