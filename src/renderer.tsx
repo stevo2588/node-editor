@@ -2,7 +2,7 @@ import "core-js/stable";
 import "regenerator-runtime/runtime";
 import * as serviceWorker from './service-worker';
 import { hot } from "react-hot-loader/root";
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 // import FileManager from './modules/fileManager';
 import { load, validate } from './modules/project';
@@ -22,17 +22,22 @@ const issues = validate(project);
 
 // Would prefer to use UI like this...
 // createUI({ stuff: 'stuff' });
-const UIView = hot(() => (<UI
-  interfaces={{
-    graph: project,
-    actions: {
-      addProject: () => {},
-      // addService: () => {},
-      // addInterface: () => {},
-    }
-  }}
-  title={project.name}
-/>));
+const UIView = hot(() => {
+  // const [graph, setGraph] = useState(project);
+  return (
+    <UI
+      interfaces={{
+        graph: project,
+        actions: {
+          addProject: () => {},
+          // addService: () => {},
+          // addInterface: () => {},
+        }
+      }}
+      title={project.name}
+    />
+  );
+});
 ReactDOM.render(<UIView/>, document.getElementById('root'));
 
 serviceWorker.register();

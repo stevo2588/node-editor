@@ -29,10 +29,6 @@ export default ({ graph, onUpdateActiveNodes }: { graph: Record<string, any>, on
         name: `${graph.interfaces[interf].name} (${interf})`,
         apis: graph.interfaces[interf].apis?.map((a: any) => a.name) || [],
       });
-      // @ts-ignore
-      interfNode.registerListener({
-        selectionChanged(e) { onUpdateActiveNodes(model.getSelectedEntities()); },
-      });
       interfaceNodes[interf] = interfNode;
       interfNode.setPosition(380, i * 130 + 85);
       model.addNode(interfNode);
@@ -45,10 +41,6 @@ export default ({ graph, onUpdateActiveNodes }: { graph: Record<string, any>, on
         name: proj,
         languages: graph.projects[proj].languages,
         artifacts: graph.projects[proj].artifacts,
-      });
-      // @ts-ignore
-      projNode.registerListener({
-        selectionChanged(e) { onUpdateActiveNodes(model.getSelectedEntities()); },
       });
       projNode.setPosition(40, i * 185 + 90);
 
@@ -80,14 +72,28 @@ export default ({ graph, onUpdateActiveNodes }: { graph: Record<string, any>, on
 
   useEffect(() => buildEngine(), []);
 
+  const model = engine.getModel();
+  // @ts-ignore
+  model.getNodes().forEach(n => n.registerListener({
+    selectionChanged(e) { onUpdateActiveNodes(model.getSelectedEntities()); },
+  }));
+
   return <NodeCanvas
     engine={engine}
     onAddProjectNode={({ x, y }: { x: number, y: number }) => {
-      const node = engine.getModel().addNode(new ProjectNodeModel({ name: 'untitled', languages: [], artifacts: [] }))
+      const node = engine.getModel().addNode(new ProjectNodeModel({ name: 'untitled', languages: [], artifacts: [] }));
+      // @ts-ignore
+      node.registerListener({
+        selectionChanged(e) { onUpdateActiveNodes(model.getSelectedEntities()); },
+      });
       node.setPosition(x, y);
     }}
     onAddIntegrationNode={({ x, y }: { x: number, y: number }) => {
       const node = engine.getModel().addNode(new IntegrationNodeModel({ name: 'untitled', apis: [] }))
+      // @ts-ignore
+      node.registerListener({
+        selectionChanged(e) { onUpdateActiveNodes(model.getSelectedEntities()); },
+      });
       node.setPosition(x, y);
     }}
   />;
