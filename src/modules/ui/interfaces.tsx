@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
+import { DiagramModel } from '@projectstorm/react-diagrams';
 import NodeEditor from './node-editor';
 import TopBar from './topbar';
 import SideBar from './sidebar';
@@ -19,14 +20,14 @@ const InnerContainer = styled.div`
   flex-direction: row;
 `;
 
-export default ({ path, graph, actions }: { path: string, graph: Record<string, any>, actions: { addProject: () => void } }) => {
+export default ({ path, graph, saveStatus, actions }: { path: string, graph: DiagramModel, saveStatus: string, actions: { updateProject: (state: any) => void } }) => {
   const [selectedNodes, setSelectedNodes] = useState<BaseNodeModel[]>([]);
 
   return (
     <Container>
-      <TopBar />
+      <TopBar saveStatus={saveStatus} />
       <InnerContainer>
-        <NodeEditor graph={graph} onUpdateActiveNodes={setSelectedNodes} />
+        <NodeEditor graph={graph} onUpdateActiveNodes={setSelectedNodes} updateProject={actions.updateProject} />
         <SideBar activeNodes={selectedNodes} />
       </InnerContainer>
     </Container>

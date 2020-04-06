@@ -2,6 +2,7 @@ import React from 'react';
 import { Router, createMemorySource, createHistory, LocationProvider } from "@reach/router"
 import styled from '@emotion/styled';
 import Interfaces from './interfaces';
+import { DiagramModel } from '@projectstorm/react-diagrams';
 
 
 const Container = styled.div`
@@ -14,11 +15,11 @@ const Container = styled.div`
   background-color: rgb(50,50,50);
 `;
 
-export default ({ title, interfaces }: { title: string, interfaces: { graph: Record<string, any>, actions: { addProject: () => void } } }) => (
+export default ({ title, saveStatus, interfaces }: { title: string, saveStatus: string, interfaces: { graph: DiagramModel, actions: { updateProject: (state: any) => void } } }) => (
   <Container>
     <LocationProvider history={createHistory(createMemorySource('/'))}>
       <Router>
-        <Interfaces path="/" {...interfaces} />
+        <Interfaces saveStatus={saveStatus} path="/" {...interfaces} />
       </Router>
     </LocationProvider>
   </Container>

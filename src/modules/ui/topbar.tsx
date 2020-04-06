@@ -36,9 +36,10 @@ const Button = styled.button`
   }
 `;
 
-export default () => (
+export default ({ saveStatus }: { saveStatus: string }) => (
   <TopBar>
     <Button>Generate Code</Button>
     <Button>Provision</Button>
+    <p>Save status: {saveStatus}</p>
   </TopBar>
 );

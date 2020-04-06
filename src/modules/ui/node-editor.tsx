@@ -5,96 +5,30 @@ import { IntegrationNodeModel, IntegrationNodeFactory } from './node-integration
 import { ProjectNodeFactory, ProjectNodeModel } from './node-project';
 
 
-export default ({ graph, onUpdateActiveNodes }: { graph: Record<string, any>, onUpdateActiveNodes: (nodes: any[]) => void }) => {
-  
-  const getDefaultEngine = () => {
-    const engine = createEngine();
-    const model = new DiagramModel();
-    engine.setModel(model);
-    return engine;
-  }
-  
-  const [engine, setEngine] = useState(getDefaultEngine());
+const engine = createEngine();
+engine.getNodeFactories().registerFactory(new IntegrationNodeFactory());
+engine.getNodeFactories().registerFactory(new ProjectNodeFactory());
 
-  const buildEngine = () => {
-    // engine.getPortFactories().registerFactory(new SimplePortFactory('diamond', config => new DiamondPortModel(PortModelAlignment.LEFT)));
-    engine.getNodeFactories().registerFactory(new IntegrationNodeFactory());
-    engine.getNodeFactories().registerFactory(new ProjectNodeFactory());
-    const model = new DiagramModel();
 
-    const interfaceNodes: { [name: string]: IntegrationNodeModel } = {};
-    let i = 0;
-    for (const interf in graph.interfaces) {
-      const interfNode = new IntegrationNodeModel({
-        name: `${graph.interfaces[interf].name} (${interf})`,
-        apis: graph.interfaces[interf].apis?.map((a: any) => a.name) || [],
-      });
-      interfaceNodes[interf] = interfNode;
-      interfNode.setPosition(380, i * 130 + 85);
-      model.addNode(interfNode);
-      i++;
-    }
-
-    i = 0;
-    for (const proj in graph.projects) {
-      const projNode = new ProjectNodeModel({
-        name: proj,
-        languages: graph.projects[proj].languages,
-        artifacts: graph.projects[proj].artifacts,
-      });
-      projNode.setPosition(40, i * 185 + 90);
-
-      let j = 0;
-      for (const interf of graph.projects[proj].interfaces) {
-        const interfNode = interfaceNodes[interf.name];
-
-        const portProj = projNode.addOutPort(j.toString());
-        const portInterf = interfNode.addInPort(proj);
-        let link = portProj.link<DefaultLinkModel>(portInterf);
-        link.getOptions().testName = 'Test';
-        // link.addLabel('Hello World!');
-        model.addLink(link);
-        j++;
-      }
-
-      projNode.addOutPort('empty');
-      model.addNode(projNode);
-      i++;
-    }
-
-    for (const interf in interfaceNodes) {
-      interfaceNodes[interf].addInPort('empty');
-    }
-
-    engine.setModel(model);
-    setEngine(engine);
-  }
-
-  useEffect(() => buildEngine(), []);
-
-  const model = engine.getModel();
-  // @ts-ignore
-  model.getNodes().forEach(n => n.registerListener({
-    selectionChanged(e) { onUpdateActiveNodes(model.getSelectedEntities()); },
-  }));
+export default ({ graph, onUpdateActiveNodes, updateProject }: { graph: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => void, updateProject: (state: any) => void, }) => {
+  // useEffect(() => updateModel(graph), []);
+  console.log(graph);
+  graph.getNodes().forEach(n => n.registerListener({
+    selectionChanged() { onUpdateActiveNodes(graph.getSelectedEntities()); },
+  }))
+  engine.setModel(graph);
 
   return <NodeCanvas
     engine={engine}
     onAddProjectNode={({ x, y }: { x: number, y: number }) => {
-      const node = engine.getModel().addNode(new ProjectNodeModel({ name: 'untitled', languages: [], artifacts: [] }));
-      // @ts-ignore
-      node.registerListener({
-        selectionChanged(e) { onUpdateActiveNodes(model.getSelectedEntities()); },
-      });
+      const node = graph.addNode(new ProjectNodeModel({ name: 'untitled', languages: [], artifacts: [] }));
       node.setPosition(x, y);
+      updateProject(graph);
     }}
     onAddIntegrationNode={({ x, y }: { x: number, y: number }) => {
-      const node = engine.getModel().addNode(new IntegrationNodeModel({ name: 'untitled', apis: [] }))
-      // @ts-ignore
-      node.registerListener({
-        selectionChanged(e) { onUpdateActiveNodes(model.getSelectedEntities()); },
-      });
+      const node = graph.addNode(new IntegrationNodeModel({ name: 'untitled', apis: [] }))
       node.setPosition(x, y);
+      updateProject(graph);
     }}
   />;
 };
