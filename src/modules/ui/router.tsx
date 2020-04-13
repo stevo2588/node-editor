@@ -15,7 +15,7 @@ const Container = styled.div`
   background-color: rgb(50,50,50);
 `;
 
-export default ({ title, saveStatus, interfaces }: { title: string, saveStatus: string, interfaces: { graph: DiagramModel, actions: { updateProject: (state: any) => void } } }) => (
+export default ({ title, saveStatus, interfaces }: { title: string, saveStatus: string, interfaces: { graph: any, actions: { updateProject: (state: any) => void } } }) => (
   <Container>
     <LocationProvider history={createHistory(createMemorySource('/'))}>
       <Router>

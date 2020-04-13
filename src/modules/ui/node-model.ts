@@ -8,12 +8,8 @@ export interface DefaultNodeModelOptions extends BasePositionModelOptions {
 	color?: string;
 }
 
-export interface DefaultNodeModelGenerics extends NodeModelGenerics {
-	OPTIONS: DefaultNodeModelOptions;
-}
-
-export abstract class BaseNodeModel extends NodeModel<DefaultNodeModelGenerics> {
-	readonly name: string;
+export abstract class BaseNodeModel extends NodeModel<NodeModelGenerics & { OPTIONS: DefaultNodeModelOptions }> {
+	public name: string;
 	protected portsIn: DefaultPortModel[];
 	protected portsOut: DefaultPortModel[];
 
@@ -22,9 +18,9 @@ export abstract class BaseNodeModel extends NodeModel<DefaultNodeModelGenerics> 
 			type: 'default',
 			name: options.name,
 			color: 'rgb(0,192,255)',
-			...options
+			...options,
 		});
-		this.name = name;
+		this.name = options.name;
 		this.portsOut = [];
 		this.portsIn = [];
 	}
@@ -90,5 +86,17 @@ export abstract class BaseNodeModel extends NodeModel<DefaultNodeModelGenerics> 
 
 	getOutPorts(): DefaultPortModel[] {
 		return this.portsOut;
+	}
+
+	serialize() {
+		return {
+			...super.serialize(),
+			name: this.name,
+		};
+	}
+
+	deserialize(event: any): void {
+    super.deserialize(event);
+    this.name = event.data.name;
 	}
 }

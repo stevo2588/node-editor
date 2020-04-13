@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useReducer, FunctionComponent } from 'react';
 import styled from '@emotion/styled';
 import { DiagramEngine } from '@projectstorm/react-diagrams';
 import { CanvasEngine, TransformLayerWidget, SmartLayerWidget } from '@projectstorm/react-canvas-core';
 import ContextMenu from './context-menu';
 
-
-export interface DiagramProps {
-	engine: CanvasEngine;
-	className?: string;
-}
 
 export const Canvas = styled.div`
 	position: relative;
@@ -16,96 +11,80 @@ export const Canvas = styled.div`
 	overflow: hidden;
 `;
 
-export class CanvasWidget extends React.Component<DiagramProps> {
-	ref: React.RefObject<HTMLDivElement>;
-	keyUp: any;
-	keyDown: any;
-	canvasListener: any;
+export const CanvasWidget: FunctionComponent<{ engine: CanvasEngine; className?: string }> = ({
+	engine, className, children
+}) => {
+	const ref = useRef(null);
+	const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
-	constructor(props: DiagramProps) {
-		super(props);
-
-		this.ref = React.createRef();
-		this.state = {
-			action: null,
-			diagramEngineListener: null
-		};
-	}
-
-	componentWillUnmount() {
-		this.props.engine.deregisterListener(this.canvasListener);
-		this.props.engine.setCanvas();
-
-		document.removeEventListener('keyup', this.keyUp);
-		document.removeEventListener('keydown', this.keyDown);
-	}
-
-	registerCanvas() {
-		this.props.engine.setCanvas(this.ref.current || undefined);
-		this.props.engine.iterateListeners(list => {
-			list.rendered && list.rendered();
-		});
-	}
-
-	componentDidUpdate() {
-		this.registerCanvas();
-	}
-
-	componentDidMount() {
-		this.canvasListener = this.props.engine.registerListener({
+	useEffect(() => {
+		const canvasListener = engine.registerListener({
 			repaintCanvas: () => {
-				this.forceUpdate();
+				forceUpdate();
 			}
 		});
 
-		this.keyDown = (event: any) => {
-			this.props.engine.getActionEventBus().fireAction({ event });
+		const keyDown = (event: any) => {
+			engine.getActionEventBus().fireAction({ event });
 		};
-		this.keyUp = (event: any) => {
-			this.props.engine.getActionEventBus().fireAction({ event });
+		const keyUp = (event: any) => {
+			engine.getActionEventBus().fireAction({ event });
 		};
 
-		document.addEventListener('keyup', this.keyUp);
-		document.addEventListener('keydown', this.keyDown);
-		this.registerCanvas();
-	}
+		document.addEventListener('keyup', keyUp);
+		document.addEventListener('keydown', keyDown);
 
-	render() {
-		const engine = this.props.engine;
-		const model = engine.getModel();
+		return () => {
+			engine.deregisterListener(canvasListener);
+			engine.setCanvas();
 
-		return (
-			<Canvas
-				className={this.props.className}
-				ref={this.ref}
-				onWheel={(event: any) => {
-					this.props.engine.getActionEventBus().fireAction({ event });
-				}}
-				onMouseDown={(e: any) => {
-					if (e.nativeEvent.which !== 3) {
-						this.props.engine.getActionEventBus().fireAction({ event: e });
-					}
-				}}
-				onMouseUp={(e: any) => {
-					if (e.nativeEvent.which !== 3) {
-						this.props.engine.getActionEventBus().fireAction({ event: e });
-					}
-				}}
-				onMouseMove={(event: any) => {
-					this.props.engine.getActionEventBus().fireAction({ event });
-				}}>
-				{model.getLayers().map(layer => {
-					return (
-						<TransformLayerWidget layer={layer} key={layer.getID()}>
-							<SmartLayerWidget layer={layer} engine={this.props.engine} key={layer.getID()} />
-						</TransformLayerWidget>
-					);
-				})}
-				{this.props.children}
-			</Canvas>
-		);
-	}
-}
+			document.removeEventListener('keyup', keyUp);
+			document.removeEventListener('keydown', keyDown);
+		}
+	}, []);
+
+	useEffect(() => {
+		console.log('component update');
+		engine.setCanvas(ref.current || undefined);
+		engine.iterateListeners(list => {
+			list.rendered && list.rendered();
+		});
+	});
+
+	const model = engine.getModel();
+
+	return (
+		<Canvas
+			className={className}
+			ref={ref}
+			onWheel={(event: any) => {
+				engine.getActionEventBus().fireAction({ event });
+			}}
+			onMouseDown={(e: any) => {
+				if (e.nativeEvent.which !== 3) {
+					engine.getActionEventBus().fireAction({ event: e });
+				}
+			}}
+			onMouseUp={(e: any) => {
+				if (e.nativeEvent.which !== 3) {
+					engine.getActionEventBus().fireAction({ event: e });
+				}
+			}}
+			onMouseMove={(event: any) => {
+				engine.getActionEventBus().fireAction({ event });
+			}}>
+			{model.getLayers().map(layer => {
+				return (
+					<TransformLayerWidget layer={layer} key={layer.getID()}>
+						<SmartLayerWidget layer={layer} engine={engine} key={layer.getID()} />
+					</TransformLayerWidget>
+				);
+			})}
+			{children}
+		</Canvas>
+	);
+};
+
 
 const Container = styled.div<{ color: string; background: string }>`
 	background-color: rgb(60, 60, 60) !important;

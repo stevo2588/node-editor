@@ -36,10 +36,10 @@ projects:
       deploys:
       - type: AWS Fargate
     interfaces:
-    - name: files
-    - name: messaging
-    - name: database
-    - name: rpc
+    - key: files
+    - key: messaging
+    - key: database
+    - key: rpc
   customer-mobile-app:
     path: $PROJECT_ROOT/tests/test-project-2
     modulePath: src/lib
@@ -55,7 +55,7 @@ projects:
       - type: Apple App Store
       - type: Filebucket
     interfaces:
-    - name: rpc
+    - key: rpc
   admin-web-app:
     path: $PROJECT_ROOT/tests/test-project-2
     modulePath: src/lib
@@ -66,7 +66,7 @@ projects:
       deploys:
       - type: S3/Cloudflare
     interfaces:
-    - name: rpc
+    - key: rpc
 
 resources:
   file-bucket-resource:

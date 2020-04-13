@@ -1,29 +1,33 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime";
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import * as serviceWorker from './service-worker';
 import { hot } from "react-hot-loader/root";
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { safeDump as dumpYml, load as loadYml } from "js-yaml";
 import { DiagramModel, DefaultLinkModel } from "@projectstorm/react-diagrams";
 // import FileManager from './modules/fileManager';
 import { load, validate } from './modules/project';
 import UI from './modules/ui';
-import exampleProject from '../static/exampleProject.yml';
+// import exampleProject from '../static/exampleProject.yml';
 import { generateCode } from 'spec-codegen/src/modules/generate';
 import plugins from 'spec-codegen/src/modules/plugins';
 import { IntegrationNodeModel } from "./modules/ui/node-integration";
 import { ProjectNodeModel } from "./modules/ui/node-project";
+import mainApi from "./mainApi";
 // import createUI from './modules/ui';
 
 
-const projectToState = (project: any) => {
+const projectToGraph = (project: any) => {
+  console.log(project);
   const model = new DiagramModel();
 
   const interfaceNodes: { [name: string]: IntegrationNodeModel } = {};
   let i = 0;
   for (const interf in project.interfaces) {
     const interfNode = new IntegrationNodeModel({
-      name: `${project.interfaces[interf].name} (${interf})`,
+      // key: interf,
+      name: `${project.interfaces[interf].name}`,
       apis: project.interfaces[interf].apis?.map((a: any) => a.name) || [],
     });
     interfaceNodes[interf] = interfNode;
@@ -35,6 +39,7 @@ const projectToState = (project: any) => {
   i = 0;
   for (const proj in project.projects) {
     const projNode = new ProjectNodeModel({
+      // key: proj,
       name: proj,
       languages: project.projects[proj].languages,
       artifacts: project.projects[proj].artifacts,
@@ -43,7 +48,9 @@ const projectToState = (project: any) => {
 
     let j = 0;
     for (const interf of project.projects[proj].interfaces) {
-      const interfNode = interfaceNodes[interf.name];
+      console.log(interf);
+      console.log(interf.key);
+      const interfNode = interfaceNodes[interf.key];
 
       const portProj = projNode.addOutPort(j.toString());
       const portInterf = interfNode.addInPort(proj);
@@ -62,37 +69,69 @@ const projectToState = (project: any) => {
   for (const interf in interfaceNodes) {
     interfaceNodes[interf].addInPort('empty');
   }
-  // model.registerListener({ nodesUpdated: (node) => { node.}})
 
   return model;
 };
 
-const stateToProject = (s: any) => s; // TODO
 const persistProject = async (p: any) => {
-  console.log('TODO: update project config');
+  console.log(p);
+  const res = await mainApi.saveFile('archie.yml', dumpYml(p, { skipInvalid: true }));
 };
 
-// const fileManager = new FileManager();
-
-const project = load(exampleProject);
-const issues = validate(project);
-
 // generateCode('', plugins[0], fileManager);
-const initialState = projectToState(project);
 
 // Would prefer to use UI like this...
 // createUI({ stuff: 'stuff' });
 const UIView = hot(() => {
   console.log('render');
-  const [projectState, setProjectState] = useState(initialState);
-  const [dummy, setDummy] = useState(true); // use this to force update because modifying Model is not recognized
+  const [projectName, setProjectName] = useState(null);
+  const [environments, setEnvironments] = useState({});
+  const [providers, setProviders] = useState({});
+  const [graph, setGraph] = useState<any>(null);
   const [projectSaveStatus, setProjectSaveStatus] = useState<'success'|'in-progress'|'failed'>('success');
+
+  useEffect(() => {
+    const loadProject = async () => {
+      // const fileManager = new FileManager();
+      let projectContents;
+      try {
+        projectContents = await mainApi.loadFile('archie.yml');
+      } catch (err) {
+        console.log(err.message);
+      }
+
+      if (!projectContents) {
+        // projectContents = exampleProject;
+        const project = {
+          name: 'Untitled',
+          environments: {},
+          providers: {},
+          graph: (new DiagramModel()).serialize(),
+        };
+        console.log(project);
+        projectContents = dumpYml(project, { skipInvalid: true });
+        const res = await mainApi.saveFile('archie.yml', projectContents);
+        console.log(`created new file from example project: ${res}`);
+      }
+      const project = load(projectContents);
+      const issues = validate(project);
+
+      setProjectName(project.name);
+      setEnvironments(project.environments);
+      setProviders(project.providers);
+      setGraph(project.graph);
+    };
+    loadProject();
+  }, []);
+
   useEffect(() => {
     const save = async () => {
+      if (projectName == null) return;
+
       console.log('saving...');
       setProjectSaveStatus('in-progress');
       try {
-        await persistProject(stateToProject(projectState));
+        await persistProject({ name: projectName, environments, providers, graph });
         setProjectSaveStatus('success');
       } catch (err) {
         console.error(err);
@@ -100,18 +139,17 @@ const UIView = hot(() => {
       }
     };
     save();
-  }, [dummy]);
+  }, [graph]);
 
   return (
     <UI
-      title={project.name}
+      title={projectName || 'Untitled'}
       saveStatus={projectSaveStatus}
       interfaces={{
-        graph: projectState,
+        graph,
         actions: {
           updateProject: (p: DiagramModel) => {
-            setProjectState(p);
-            setDummy(!dummy);
+            setGraph(p.serialize());
           },
           // updateApi: () => {},
           // updateService: () => {},

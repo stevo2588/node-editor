@@ -1,9 +1,11 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
-import { DiagramEngine, NodeModelGenerics } from '@projectstorm/react-diagrams-core';
+import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { BasePositionModelOptions, AbstractReactFactory } from '@projectstorm/react-canvas-core';
 import { BaseNodeWidget } from './node-widget';
 import { BaseNodeModel } from './node-model';
+import { ProjectNodeModel } from './node-project';
+import { DefaultPortModel } from '@projectstorm/react-diagrams';
 
 
 const Apis = styled.div`
@@ -58,30 +60,36 @@ const ApiAdd = styled.button`
 `;
 
 
-
-export interface DefaultNodeModelOptions extends BasePositionModelOptions {
-  name: string;
-  apis: string[];
-}
-
 export class IntegrationNodeModel extends BaseNodeModel {
   apis: string[];
-  constructor({ name, apis }: DefaultNodeModelOptions) {
+  constructor({ name, apis }: { name: string; apis: string[] } & BasePositionModelOptions) {
     super({ type: 'integration', name, color: 'rgb(180,100,150)' });
     this.apis = apis;
   }
+
+	getProjects(): ProjectNodeModel[] {
+		return this.portsOut.map(p => p.getLinks()[0].getSourcePort().getNode() as ProjectNodeModel);
+  }
+  
+	serialize() {
+		return {
+			...super.serialize(),
+			api: this.apis,
+		};
+	}
+
+	deserialize(event: any): void {
+    super.deserialize(event);
+		this.apis = event.data.apis || [];
+	}
 }
 
-export interface IntegrationNodeProps {
-	node: IntegrationNodeModel;
-	engine: DiagramEngine;
-}
 
-export const IntegrationNodeWidget = (props: IntegrationNodeProps) => (
-  <BaseNodeWidget node={props.node} engine={props.engine}>
+export const IntegrationNodeWidget = ({ node, engine }: { node: IntegrationNodeModel; engine: DiagramEngine; }) => (
+  <BaseNodeWidget node={node} engine={engine}>
     <Apis>
       <ApisContainer>
-        {props.node.apis.map(a => <Api key={a} onMouseDown={e => e.stopPropagation()}>{a}</Api>)}
+        {node.apis.map(a => <Api key={a} onMouseDown={e => e.stopPropagation()}>{a}</Api>)}
         <ApiAdd onMouseDown={e => e.stopPropagation()}>+</ApiAdd>
       </ApisContainer>
     </Apis>
@@ -93,7 +101,9 @@ export class IntegrationNodeFactory extends AbstractReactFactory<IntegrationNode
 		super('integration');
 	}
 
-	generateModel() {
+	generateModel(event: any) {
+    // is this being used for deserialization?
+    console.log(event);
 		return new IntegrationNodeModel({ name: 'Integration', apis: [] });
 	}
 

@@ -4,6 +4,7 @@ import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { BasePositionModelOptions, AbstractReactFactory } from '@projectstorm/react-canvas-core';
 import { BaseNodeWidget } from './node-widget';
 import { BaseNodeModel } from './node-model';
+import { IntegrationNodeModel } from './node-integration';
 
 
 const Text = styled.p`
@@ -47,6 +48,27 @@ export class ProjectNodeModel extends BaseNodeModel {
     this.artifacts = artifacts;
     this.languages = languages;
   }
+
+	getIntegrations(): IntegrationNodeModel[] {
+    console.log(this.portsOut.map(p => p.getLinks()));
+    return this.portsOut
+      .filter(p => Object.keys(p.getLinks()).length > 0)
+      .map(p => Object.values(p.getLinks())[0].getTargetPort().getNode() as IntegrationNodeModel);
+  }
+
+	serialize() {
+		return {
+			...super.serialize(),
+			artifacts: this.artifacts,
+			languages: this.languages,
+		};
+	}
+
+	deserialize(event: any): void {
+    super.deserialize(event);
+		this.artifacts = event.data.artifacts;
+		this.languages = event.data.languages;
+	}
 }
 
 export interface ProjectNodeProps {
@@ -71,7 +93,9 @@ export class ProjectNodeFactory extends AbstractReactFactory<ProjectNodeModel, D
 		super('project');
 	}
 
-	generateModel() {
+  // this is called for every node during "deserialization" to create the initial instance.
+  // The deserialize method on the created instance is then called immediately after.
+	generateModel({ initialConfig }: { initialConfig: { id: string, ports: any[], type: string, selected: boolean, x: number, y: number }}) {
 		return new ProjectNodeModel({ name: 'Project', languages: [], artifacts: [] });
 	}
 

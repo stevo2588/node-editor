@@ -22,10 +22,10 @@ export const Label = styled.div`
 `;
 
 export const Port = styled.div`
-  width: 10px;
-  height: 10px;
+  width: 15px;
+  height: 15px;
   margin: 3px -7.5px;
-  border-radius: 7px;
+  border-radius: 10px;
   border: solid 2px black;
   background: rgb(140, 140, 140);
   &:hover {
@@ -121,12 +121,12 @@ export interface BaseNodeProps {
 
 export const BaseNodeWidget = (props: BaseNodeProps) => (
   <Node
-    data-default-node-name={props.node.getOptions().name}
+    data-default-node-name={props.node.name}
     selected={props.node.isSelected()}
     background={props.node.getOptions().color || '#ffffff'}
   >
     <Title>
-      <TitleName>{props.node.getOptions().name}</TitleName>
+      <TitleName>{props.node.name}</TitleName>
       {/* <Config>&#9881;</Config> */}
     </Title>
     <Content>

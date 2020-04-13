@@ -1,5 +1,6 @@
-import { app, BrowserWindow } from 'electron';
-import contextMenu from 'electron-context-menu';
+import { app, BrowserWindow, ipcMain } from 'electron';
+import path from 'path';
+import { promises as fs } from 'fs';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -12,12 +13,16 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 let mainWindow: Electron.BrowserWindow;
 
 const createWindow = () => {
-  contextMenu();
-
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 700,
     width: 1000,
+    webPreferences: {
+      nodeIntegration: false, // is default value after Electron v5
+      contextIsolation: true, // protect against prototype pollution
+      enableRemoteModule: false, // turn off remote
+      preload: path.join(__dirname, "preload.js") // use a preload script
+    }
   });
 
   // and load the index.html of the app.
@@ -58,5 +63,28 @@ app.on('activate', () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+
+async function saveFile(filename: string, contents: string) {
+  const projFilename = path.join(app.getPath('desktop'), filename);
+  await fs.writeFile(projFilename, contents, 'utf8');
+  return projFilename;
+};
+
+async function loadFile(filename: string) {
+  const projFilename = path.join(app.getPath('desktop'), filename);
+  return fs.readFile(projFilename, 'utf8');
+};
+
+ipcMain.handle("toMain", async (event, ...args) => {
+  const [func, ...params] = args;
+
+  switch (func) {
+    case 'saveFile':
+      return saveFile(params[0], params[1]);
+    case 'loadFile':
+      return loadFile(params[0]);
+  
+    default:
+      break;
+  }
+});
