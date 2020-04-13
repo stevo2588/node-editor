@@ -116,6 +116,7 @@ const NodePort = (props: DefaultPortLabelProps) => {
 export interface BaseNodeProps {
 	node: BaseNodeModel;
   engine: DiagramEngine;
+  headerButtonAction?: () => void;
   children: React.ReactNode;
 }
 
@@ -127,7 +128,7 @@ export const BaseNodeWidget = (props: BaseNodeProps) => (
   >
     <Title>
       <TitleName>{props.node.name}</TitleName>
-      {/* <Config>&#9881;</Config> */}
+      {props.headerButtonAction ? <Config onClick={props.headerButtonAction}>&#9881;</Config>: null}
     </Title>
     <Content>
       <PortsContainer>

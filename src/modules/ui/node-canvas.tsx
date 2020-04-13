@@ -21,7 +21,7 @@ export const CanvasWidget: FunctionComponent<{ engine: CanvasEngine; className?:
 		const canvasListener = engine.registerListener({
 			repaintCanvas: () => {
 				forceUpdate();
-			}
+			},
 		});
 
 		const keyDown = (event: any) => {
@@ -44,7 +44,6 @@ export const CanvasWidget: FunctionComponent<{ engine: CanvasEngine; className?:
 	}, []);
 
 	useEffect(() => {
-		console.log('component update');
 		engine.setCanvas(ref.current || undefined);
 		engine.iterateListeners(list => {
 			list.rendered && list.rendered();
@@ -123,12 +122,13 @@ const Container = styled.div<{ color: string; background: string }>`
 `;
 
 export default ({
-	background, color, engine, onAddProjectNode, onAddIntegrationNode }: {
+	background, color, engine, onAddProjectNode, onAddIntegrationNode, onAddContainerNode }: {
 		background?: string,
 		color?: string,
 		engine: DiagramEngine,
 		onAddProjectNode: (position: { x: number, y: number }) => void,
 		onAddIntegrationNode: (position: { x: number, y: number }) => void,
+		onAddContainerNode: (position: { x: number, y: number }) => void,
 }) => {
 	const [mouseX, setMouseX] = useState(0);
 	const [mouseY, setMouseY] = useState(0);
@@ -165,6 +165,7 @@ export default ({
 						y={mouseY}
 						addProject={(node, pos) => onAddProjectNode(pos)}
 						addService={(node, pos) => onAddIntegrationNode(pos)}
+						addContainer={(node, pos) => onAddContainerNode(pos)}
 					/>
 				)}
 			</CanvasWidget>

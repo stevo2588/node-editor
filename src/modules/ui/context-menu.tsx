@@ -10,7 +10,7 @@ const Menu = styled(PieMenu)<{ xPos: number, yPos: number, radiusPx: number }>`
 `;
 
 
-export default ({ x, y, addProject, addService }: { x: number, y: number, addProject: (p: any, pos: any) => void, addService: (s: any, pos: any) => void }) => (
+export default ({ x, y, addProject, addService, addContainer }: { x: number, y: number, addProject: (p: any, pos: any) => void, addService: (s: any, pos: any) => void, addContainer: (p: any, pos: any) => void }) => (
   <Menu 
     radius='80px' 
     radiusPx={80}
@@ -23,6 +23,9 @@ export default ({ x, y, addProject, addService }: { x: number, y: number, addPro
     </Slice>
     <Slice onSelect={() => addService({ name: 'untitled' }, { x, y })}>
       <p>Service</p>
+    </Slice>
+    <Slice onSelect={() => addContainer({ name: 'untitled' }, { x, y })}>
+      <p>Container</p>
     </Slice>
   </Menu>
 );

@@ -43,7 +43,7 @@ export class ProjectNodeModel extends BaseNodeModel {
   languages: string[];
   artifacts: { name: string, deploys: { type: string }[] }[];
   constructor(name: string, opts?: DefaultNodeModelOptions) {
-    super({ type: 'project', name, color: 'rgb(0,120,255)' });
+    super({ type: 'project', name, color: 'rgb(0,120,200)' });
     if (!opts) {
       this.artifacts = [];
       this.languages = [];

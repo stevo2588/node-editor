@@ -5,7 +5,6 @@ import { BasePositionModelOptions, AbstractReactFactory } from '@projectstorm/re
 import { BaseNodeWidget } from './node-widget';
 import { BaseNodeModel } from './node-model';
 import { ProjectNodeModel } from './node-project';
-import { DefaultPortModel } from '@projectstorm/react-diagrams';
 
 
 const Apis = styled.div`
@@ -107,7 +106,6 @@ export class IntegrationNodeFactory extends AbstractReactFactory<IntegrationNode
 	}
 
 	generateModel(event: any) {
-    // is this being used for deserialization?
     console.log(event);
 		return new IntegrationNodeModel('Integration', { apis: [] });
 	}
