@@ -115,6 +115,7 @@ export default ({ graph, onUpdateActiveNodes, updateProject }: { graph: any, onU
       node.registerListener({
         selectionChanged() { onUpdateActiveNodes(curDiagram.getSelectedEntities()); },
       });
+      diagramInit(node.graph, onUpdateActiveNodes, updateProject);
       curDiagram.addNode(node);
     }}
 
