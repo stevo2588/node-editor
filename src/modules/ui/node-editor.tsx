@@ -77,8 +77,7 @@ export default ({ graph, onUpdateActiveNodes, updateProject }: { graph: any, onU
   return <NodeCanvas
     engine={engine}
     onAddProjectNode={({ x, y }: { x: number, y: number }) => {
-      const node = new ProjectNodeModel({ name: 'untitled', languages: [], artifacts: [] });
-      node.addOutPort('empty');
+      const node = new ProjectNodeModel('untitled');
       node.setPosition(x, y);
       node.registerListener({
         selectionChanged() { onUpdateActiveNodes(diagram.getSelectedEntities()); },
@@ -87,8 +86,7 @@ export default ({ graph, onUpdateActiveNodes, updateProject }: { graph: any, onU
       // updateProject(diagram);
     }}
     onAddIntegrationNode={({ x, y }: { x: number, y: number }) => {
-      const node = new IntegrationNodeModel({ name: 'untitled', apis: [] });
-      node.addInPort('empty');
+      const node = new IntegrationNodeModel('untitled');
       node.setPosition(x, y);
       node.registerListener({
         selectionChanged() { onUpdateActiveNodes(diagram.getSelectedEntities()); },

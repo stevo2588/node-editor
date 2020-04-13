@@ -35,7 +35,6 @@ const Artifact = styled.button`
 
 
 export interface DefaultNodeModelOptions extends BasePositionModelOptions {
-  name: string;
   languages: string[];
   artifacts: { name: string, deploys: { type: string }[] }[];
 }
@@ -43,10 +42,16 @@ export interface DefaultNodeModelOptions extends BasePositionModelOptions {
 export class ProjectNodeModel extends BaseNodeModel {
   languages: string[];
   artifacts: { name: string, deploys: { type: string }[] }[];
-  constructor({ name, artifacts, languages }: DefaultNodeModelOptions) {
+  constructor(name: string, opts?: DefaultNodeModelOptions) {
     super({ type: 'project', name, color: 'rgb(0,120,255)' });
-    this.artifacts = artifacts;
-    this.languages = languages;
+    if (!opts) {
+      this.artifacts = [];
+      this.languages = [];
+      this.addOutPort('empty');
+      return;
+    }
+    this.artifacts = opts.artifacts;
+    this.languages = opts.languages;
   }
 
 	getIntegrations(): IntegrationNodeModel[] {
@@ -96,7 +101,7 @@ export class ProjectNodeFactory extends AbstractReactFactory<ProjectNodeModel, D
   // this is called for every node during "deserialization" to create the initial instance.
   // The deserialize method on the created instance is then called immediately after.
 	generateModel({ initialConfig }: { initialConfig: { id: string, ports: any[], type: string, selected: boolean, x: number, y: number }}) {
-		return new ProjectNodeModel({ name: 'Project', languages: [], artifacts: [] });
+		return new ProjectNodeModel('Project', { languages: [], artifacts: [] });
 	}
 
 	generateReactWidget(event: any): JSX.Element {

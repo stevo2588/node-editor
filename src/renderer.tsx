@@ -12,66 +12,66 @@ import UI from './modules/ui';
 // import exampleProject from '../static/exampleProject.yml';
 import { generateCode } from 'spec-codegen/src/modules/generate';
 import plugins from 'spec-codegen/src/modules/plugins';
-import { IntegrationNodeModel } from "./modules/ui/node-integration";
-import { ProjectNodeModel } from "./modules/ui/node-project";
+// import { IntegrationNodeModel } from "./modules/ui/node-integration";
+// import { ProjectNodeModel } from "./modules/ui/node-project";
 import mainApi from "./mainApi";
 // import createUI from './modules/ui';
 
 
-const projectToGraph = (project: any) => {
-  console.log(project);
-  const model = new DiagramModel();
+// const projectToGraph = (project: any) => {
+//   console.log(project);
+//   const model = new DiagramModel();
 
-  const interfaceNodes: { [name: string]: IntegrationNodeModel } = {};
-  let i = 0;
-  for (const interf in project.interfaces) {
-    const interfNode = new IntegrationNodeModel({
-      // key: interf,
-      name: `${project.interfaces[interf].name}`,
-      apis: project.interfaces[interf].apis?.map((a: any) => a.name) || [],
-    });
-    interfaceNodes[interf] = interfNode;
-    interfNode.setPosition(380, i * 130 + 85);
-    model.addNode(interfNode);
-    i++;
-  }
+//   const interfaceNodes: { [name: string]: IntegrationNodeModel } = {};
+//   let i = 0;
+//   for (const interf in project.interfaces) {
+//     const interfNode = new IntegrationNodeModel({
+//       // key: interf,
+//       name: `${project.interfaces[interf].name}`,
+//       apis: project.interfaces[interf].apis?.map((a: any) => a.name) || [],
+//     });
+//     interfaceNodes[interf] = interfNode;
+//     interfNode.setPosition(380, i * 130 + 85);
+//     model.addNode(interfNode);
+//     i++;
+//   }
 
-  i = 0;
-  for (const proj in project.projects) {
-    const projNode = new ProjectNodeModel({
-      // key: proj,
-      name: proj,
-      languages: project.projects[proj].languages,
-      artifacts: project.projects[proj].artifacts,
-    });
-    projNode.setPosition(40, i * 185 + 90);
+//   i = 0;
+//   for (const proj in project.projects) {
+//     const projNode = new ProjectNodeModel({
+//       // key: proj,
+//       name: proj,
+//       languages: project.projects[proj].languages,
+//       artifacts: project.projects[proj].artifacts,
+//     });
+//     projNode.setPosition(40, i * 185 + 90);
 
-    let j = 0;
-    for (const interf of project.projects[proj].interfaces) {
-      console.log(interf);
-      console.log(interf.key);
-      const interfNode = interfaceNodes[interf.key];
+//     let j = 0;
+//     for (const interf of project.projects[proj].interfaces) {
+//       console.log(interf);
+//       console.log(interf.key);
+//       const interfNode = interfaceNodes[interf.key];
 
-      const portProj = projNode.addOutPort(j.toString());
-      const portInterf = interfNode.addInPort(proj);
-      let link = portProj.link<DefaultLinkModel>(portInterf);
-      link.getOptions().testName = 'Test';
-      // link.addLabel('Hello World!');
-      model.addLink(link);
-      j++;
-    }
+//       const portProj = projNode.addOutPort(j.toString());
+//       const portInterf = interfNode.addInPort(proj);
+//       let link = portProj.link<DefaultLinkModel>(portInterf);
+//       link.getOptions().testName = 'Test';
+//       // link.addLabel('Hello World!');
+//       model.addLink(link);
+//       j++;
+//     }
 
-    projNode.addOutPort('empty');
-    model.addNode(projNode);
-    i++;
-  }
+//     projNode.addOutPort('empty');
+//     model.addNode(projNode);
+//     i++;
+//   }
 
-  for (const interf in interfaceNodes) {
-    interfaceNodes[interf].addInPort('empty');
-  }
+//   for (const interf in interfaceNodes) {
+//     interfaceNodes[interf].addInPort('empty');
+//   }
 
-  return model;
-};
+//   return model;
+// };
 
 const persistProject = async (p: any) => {
   console.log(p);

@@ -62,9 +62,14 @@ const ApiAdd = styled.button`
 
 export class IntegrationNodeModel extends BaseNodeModel {
   apis: string[];
-  constructor({ name, apis }: { name: string; apis: string[] } & BasePositionModelOptions) {
+  constructor(name: string, opts?: { apis: string[] } & BasePositionModelOptions) {
     super({ type: 'integration', name, color: 'rgb(180,100,150)' });
-    this.apis = apis;
+    if (!opts) {
+      this.apis = [];
+      this.addInPort('empty');
+      return;
+    }
+    this.apis = opts.apis;
   }
 
 	getProjects(): ProjectNodeModel[] {
@@ -104,7 +109,7 @@ export class IntegrationNodeFactory extends AbstractReactFactory<IntegrationNode
 	generateModel(event: any) {
     // is this being used for deserialization?
     console.log(event);
-		return new IntegrationNodeModel({ name: 'Integration', apis: [] });
+		return new IntegrationNodeModel('Integration', { apis: [] });
 	}
 
 	generateReactWidget(event: any): JSX.Element {
