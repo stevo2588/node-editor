@@ -40,6 +40,31 @@ engine.getStateMachine().pushState(state);
 const diagram = new DiagramModel();
 engine.setModel(diagram);
 
+const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => void, updateProject: (state: any) => void) => {
+  d.registerListener({
+    // nodesUpdated() { setUpdated(updated+1); },
+    // linksUpdated() { console.log('updating links'); setUpdated(updated+1); },
+    eventDidFire(event: any) {
+      if (['offsetUpdated', 'zoomUpdated'].includes(event.function)) return;
+      console.log(event.function);
+      updateProject(diagram); // must always update root diagram
+    },
+  });
+
+  d.getNodes().forEach(n => {
+    console.log('registerListener node');
+    // n.clearListeners();
+    n.registerListener({
+      selectionChanged() { onUpdateActiveNodes(d.getSelectedEntities()); },
+    });
+    console.log('DONE registerListener node');
+
+    if (n.getType() === 'container') {
+      const containerNode = n as ContainerNodeModel;
+      diagramInit(containerNode.graph, onUpdateActiveNodes, updateProject);
+    }
+  });
+};
 
 export default ({ graph, onUpdateActiveNodes, updateProject }: { graph: any, onUpdateActiveNodes: (nodes: any[]) => void, updateProject: (state: any) => void, }) => {
   console.log('render graph');
@@ -54,24 +79,8 @@ export default ({ graph, onUpdateActiveNodes, updateProject }: { graph: any, onU
     console.log(graph);
     diagram.deserializeModel(graph, engine);
     console.log('deserialized')
-    diagram.registerListener({
-      // nodesUpdated() { setUpdated(updated+1); },
-      // linksUpdated() { console.log('updating links'); setUpdated(updated+1); },
-      eventDidFire(event: any) {
-        if (['offsetUpdated', 'zoomUpdated'].includes(event.function)) return;
-        console.log(event.function);
-        updateProject(diagram);
-      },
-    });
 
-    diagram.getNodes().forEach(n => {
-      console.log('registerListener node');
-      // n.clearListeners();
-      n.registerListener({
-        selectionChanged() { onUpdateActiveNodes(diagram.getSelectedEntities()); },
-      });
-      console.log('DONE registerListener node');
-    });
+    diagramInit(diagram, onUpdateActiveNodes, updateProject);
 
     setLoaded(true);
     console.log('DONE registerListener diagram');
