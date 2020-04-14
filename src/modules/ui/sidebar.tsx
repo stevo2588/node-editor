@@ -1,8 +1,8 @@
 import React from 'react';
 import { Layout, Button, Typography, Form } from 'antd';
-import { BaseNodeModel } from './node-model';
-import { IntegrationNodeModel } from './node-integration';
-import { ProjectNodeModel } from './node-project';
+import { BaseNodeModel } from './graph/models/base';
+import { IntegrationNodeModel } from './graph/models/integration';
+import { ProjectNodeModel } from './graph/models/project';
 const { Sider } = Layout;
 
 

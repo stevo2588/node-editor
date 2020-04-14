@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import NodeEditor from './node-editor';
+import NodeEditor from './graph';
 import SideBar from './sidebar';
-import { BaseNodeModel } from './node-model';
+import { BaseNodeModel } from './graph/models/base';
 import { Layout, Button, Space } from 'antd';
 import { Breadcrumb } from 'antd';
 import { Link } from '@reach/router';
@@ -24,7 +24,6 @@ export default ({ path, graphPath = '', graph, saveStatus, actions, ...rest }: {
       <Layout style={{ height: '100vh', overflow: 'hidden' }}>
         <Header>
           <Space direction="horizontal">
-            <Button>Provision</Button>
             <Breadcrumb>
               <Breadcrumb.Item>
                 <Link to="/graph">home</Link>

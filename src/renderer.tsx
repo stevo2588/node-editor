@@ -74,7 +74,6 @@ import mainApi from "./mainApi";
 // };
 
 const persistProject = async (p: any) => {
-  console.log(p);
   const res = await mainApi.saveFile('archie.yml', dumpYml(p, { skipInvalid: true }));
 };
 
@@ -108,7 +107,6 @@ const UIView = hot(() => {
           providers: {},
           graph: (new DiagramModel()).serialize(),
         };
-        console.log(project);
         projectContents = dumpYml(project, { skipInvalid: true });
         const res = await mainApi.saveFile('archie.yml', projectContents);
         console.log(`created new file from example project: ${res}`);
