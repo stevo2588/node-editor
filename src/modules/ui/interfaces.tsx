@@ -3,7 +3,10 @@ import styled from '@emotion/styled';
 import NodeEditor from './node-editor';
 import SideBar from './sidebar';
 import { BaseNodeModel } from './node-model';
-import { Layout, Button } from 'antd';
+import { Layout, Button, Space } from 'antd';
+import { Breadcrumb } from 'antd';
+import { Link } from '@reach/router';
+import { navigate } from './router';
 const { Header, Content, Footer } = Layout;
 
 const Container = styled.div`
@@ -13,18 +16,31 @@ const Container = styled.div`
   height: 100%;
 `;
 
-export default ({ path, graph, saveStatus, actions }: { path: string, graph: any, saveStatus: string, actions: { updateProject: (state: any) => void } }) => {
+export default ({ path, graphPath = '', graph, saveStatus, actions, ...rest }: { path: string, graphPath?: string, graph: any, saveStatus: string, actions: { updateProject: (state: any) => void } }) => {
+  console.log(rest);
   const [selectedNodes, setSelectedNodes] = useState<BaseNodeModel[]>([]);
 
   return (
       <Layout style={{ height: '100vh', overflow: 'hidden' }}>
         <Header>
-          <Button>Provision</Button>
+          <Space direction="horizontal">
+            <Button>Provision</Button>
+            <Breadcrumb>
+              <Breadcrumb.Item>
+                <Link to="/graph">home</Link>
+              </Breadcrumb.Item>
+              {graphPath.split('/').filter(i => i).map((p, i) => (
+                <Breadcrumb.Item key={p}>
+                  <Link to={`/graph/${p}`}>{p}</Link>
+                </Breadcrumb.Item>
+              ))}
+            </Breadcrumb>
+          </Space>
         </Header>
         <Layout>
           <Content>
             <Container>
-                <NodeEditor graph={graph} onUpdateActiveNodes={setSelectedNodes} updateProject={actions.updateProject} />
+              <NodeEditor graph={graph} graphPath={graphPath} navigate={path => { console.log(path); navigate(path); }} onUpdateActiveNodes={setSelectedNodes} updateProject={actions.updateProject} />
             </Container>
           </Content>
           <SideBar activeNodes={selectedNodes} />

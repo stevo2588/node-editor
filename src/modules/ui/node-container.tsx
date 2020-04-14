@@ -7,6 +7,8 @@ import { BaseNodeModel } from './node-model';
 
 export class ContainerNodeModel extends BaseNodeModel {
   graph: DiagramModel;
+  public path = '/';
+  
   constructor(name: string, opts?: { graph: DiagramModel } & BasePositionModelOptions) {
     super({ type: 'container', name, color: 'rgb(70,200,100)' });
     if (!opts) {
@@ -38,12 +40,10 @@ export class ContainerNodeModel extends BaseNodeModel {
 	}
 }
 
-
 export const ContainerNodeWidget = ({ node, engine }: { node: ContainerNodeModel; engine: DiagramEngine; }) => (
   <BaseNodeWidget node={node} engine={engine} headerButtonAction={() => {
-    console.log(node.graph);
-    engine.setModel(node.graph);
-    // engine.repaintCanvas();
+    // @ts-ignore
+    engine.fireEvent({ nav: { path: node.graph.path } }, 'navigateToDiagram');
   }}>
   </BaseNodeWidget>
 );
