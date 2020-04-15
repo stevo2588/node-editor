@@ -2,6 +2,7 @@ import React from 'react';
 import { Router, createMemorySource, createHistory, LocationProvider } from "@reach/router"
 import styled from '@emotion/styled';
 import Interfaces from './interfaces';
+import { Props } from './graph';
 
 
 const Container = styled.div`
@@ -19,7 +20,7 @@ const rootPath = '/graph';
 const history = createHistory(createMemorySource(rootPath));
 export const navigate = (path: string) => history.navigate(path);
 
-export default ({ title, saveStatus, interfaces }: { title: string, saveStatus: string, interfaces: { graph: any, actions: { updateProject: (state: any) => void } } }) => {
+export default ({ saveStatus, interfaces }: { saveStatus: string, interfaces: { graphState: any, graph: Props['graph'], actions: { updateProject: (state: any) => void } } }) => {
   return (
     <Container>
       <LocationProvider history={history}>

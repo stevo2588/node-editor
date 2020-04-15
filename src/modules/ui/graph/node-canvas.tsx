@@ -122,10 +122,11 @@ const Container = styled.div<{ color: string; background: string }>`
 `;
 
 export default ({
-	background, color, engine, onAddProjectNode, onAddIntegrationNode, onAddContainerNode }: {
+	background, color, engine, nodes, onAddProjectNode, onAddIntegrationNode, onAddContainerNode }: {
 		background?: string,
 		color?: string,
 		engine: DiagramEngine,
+		nodes: { name: string, onAddNode: (position: { x: number, y: number }) => void }[],
 		onAddProjectNode: (position: { x: number, y: number }) => void,
 		onAddIntegrationNode: (position: { x: number, y: number }) => void,
 		onAddContainerNode: (position: { x: number, y: number }) => void,
@@ -163,6 +164,7 @@ export default ({
 					<ContextMenu
 						x={mouseX}
 						y={mouseY}
+						options={nodes}
 						addProject={(node, pos) => onAddProjectNode(pos)}
 						addService={(node, pos) => onAddIntegrationNode(pos)}
 						addContainer={(node, pos) => onAddContainerNode(pos)}

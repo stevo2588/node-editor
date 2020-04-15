@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { AbstractReactFactory } from '@projectstorm/react-canvas-core';

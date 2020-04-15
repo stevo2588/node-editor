@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import NodeEditor from './graph';
+import NodeEditor, { Props } from './graph';
 import SideBar from './sidebar';
 import { BaseNodeModel } from './graph/models/base';
 import { Layout, Button, Space } from 'antd';
@@ -16,8 +16,7 @@ const Container = styled.div`
   height: 100%;
 `;
 
-export default ({ path, graphPath = '', graph, saveStatus, actions, ...rest }: { path: string, graphPath?: string, graph: any, saveStatus: string, actions: { updateProject: (state: any) => void } }) => {
-  console.log(rest);
+export default ({ path, graphPath = '', saveStatus, actions, ...rest }: { path: string, graphPath?: string, graphState: any, graph: Props['graph'], saveStatus: string, actions: { updateProject: (state: any) => void } }) => {
   const [selectedNodes, setSelectedNodes] = useState<BaseNodeModel[]>([]);
 
   return (
@@ -39,7 +38,7 @@ export default ({ path, graphPath = '', graph, saveStatus, actions, ...rest }: {
         <Layout>
           <Content>
             <Container>
-              <NodeEditor graph={graph} graphPath={graphPath} navigate={path => { console.log(path); navigate(path); }} onUpdateActiveNodes={setSelectedNodes} updateProject={actions.updateProject} />
+              <NodeEditor {...rest} graphPath={graphPath} navigate={path => { console.log(path); navigate(path); }} onUpdateActiveNodes={setSelectedNodes} updateProject={actions.updateProject} />
             </Container>
           </Content>
           <SideBar activeNodes={selectedNodes} />

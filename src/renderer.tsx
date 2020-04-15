@@ -86,7 +86,7 @@ const UIView = hot(() => {
   const [projectName, setProjectName] = useState(null);
   const [environments, setEnvironments] = useState({});
   const [providers, setProviders] = useState({});
-  const [graph, setGraph] = useState<any>(null);
+  const [graphState, setGraphState] = useState<any>(null);
   const [projectSaveStatus, setProjectSaveStatus] = useState<'success'|'in-progress'|'failed'>('success');
 
   useEffect(() => {
@@ -117,7 +117,7 @@ const UIView = hot(() => {
       setProjectName(project.name);
       setEnvironments(project.environments);
       setProviders(project.providers);
-      setGraph(project.graph);
+      setGraphState(project.graph);
     };
     loadProject();
   }, []);
@@ -129,7 +129,7 @@ const UIView = hot(() => {
       console.log('saving...');
       setProjectSaveStatus('in-progress');
       try {
-        await persistProject({ name: projectName, environments, providers, graph });
+        await persistProject({ name: projectName, environments, providers, graph: graphState });
         setProjectSaveStatus('success');
       } catch (err) {
         console.error(err);
@@ -137,22 +137,91 @@ const UIView = hot(() => {
       }
     };
     save();
-  }, [graph]);
+  }, [graphState]);
 
   return (
     <UI
-      title={projectName || 'Untitled'}
       saveStatus={projectSaveStatus}
       interfaces={{
-        graph,
+        graphState,
         actions: {
           updateProject: (p: DiagramModel) => {
-            setGraph(p.serialize());
+            setGraphState(p.serialize());
           },
           // updateApi: () => {},
           // updateService: () => {},
           // updateResource: () => {},
-        }
+        },
+        graph: {
+          nodes: {
+            code: {
+              defaultInputs: ['code'],
+              additionalInputs: ['code'],
+              defaultOutputs: ['code'],
+              additionalOutputs: ['implementedEvent'],
+            },
+            codeGen: {
+              defaultInputs: ['code'],
+              additionalInputs: ['code'],
+              defaultOutputs: ['code'],
+              additionalOutputs: ['implementedEvent'],
+            },
+            test: {
+              defaultInputs: ['code'],
+              additionalInputs: ['code'],
+              defaultOutputs: ['code'],
+              additionalOutputs: ['implementedEvent'],
+            },
+            build: {
+              defaultInputs: ['code'],
+              additionalInputs: ['code'],
+              defaultOutputs: ['code'],
+              additionalOutputs: ['implementedEvent'],
+            },
+            service: {
+              defaultInputs: ['code'],
+              additionalInputs: ['code'],
+              defaultOutputs: ['code'],
+              additionalOutputs: ['implementedEvent'],
+            },
+            serviceHost: {
+              defaultInputs: ['code'],
+              additionalInputs: ['code'],
+              defaultOutputs: ['code'],
+              additionalOutputs: ['implementedEvent'],
+            },
+            apiMapper: {
+              defaultInputs: ['code'],
+              additionalInputs: ['code'],
+              defaultOutputs: ['code'],
+              additionalOutputs: ['implementedEvent'],
+            },
+            codeContainer: {
+              root: true,
+              contains: ['code', 'codeGen'],
+              defaultInputs: ['code'],
+              additionalInputs: ['code'],
+              defaultOutputs: ['code'],
+              additionalOutputs: ['implementedEvent'],
+            },
+            buildContainer: {
+              root: true,
+              contains: ['test', 'build', 'codeContainer'],
+              defaultInputs: ['code'],
+              additionalInputs: ['code'],
+              defaultOutputs: ['code'],
+              additionalOutputs: ['implementedEvent'],
+            },
+            serviceContainer: {
+              root: true,
+              contains: ['service', 'serviceHost', 'apiMapper', 'serviceContainer'],
+              defaultInputs: ['code'],
+              additionalInputs: ['code'],
+              defaultOutputs: ['code'],
+              additionalOutputs: ['implementedEvent'],
+            },
+          },
+        },
       }}
     />
   );

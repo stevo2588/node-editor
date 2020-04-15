@@ -13,13 +13,35 @@ import {
 import { PathFindingLinkFactory } from '@projectstorm/react-diagrams-routing';
 import { SelectionBoxLayerFactory } from '@projectstorm/react-canvas-core';
 import NodeCanvas from './node-canvas';
+import { NodeFactory } from './node';
 import { IntegrationNodeFactory } from './node-integration';
 import { IntegrationNodeModel } from './models/integration';
 import { ProjectNodeFactory } from './node-project';
 import { ProjectNodeModel } from './models/project';
 import { MiddlewareLinkFactory } from './link-custom';
-import { ContainerNodeModel, ContainerNodeFactory } from './node-container';
+import { ContainerNodeFactory, ContainerNodeModel } from './node-container';
+import { NodeModel } from './models/model';
 
+
+export type Props = {
+  graph: {
+    nodes: {
+      [key: string]: {
+        root?: boolean;
+        contains?: string[];
+        defaultInputs: string[];
+        additionalInputs: string[];
+        defaultOutputs: string[];
+        additionalOutputs: string[]; // calculated
+      };
+    };
+  };
+  graphState: any;
+  graphPath: string;
+  navigate: (path: string) => void;
+  onUpdateActiveNodes: (nodes: any[]) => void;
+  updateProject: (state: any) => void;
+}
 
 const engine = new DiagramEngine();
 engine.getLayerFactories().registerFactory(new NodeLayerFactory());
@@ -71,34 +93,74 @@ const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => voi
   });
 };
 
-export default ({ graph, graphPath, navigate, onUpdateActiveNodes, updateProject }: { graph: any; graphPath: string; navigate: (path: string) => void; onUpdateActiveNodes: (nodes: any[]) => void; updateProject: (state: any) => void }) => {
+export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, updateProject }: Props) => {
   console.log(graphPath);
   const [loaded, setLoaded] = useState(false);
+  const [availableNodes, setAvailableNodes] = useState<{ name: string, onAddNode: (position: { x: number, y: number }) => void }[]>([]);
 
-  // useEffect(() => {
-  //   // engine.setModel(graphFromRouterState);
-  //   engine.setModel(rootDiagram);
-  // }, []);
+  useEffect(() => {
+    console.log('graph');
+    console.log(graph);
+    for (const nodeType in graph) {
+      engine.getNodeFactories().registerFactory(new NodeFactory(nodeType));
+    }
+    // engine.setModel(graphFromRouterState);
+    // engine.setModel(rootDiagram);
+    console.log('useEffect 1');
+  }, []);
 
   useEffect(() => {
     let cur = rootDiagram;
+    let curType: string|undefined;
     graphPath.split('/').filter(i => i).forEach((id) => {
       const match = cur.getModels()
         .filter(m => m.getType() === 'container')
         .find(m => (m as ContainerNodeModel).graph.getID() === id);
-      if (match) cur = (match as ContainerNodeModel).graph;
+      if (match) {
+        cur = (match as ContainerNodeModel).graph;
+        curType = match.getType();
+      }
     });
 
     if (!cur) throw new Error('path invalid');
+
     engine.setModel(cur);
+
+    let avail = [];
+    if (curType && graph.nodes[curType]?.contains) avail = graph.nodes[curType].contains || [];
+    else avail = Object.keys(graph.nodes).filter(nodeType => graph.nodes[nodeType].root);
+
+    const availNodes = avail
+      .map(nodeType => ({
+        key: nodeType,
+        name: nodeType,
+        onAddNode: ({ x, y }: { x: number, y: number }) => {
+          const curDiagram = engine.getModel();
+          const node = new NodeModel(!!graph.nodes[nodeType].contains, nodeType, nodeType, 'red');
+          node.setPosition(x, y);
+          node.registerListener({
+            selectionChanged() { onUpdateActiveNodes(curDiagram.getSelectedEntities()); },
+          });
+          if (graph.nodes[nodeType].contains) {
+            // @ts-ignore
+            diagramInit(node.graph, onUpdateActiveNodes, updateProject, `${curDiagram.path}/${node.graph.getID()}`);
+          }
+          curDiagram.addNode(node);
+          // updateProject(diagram);
+        } }));
+
+    console.log(availNodes);
+    setAvailableNodes(availNodes);
+
+    console.log('useEffect 2');
   }, [graphPath]);
 
   useEffect(() => {
-    if (loaded || !graph) return;
+    if (loaded || !graphState) return;
 
     // TODO: panning is randomly broken upon starting app (happens every few times). Init race condition maybe?
 
-    rootDiagram.deserializeModel(graph, engine);
+    rootDiagram.deserializeModel(graphState, engine);
     console.log('deserialized')
 
     diagramInit(rootDiagram, onUpdateActiveNodes, updateProject);
@@ -110,10 +172,12 @@ export default ({ graph, graphPath, navigate, onUpdateActiveNodes, updateProject
     });
 
     setLoaded(true);
-  }, [graph]);
+    console.log('useEffect 3');
+  }, [graphState]);
 
   return <NodeCanvas
     engine={engine}
+    nodes={availableNodes}
     onAddProjectNode={({ x, y }: { x: number, y: number }) => {
       const curDiagram = engine.getModel();
       const node = new ProjectNodeModel('untitled');

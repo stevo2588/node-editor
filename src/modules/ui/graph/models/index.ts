@@ -1,7 +1,7 @@
 import { BaseNodeModel } from "./base";
 
 
-export const CodenModel = BaseNodeModel;
+export const CodeModel = BaseNodeModel;
 export const CodeGenModel = BaseNodeModel;
 export const CodeContainerModel = BaseNodeModel;
 
