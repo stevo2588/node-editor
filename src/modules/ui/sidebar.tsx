@@ -1,18 +1,18 @@
 import React from 'react';
 import { Layout, Button, Typography, Form } from 'antd';
 import { BaseNodeModel } from './graph/models/base';
-import { IntegrationNodeModel } from './graph/models/integration';
-import { ProjectNodeModel } from './graph/models/project';
 const { Sider } = Layout;
 
 
 export default ({ activeNodes }: { activeNodes: BaseNodeModel[] }) => {
-  const projectNodes = activeNodes
-    .filter(n => n.getType() === 'project')
-    .map(n => n as ProjectNodeModel);
-  const integrationNodes = activeNodes
-    .filter(n => n.getType() === 'integration')
-    .map(n => n as IntegrationNodeModel);
+  // const projectNodes = activeNodes
+  //   .filter(n => n.getType() === 'project')
+  //   .map(n => n as ProjectNodeModel);
+  // const integrationNodes = activeNodes
+  //   .filter(n => n.getType() === 'integration')
+  //   .map(n => n as IntegrationNodeModel);
+  const projectNodes = [];
+  const integrationNodes = [];
 
   return (
     <Sider collapsed={activeNodes.length <= 0} width={300} collapsedWidth={0} trigger={null} style={{ padding: '15px', marginRight: '-30px' }}>

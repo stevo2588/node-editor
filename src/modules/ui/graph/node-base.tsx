@@ -126,8 +126,8 @@ export interface BaseNodeProps<Model extends BaseNodeModel> {
 export const BaseNodeWidget = <T extends BaseNodeModel>(props: BaseNodeProps<T>) => {
   const addPortMenu = (input: boolean) => (
     <Menu onClick={() => {
-      if (input) props.node.addInPort('new');
-      else props.node.addOutPort('new');
+      if (input) props.node.addInPort('input');
+      else props.node.addOutPort('output');
       props.engine.repaintCanvas();
     }}>
       <Menu.Item key="0">
@@ -150,7 +150,7 @@ export const BaseNodeWidget = <T extends BaseNodeModel>(props: BaseNodeProps<T>)
     >
       <Title>
         <TitleName>{props.node.name}</TitleName>
-        {props.headerButtonAction ? <Config onClick={props.headerButtonAction}>&#9881;</Config>: null}
+        {props.headerButtonAction ? <Config onClick={props.headerButtonAction}>&#x2315;</Config>: null}
       </Title>
       <Content>
         <PortsContainer>

@@ -5,24 +5,24 @@ import { BaseNodeModel } from './base';
 
 export class NodeModel extends BaseNodeModel {
   graph?: DiagramModel;
-  model: any;
+  // model: any;
   public path = '/';
   
   constructor(isContainer: boolean, type: string, name: string, color: string, opts?: { graph: DiagramModel } & BasePositionModelOptions) {
     super({ type, name, color });
+    console.log(isContainer);
     if (!opts) {
-      this.addInPort('empty');
-      this.addOutPort('empty');
+      // this.addInPort('empty');
+      // this.addOutPort('empty');
       if (isContainer) this.graph = new DiagramModel();
+      console.log(this.graph);
       return;
     }
     if (isContainer) this.graph = opts.graph;
   }
 
 	serialize() {
-    const s: any = {
-			...super.serialize(),
-    };
+    const s: any = super.serialize();
     if (this.graph) s.graph = this.graph.serialize();
 
     return s;
@@ -30,6 +30,9 @@ export class NodeModel extends BaseNodeModel {
 
 	deserialize(event: any): void {
     super.deserialize(event);
-    if (event.data.graph && this.graph) this.graph.deserializeModel(event.data.graph, event.engine);
+    if (event.data.graph) {
+      this.graph = new DiagramModel();
+      this.graph.deserializeModel(event.data.graph, event.engine);
+    }
 	}
 }

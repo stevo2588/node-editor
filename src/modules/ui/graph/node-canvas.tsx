@@ -52,6 +52,8 @@ export const CanvasWidget: FunctionComponent<{ engine: CanvasEngine; className?:
 
 	const model = engine.getModel();
 
+	// if (!model) return null;
+
 	return (
 		<Canvas
 			className={className}
@@ -122,14 +124,11 @@ const Container = styled.div<{ color: string; background: string }>`
 `;
 
 export default ({
-	background, color, engine, nodes, onAddProjectNode, onAddIntegrationNode, onAddContainerNode }: {
+	background, color, engine, nodes }: {
 		background?: string,
 		color?: string,
 		engine: DiagramEngine,
-		nodes: { name: string, onAddNode: (position: { x: number, y: number }) => void }[],
-		onAddProjectNode: (position: { x: number, y: number }) => void,
-		onAddIntegrationNode: (position: { x: number, y: number }) => void,
-		onAddContainerNode: (position: { x: number, y: number }) => void,
+		nodes: { name: string, onAddNode: (model: { name: string }, position: { x: number, y: number }) => void }[],
 }) => {
 	const [mouseX, setMouseX] = useState(0);
 	const [mouseY, setMouseY] = useState(0);
@@ -165,9 +164,6 @@ export default ({
 						x={mouseX}
 						y={mouseY}
 						options={nodes}
-						addProject={(node, pos) => onAddProjectNode(pos)}
-						addService={(node, pos) => onAddIntegrationNode(pos)}
-						addContainer={(node, pos) => onAddContainerNode(pos)}
 					/>
 				)}
 			</CanvasWidget>

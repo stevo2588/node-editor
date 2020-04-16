@@ -14,12 +14,7 @@ import { PathFindingLinkFactory } from '@projectstorm/react-diagrams-routing';
 import { SelectionBoxLayerFactory } from '@projectstorm/react-canvas-core';
 import NodeCanvas from './node-canvas';
 import { NodeFactory } from './node';
-import { IntegrationNodeFactory } from './node-integration';
-import { IntegrationNodeModel } from './models/integration';
-import { ProjectNodeFactory } from './node-project';
-import { ProjectNodeModel } from './models/project';
 import { MiddlewareLinkFactory } from './link-custom';
-import { ContainerNodeFactory, ContainerNodeModel } from './node-container';
 import { NodeModel } from './models/model';
 
 
@@ -29,6 +24,7 @@ export type Props = {
       [key: string]: {
         root?: boolean;
         contains?: string[];
+        color: string;
         defaultInputs: string[];
         additionalInputs: string[];
         defaultOutputs: string[];
@@ -52,17 +48,12 @@ engine.getLabelFactories().registerFactory(new DefaultLabelFactory());
 engine.getLinkFactories().registerFactory(new PathFindingLinkFactory());
 engine.getPortFactories().registerFactory(new DefaultPortFactory());
 
-engine.getNodeFactories().registerFactory(new IntegrationNodeFactory());
-engine.getNodeFactories().registerFactory(new ProjectNodeFactory());
-engine.getNodeFactories().registerFactory(new ContainerNodeFactory());
-engine.getLinkFactories().registerFactory(new MiddlewareLinkFactory());
 
 const state = new DefaultDiagramState();
 state.dragNewLink.config.allowLooseLinks = false;
 engine.getStateMachine().pushState(state);
 
 const rootDiagram = new DiagramModel();
-engine.setModel(rootDiagram);
 
 const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => void, updateProject: (state: any) => void, path = '') => {
   // @ts-ignore
@@ -85,9 +76,8 @@ const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => voi
       selectionChanged() { onUpdateActiveNodes(d.getSelectedEntities()); },
     });
 
-    if (n.getType() === 'container') {
-      const containerNode = n as ContainerNodeModel;
-
+    const containerNode = n as NodeModel;
+    if (containerNode.graph) {
       diagramInit(containerNode.graph, onUpdateActiveNodes, updateProject, `${path}/${containerNode.graph.getID()}`);
     }
   });
@@ -96,16 +86,25 @@ const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => voi
 export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, updateProject }: Props) => {
   console.log(graphPath);
   const [loaded, setLoaded] = useState(false);
-  const [availableNodes, setAvailableNodes] = useState<{ name: string, onAddNode: (position: { x: number, y: number }) => void }[]>([]);
+  const [loaded2, setLoaded2] = useState(false);
+  const [availableNodes, setAvailableNodes] = useState<{ name: string, onAddNode: (model: { name: string }, position: { x: number, y: number }) => void }[]>([]);
 
   useEffect(() => {
     console.log('graph');
     console.log(graph);
-    for (const nodeType in graph) {
+    for (const nodeType in graph.nodes) {
+      console.log(nodeType);
       engine.getNodeFactories().registerFactory(new NodeFactory(nodeType));
     }
-    // engine.setModel(graphFromRouterState);
-    // engine.setModel(rootDiagram);
+    engine.getLinkFactories().registerFactory(new MiddlewareLinkFactory());
+
+    engine.registerListener({
+      navigateToDiagram(event: any) {
+        navigate(`graph/${event.nav.path}`);
+      },
+    });
+
+    setLoaded2(true);
     console.log('useEffect 1');
   }, []);
 
@@ -114,10 +113,11 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, u
     let curType: string|undefined;
     graphPath.split('/').filter(i => i).forEach((id) => {
       const match = cur.getModels()
-        .filter(m => m.getType() === 'container')
-        .find(m => (m as ContainerNodeModel).graph.getID() === id);
-      if (match) {
-        cur = (match as ContainerNodeModel).graph;
+        .map(m => m as NodeModel)
+        .filter(m => m.graph)
+        .find(m => m.graph?.getID() === id);
+      if (match && match.graph) {
+        cur = match.graph;
         curType = match.getType();
       }
     });
@@ -134,9 +134,9 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, u
       .map(nodeType => ({
         key: nodeType,
         name: nodeType,
-        onAddNode: ({ x, y }: { x: number, y: number }) => {
+        onAddNode: ({ name }: { name: string }, { x, y }: { x: number, y: number }) => {
           const curDiagram = engine.getModel();
-          const node = new NodeModel(!!graph.nodes[nodeType].contains, nodeType, nodeType, 'red');
+          const node = new NodeModel(!!graph.nodes[nodeType].contains, nodeType, name, graph.nodes[nodeType].color);
           node.setPosition(x, y);
           node.registerListener({
             selectionChanged() { onUpdateActiveNodes(curDiagram.getSelectedEntities()); },
@@ -165,50 +165,11 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, u
 
     diagramInit(rootDiagram, onUpdateActiveNodes, updateProject);
 
-    engine.registerListener({
-      navigateToDiagram(event: any) {
-        navigate(`graph/${event.nav.path}`);
-      },
-    });
-
     setLoaded(true);
     console.log('useEffect 3');
   }, [graphState]);
 
-  return <NodeCanvas
-    engine={engine}
-    nodes={availableNodes}
-    onAddProjectNode={({ x, y }: { x: number, y: number }) => {
-      const curDiagram = engine.getModel();
-      const node = new ProjectNodeModel('untitled');
-      node.setPosition(x, y);
-      node.registerListener({
-        selectionChanged() { onUpdateActiveNodes(curDiagram.getSelectedEntities()); },
-      });
-      curDiagram.addNode(node);
-      // updateProject(diagram);
-    }}
-    onAddIntegrationNode={({ x, y }: { x: number, y: number }) => {
-      const curDiagram = engine.getModel();
-      const node = new IntegrationNodeModel('untitled');
-      node.setPosition(x, y);
-      node.registerListener({
-        selectionChanged() { onUpdateActiveNodes(curDiagram.getSelectedEntities()); },
-      });
-      curDiagram.addNode(node);
-      // updateProject(diagram);
-    }}
-    onAddContainerNode={({ x, y }: { x: number, y: number }) => {
-      const curDiagram = engine.getModel();
-      const node = new ContainerNodeModel('untitled');
-      node.setPosition(x, y);
-      node.registerListener({
-        selectionChanged() { onUpdateActiveNodes(curDiagram.getSelectedEntities()); },
-      });
-      // @ts-ignore
-      diagramInit(node.graph, onUpdateActiveNodes, updateProject, `${curDiagram.path}/${node.graph.getID()}`);
-      curDiagram.addNode(node);
-    }}
+  if (!loaded2) return null;
 
-  />;
+  return <NodeCanvas engine={engine} nodes={availableNodes} />;
 };

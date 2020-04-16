@@ -155,49 +155,57 @@ const UIView = hot(() => {
         graph: {
           nodes: {
             code: {
+              color: 'blue',
               defaultInputs: ['code'],
               additionalInputs: ['code'],
               defaultOutputs: ['code'],
               additionalOutputs: ['implementedEvent'],
             },
             codeGen: {
+              color: 'blue',
               defaultInputs: ['code'],
               additionalInputs: ['code'],
               defaultOutputs: ['code'],
               additionalOutputs: ['implementedEvent'],
             },
             test: {
+              color: 'yellow',
               defaultInputs: ['code'],
               additionalInputs: ['code'],
               defaultOutputs: ['code'],
               additionalOutputs: ['implementedEvent'],
             },
             build: {
+              color: 'yellow',
               defaultInputs: ['code'],
               additionalInputs: ['code'],
               defaultOutputs: ['code'],
               additionalOutputs: ['implementedEvent'],
             },
             service: {
+              color: 'green',
               defaultInputs: ['code'],
               additionalInputs: ['code'],
               defaultOutputs: ['code'],
               additionalOutputs: ['implementedEvent'],
             },
             serviceHost: {
+              color: 'green',
               defaultInputs: ['code'],
               additionalInputs: ['code'],
               defaultOutputs: ['code'],
               additionalOutputs: ['implementedEvent'],
             },
             apiMapper: {
+              root: true,
+              color: 'purple',
               defaultInputs: ['code'],
               additionalInputs: ['code'],
               defaultOutputs: ['code'],
               additionalOutputs: ['implementedEvent'],
             },
             codeContainer: {
-              root: true,
+              color: 'blue',
               contains: ['code', 'codeGen'],
               defaultInputs: ['code'],
               additionalInputs: ['code'],
@@ -207,6 +215,7 @@ const UIView = hot(() => {
             buildContainer: {
               root: true,
               contains: ['test', 'build', 'codeContainer'],
+              color: 'yellow',
               defaultInputs: ['code'],
               additionalInputs: ['code'],
               defaultOutputs: ['code'],
@@ -215,6 +224,7 @@ const UIView = hot(() => {
             serviceContainer: {
               root: true,
               contains: ['service', 'serviceHost', 'apiMapper', 'serviceContainer'],
+              color: 'green',
               defaultInputs: ['code'],
               additionalInputs: ['code'],
               defaultOutputs: ['code'],
