@@ -5,11 +5,12 @@ import { DefaultPortModel } from '@projectstorm/react-diagrams';
 
 export interface DefaultNodeModelOptions extends BasePositionModelOptions {
 	name: string;
-	color?: string;
+	color: string;
 }
 
 export abstract class BaseNodeModel extends NodeModel<NodeModelGenerics & { OPTIONS: DefaultNodeModelOptions }> {
 	public name: string;
+	public color: string;
 	protected portsIn: DefaultPortModel[];
 	protected portsOut: DefaultPortModel[];
 
@@ -21,6 +22,7 @@ export abstract class BaseNodeModel extends NodeModel<NodeModelGenerics & { OPTI
 			...options,
 		});
 		this.name = options.name;
+		this.color = options.color;
 		this.portsOut = [];
 		this.portsIn = [];
 	}
@@ -100,11 +102,13 @@ export abstract class BaseNodeModel extends NodeModel<NodeModelGenerics & { OPTI
 		return {
 			...super.serialize(),
 			name: this.name,
+			color: this.color,
 		};
 	}
 
 	deserialize(event: any): void {
     super.deserialize(event);
     this.name = event.data.name;
+    this.color = event.data.color;
 	}
 }

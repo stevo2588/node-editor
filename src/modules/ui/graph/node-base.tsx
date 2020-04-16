@@ -146,7 +146,7 @@ export const BaseNodeWidget = <T extends BaseNodeModel>(props: BaseNodeProps<T>)
     <Node
       data-default-node-name={props.node.name}
       selected={props.node.isSelected()}
-      background={props.node.getOptions().color || '#ffffff'}
+      background={props.node.color || '#ffffff'}
     >
       <Title>
         <TitleName>{props.node.name}</TitleName>
