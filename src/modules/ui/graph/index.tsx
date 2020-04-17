@@ -113,8 +113,6 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, u
 
     engine.setModel(cur);
 
-    console.log(curType);
-    console.log(graph[curType || '']?.type?.contains);
     let avail = [];
     if (curType && graph[curType].type?.contains) avail = graph[curType].type.contains || [];
     else avail = Object.keys(graph).filter(nodeType => graph[nodeType].type.root);
@@ -139,7 +137,6 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, u
           // updateProject(diagram);
         } }));
 
-    console.log(availNodes);
     setAvailableNodes(availNodes);
 
     console.log('useEffect 2');

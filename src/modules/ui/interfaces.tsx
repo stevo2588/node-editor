@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import NodeEditor, { Props } from './graph';
 import SideBar from './sidebar';
-import { BaseNodeModel } from './graph/models/base';
+import { NodeModel } from './graph/models/model';
 import { Layout, Button, Space } from 'antd';
 import { Breadcrumb } from 'antd';
 import { Link } from '@reach/router';
@@ -17,7 +17,7 @@ const Container = styled.div`
 `;
 
 export default ({ path, graphPath = '', saveStatus, actions, ...rest }: { path: string, graphPath?: string, graphState: any, graph: Props['graph'], saveStatus: string, actions: { updateProject: (state: any) => void } }) => {
-  const [selectedNodes, setSelectedNodes] = useState<BaseNodeModel[]>([]);
+  const [selectedNodes, setSelectedNodes] = useState<NodeModel[]>([]);
 
   return (
       <Layout style={{ height: '100vh', overflow: 'hidden' }}>

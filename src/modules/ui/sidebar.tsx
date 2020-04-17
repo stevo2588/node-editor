@@ -1,10 +1,10 @@
 import React from 'react';
 import { Layout, Button, Typography, Form } from 'antd';
-import { BaseNodeModel } from './graph/models/base';
+import { NodeModel } from './graph/models/model';
 const { Sider } = Layout;
 
 
-export default ({ activeNodes }: { activeNodes: BaseNodeModel[] }) => {
+export default ({ activeNodes }: { activeNodes: NodeModel[] }) => {
   // const projectNodes = activeNodes
   //   .filter(n => n.getType() === 'project')
   //   .map(n => n as ProjectNodeModel);
