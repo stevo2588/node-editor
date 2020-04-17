@@ -1,6 +1,6 @@
 import { NodeModel as Model, NodeModelGenerics, PortModelAlignment, DiagramModel } from '@projectstorm/react-diagrams-core';
 import { BasePositionModelOptions } from '@projectstorm/react-canvas-core';
-import { DefaultPortModel } from '@projectstorm/react-diagrams';
+import { PortModel } from './port';
 
 
 export interface DefaultNodeModelOptions extends BasePositionModelOptions {
@@ -14,31 +14,25 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
   public path = '/';
 	public name: string;
 	public color: string;
-	public defaultInputs: any[] = []; // TODO: enum
-	protected portsIn: DefaultPortModel[];
-	protected portsOut: DefaultPortModel[];
+	readonly abstract defaultInputs: any[]; // TODO: enum
+	readonly abstract defaultOutputs: any[]; // TODO: enum
+	readonly abstract additionalInputs: any[]; // TODO: enum
+	readonly abstract additionalOutputs: any[]; // TODO: enum
+	protected portsIn: PortModel[];
+	protected portsOut: PortModel[];
 
-  constructor(isContainer: boolean, type: string, name: string, color: string, opts?: { graph: DiagramModel } & BasePositionModelOptions) {
+  constructor(isContainer: boolean, type: string, name: string, color: string) {
 		super({
 			type,
 			name,
 			color,
-			...opts,
 		});
 		this.color = color;
 		this.portsOut = [];
 		this.portsIn = [];
     this.name = name;
 
-    if (!opts) {
-      // this.addInPort('empty');
-      // this.addOutPort('empty');
-      if (isContainer) this.graph = new DiagramModel();
-      console.log(this.graph);
-      return;
-    }
-
-    if (isContainer) this.graph = opts.graph;
+    if (isContainer) this.graph = new DiagramModel();
   }
 
 	public get outputs() {
@@ -51,7 +45,7 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		super.doClone(lookupTable, clone);
 	}
 
-	removePort(port: DefaultPortModel): void {
+	removePort(port: PortModel): void {
 		super.removePort(port);
 		if (port.getOptions().in) {
 			this.portsIn.splice(this.portsIn.indexOf(port), 1);
@@ -60,7 +54,7 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		}
 	}
 
-	addPort<T extends DefaultPortModel>(port: T): T {
+	addPort<T extends PortModel>(port: T): T {
 		super.addPort(port);
 		if (port.getOptions().in) {
 			if (this.portsIn.indexOf(port) === -1) {
@@ -74,8 +68,8 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		return port;
 	}
 
-	addInPort(label: string, after = true): DefaultPortModel {
-		const p = new DefaultPortModel({
+	addInPort(label: string, after = true): PortModel {
+		const p = new PortModel({
 			in: true,
 			name: label,
 			label: label,
@@ -87,8 +81,8 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		return this.addPort(p);
 	}
 
-	addOutPort(label: string, after = true): DefaultPortModel {
-		const p = new DefaultPortModel({
+	addOutPort(label: string, after = true): PortModel {
+		const p = new PortModel({
 			in: false,
 			name: label,
 			label: label,
@@ -108,11 +102,11 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 	// 	return this.portsOut.map(p => p.getLinks()[0].getSourcePort().getNode() as T);
 	// }
 
-	getInPorts(): DefaultPortModel[] {
+	getInPorts(): PortModel[] {
 		return this.portsIn;
 	}
 
-	getOutPorts(): DefaultPortModel[] {
+	getOutPorts(): PortModel[] {
 		return this.portsOut;
 	}
 

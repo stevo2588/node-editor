@@ -12,8 +12,8 @@ import {
 } from '@projectstorm/react-diagrams-defaults';
 import { PathFindingLinkFactory } from '@projectstorm/react-diagrams-routing';
 import { SelectionBoxLayerFactory } from '@projectstorm/react-canvas-core';
-import NodeCanvas from './node-canvas';
-import { MiddlewareLinkFactory } from './link-custom';
+import NodeCanvas from './canvas';
+import { MiddlewareLinkFactory } from './link';
 import { NodeModel } from './models/model';
 
 

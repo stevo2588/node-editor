@@ -1,13 +1,13 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { DiagramEngine, PortWidget } from '@projectstorm/react-diagrams-core';
-import { DefaultPortModel } from '@projectstorm/react-diagrams';
 import { Dropdown, Menu, Button } from 'antd';
 import { NodeModel } from './models/model';
+import { PortModel } from './models/port';
 
 
 export interface DefaultPortLabelProps {
-	port: DefaultPortModel;
+	port: PortModel;
 	engine: DiagramEngine;
 }
 
@@ -124,20 +124,16 @@ export interface BaseNodeProps {
 
 export const NodeWidget = (props: BaseNodeProps) => {
   const addPortMenu = (input: boolean) => (
-    <Menu onClick={() => {
-      if (input) props.node.addInPort('input');
-      else props.node.addOutPort('output');
-      props.engine.repaintCanvas();
-    }}>
-      <Menu.Item key="0">
-        <div>Item 1</div>
-      </Menu.Item>
-      <Menu.Item key="1">
-        <div>Item 2</div>
-      </Menu.Item>
-      <Menu.Item key="3">
-        <div>Item 3</div>
-      </Menu.Item>
+    <Menu>
+      {(input ? (props.node.additionalInputs || []) : props.node.additionalOutputs).map((io: any) => (
+        <Menu.Item key="0" onClick={() => {
+          if (input) props.node.addInPort(io);
+          else props.node.addOutPort(io);
+          props.engine.repaintCanvas();
+        }}>
+          <div>{io}</div>
+        </Menu.Item>
+      ))}
     </Menu>
   );
 
@@ -162,18 +158,22 @@ export const NodeWidget = (props: BaseNodeProps) => {
       <Content>
         <PortsContainer>
           {props.node.getInPorts().map((port: any) => <NodePort left engine={props.engine} port={port} key={port.getID()} />)}
+          {props.node.additionalInputs?.length ?
           <Dropdown overlay={addPortMenu(true)} trigger={['click']} placement="bottomRight">
             <Button size="small">+</Button>
           </Dropdown>
+          : null}
         </PortsContainer>
         <BodyContainer>
           {/* {props.children} */}
         </BodyContainer>
         <PortsContainer>
           {props.node.getOutPorts().map((port: any) => <NodePort left={false} engine={props.engine} port={port} key={port.getID()} />)}
-          <Dropdown overlay={addPortMenu(false)} trigger={['click']} placement="bottomLeft">
-            <Button size="small">+</Button>
-          </Dropdown>
+          {props.node.additionalOutputs?.length ?
+            <Dropdown overlay={addPortMenu(false)} trigger={['click']} placement="bottomLeft">
+              <Button size="small">+</Button>
+            </Dropdown>
+          : null}
         </PortsContainer>
       </Content>
     </Node>
