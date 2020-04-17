@@ -11,6 +11,7 @@ export interface DefaultNodeModelOptions extends BasePositionModelOptions {
 export abstract class BaseNodeModel extends NodeModel<NodeModelGenerics & { OPTIONS: DefaultNodeModelOptions }> {
 	public name: string;
 	public color: string;
+	public defaultInputs: any[] = []; // TODO: enum
 	protected portsIn: DefaultPortModel[];
 	protected portsOut: DefaultPortModel[];
 
@@ -25,6 +26,10 @@ export abstract class BaseNodeModel extends NodeModel<NodeModelGenerics & { OPTI
 		this.color = options.color;
 		this.portsOut = [];
 		this.portsIn = [];
+	}
+
+	public get outputs() {
+		return []; // TODO
 	}
 
 	doClone(lookupTable: {}, clone: any): void {

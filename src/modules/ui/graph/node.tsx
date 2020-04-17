@@ -5,7 +5,7 @@ import { BaseNodeWidget } from './node-base';
 import { NodeModel } from './models/model';
 
 
-const NodeWidget = ({ node, engine }: { node: NodeModel; engine: DiagramEngine; }) => (
+export const NodeWidget = ({ node, engine }: { node: NodeModel; engine: DiagramEngine; }) => (
   <BaseNodeWidget
     node={node}
     engine={engine} headerButtonAction={node.graph ? () => {
@@ -16,15 +16,3 @@ const NodeWidget = ({ node, engine }: { node: NodeModel; engine: DiagramEngine; 
     <div>{console.log('rendering NodeWidget') as undefined}</div>
   </BaseNodeWidget>
 );
-
-export class NodeFactory extends AbstractReactFactory<NodeModel, DiagramEngine> {
-	constructor(type: string) { super(type); }
-  // this is called for every node during "deserialization" to create the initial instance.
-  // The deserialize method on the created instance is then called immediately after.
-	generateModel({ initialConfig }: { initialConfig: { id: string, ports: any[], type: string, selected: boolean, x: number, y: number } }) {
-    return new NodeModel(false, initialConfig.type, 'Untitled', 'red');
-  }
-	generateReactWidget(event: any) {
-    return <NodeWidget engine={this.engine as DiagramEngine} node={event.model} />;
-	}
-}

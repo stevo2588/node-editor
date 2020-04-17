@@ -6,6 +6,9 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { safeDump as dumpYml, load as loadYml } from "js-yaml";
 import { DiagramModel, DefaultLinkModel } from "@projectstorm/react-diagrams";
+import { DiagramEngine } from '@projectstorm/react-diagrams-core';
+import { NodeModel } from './modules/ui/graph/models/model';
+import { NodeWidget } from './modules/ui/graph/node';
 // import FileManager from './modules/fileManager';
 import { load, validate } from './modules/project';
 import UI from './modules/ui';
@@ -15,6 +18,8 @@ import plugins from 'spec-codegen/src/modules/plugins';
 // import { IntegrationNodeModel } from "./modules/ui/node-integration";
 // import { ProjectNodeModel } from "./modules/ui/node-project";
 import mainApi from "./mainApi";
+import { AbstractReactFactory } from '@projectstorm/react-canvas-core';
+import { CodeModel, CodeGenModel, BuildModel, ServiceModel, ServiceHostModel, ApiMapperModel, CodeContainerModel, BuildContainerModel, ServiceContainerModel, TestModel } from './modules/ui/graph/models';
 // import createUI from './modules/ui';
 
 
@@ -78,6 +83,23 @@ const persistProject = async (p: any) => {
 };
 
 // generateCode('', plugins[0], fileManager);
+
+class NodeFactory<T extends NodeModel> extends AbstractReactFactory<NodeModel, DiagramEngine> {
+  create: () => T;
+	constructor(type: { new(): T; type: string; }) {
+    super(type.type);
+    this.create = () => new type();
+  }
+  // this is called for every node during "deserialization" to create the initial instance.
+  // The deserialize method on the created instance is then called immediately after.
+	generateModel() {
+    return this.create();
+  }
+	generateReactWidget(event: any) {
+    return <NodeWidget engine={this.engine as DiagramEngine} node={event.model} />;
+	}
+}
+
 
 // Would prefer to use UI like this...
 // createUI({ stuff: 'stuff' });
@@ -152,86 +174,19 @@ const UIView = hot(() => {
           // updateService: () => {},
           // updateResource: () => {},
         },
-        graph: {
-          nodes: {
-            code: {
-              color: 'blue',
-              defaultInputs: ['code'],
-              additionalInputs: ['code'],
-              defaultOutputs: ['code'],
-              additionalOutputs: ['implementedEvent'],
-            },
-            codeGen: {
-              color: 'blue',
-              defaultInputs: ['code'],
-              additionalInputs: ['code'],
-              defaultOutputs: ['code'],
-              additionalOutputs: ['implementedEvent'],
-            },
-            test: {
-              color: 'yellow',
-              defaultInputs: ['code'],
-              additionalInputs: ['code'],
-              defaultOutputs: ['code'],
-              additionalOutputs: ['implementedEvent'],
-            },
-            build: {
-              color: 'yellow',
-              defaultInputs: ['code'],
-              additionalInputs: ['code'],
-              defaultOutputs: ['code'],
-              additionalOutputs: ['implementedEvent'],
-            },
-            service: {
-              color: 'green',
-              defaultInputs: ['code'],
-              additionalInputs: ['code'],
-              defaultOutputs: ['code'],
-              additionalOutputs: ['implementedEvent'],
-            },
-            serviceHost: {
-              color: 'green',
-              defaultInputs: ['code'],
-              additionalInputs: ['code'],
-              defaultOutputs: ['code'],
-              additionalOutputs: ['implementedEvent'],
-            },
-            apiMapper: {
-              root: true,
-              color: 'purple',
-              defaultInputs: ['code'],
-              additionalInputs: ['code'],
-              defaultOutputs: ['code'],
-              additionalOutputs: ['implementedEvent'],
-            },
-            codeContainer: {
-              color: 'blue',
-              contains: ['code', 'codeGen'],
-              defaultInputs: ['code'],
-              additionalInputs: ['code'],
-              defaultOutputs: ['code'],
-              additionalOutputs: ['implementedEvent'],
-            },
-            buildContainer: {
-              root: true,
-              contains: ['test', 'build', 'codeContainer'],
-              color: 'yellow',
-              defaultInputs: ['code'],
-              additionalInputs: ['code'],
-              defaultOutputs: ['code'],
-              additionalOutputs: ['implementedEvent'],
-            },
-            serviceContainer: {
-              root: true,
-              contains: ['service', 'serviceHost', 'apiMapper', 'serviceContainer'],
-              color: 'green',
-              defaultInputs: ['code'],
-              additionalInputs: ['code'],
-              defaultOutputs: ['code'],
-              additionalOutputs: ['implementedEvent'],
-            },
-          },
-        },
+        graph: [
+          CodeModel,
+          CodeGenModel,
+          TestModel,
+          BuildModel,
+          ServiceModel,
+          ServiceHostModel,
+          ApiMapperModel,
+          CodeContainerModel,
+          BuildContainerModel,
+          ServiceContainerModel,
+        ].map(M => ({ [M.type]: { type: M, factory: new NodeFactory(M) } }))
+          .reduce((a, b) => ({ ...a, ...b }), {}),
       }}
     />
   );

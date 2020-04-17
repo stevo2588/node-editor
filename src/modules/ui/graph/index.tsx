@@ -13,25 +13,12 @@ import {
 import { PathFindingLinkFactory } from '@projectstorm/react-diagrams-routing';
 import { SelectionBoxLayerFactory } from '@projectstorm/react-canvas-core';
 import NodeCanvas from './node-canvas';
-import { NodeFactory } from './node';
 import { MiddlewareLinkFactory } from './link-custom';
 import { NodeModel } from './models/model';
 
 
 export type Props = {
-  graph: {
-    nodes: {
-      [key: string]: {
-        root?: boolean;
-        contains?: string[];
-        color: string;
-        defaultInputs: string[];
-        additionalInputs: string[];
-        defaultOutputs: string[];
-        additionalOutputs: string[]; // calculated
-      };
-    };
-  };
+  graph: any;
   graphState: any;
   graphPath: string;
   navigate: (path: string) => void;
@@ -92,9 +79,9 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, u
   useEffect(() => {
     console.log('graph');
     console.log(graph);
-    for (const nodeType in graph.nodes) {
+    for (const nodeType in graph) {
       console.log(nodeType);
-      engine.getNodeFactories().registerFactory(new NodeFactory(nodeType));
+      engine.getNodeFactories().registerFactory(graph[nodeType].factory);
     }
     engine.getLinkFactories().registerFactory(new MiddlewareLinkFactory());
 
@@ -126,22 +113,25 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, u
 
     engine.setModel(cur);
 
+    console.log(curType);
+    console.log(graph[curType || '']?.type?.contains);
     let avail = [];
-    if (curType && graph.nodes[curType]?.contains) avail = graph.nodes[curType].contains || [];
-    else avail = Object.keys(graph.nodes).filter(nodeType => graph.nodes[nodeType].root);
+    if (curType && graph[curType].type?.contains) avail = graph[curType].type.contains || [];
+    else avail = Object.keys(graph).filter(nodeType => graph[nodeType].type.root);
 
     const availNodes = avail
-      .map(nodeType => ({
+      .map((nodeType: string) => ({
         key: nodeType,
         name: nodeType,
         onAddNode: ({ name }: { name: string }, { x, y }: { x: number, y: number }) => {
           const curDiagram = engine.getModel();
-          const node = new NodeModel(!!graph.nodes[nodeType].contains, nodeType, name, graph.nodes[nodeType].color);
+          // const node = new NodeModel(!!graph[nodeType].contains, nodeType, name, graph[nodeType].color);
+          const node = graph[nodeType].factory.generateModel();
           node.setPosition(x, y);
           node.registerListener({
             selectionChanged() { onUpdateActiveNodes(curDiagram.getSelectedEntities()); },
           });
-          if (graph.nodes[nodeType].contains) {
+          if (graph[nodeType].type.contains) {
             // @ts-ignore
             diagramInit(node.graph, onUpdateActiveNodes, updateProject, `${curDiagram.path}/${node.graph.getID()}`);
           }
