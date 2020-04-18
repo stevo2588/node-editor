@@ -17,7 +17,7 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 	readonly abstract defaultInputs: any[]; // TODO: enum
 	readonly abstract defaultOutputs: any[]; // TODO: enum
 	readonly abstract additionalInputs: any[]; // TODO: enum
-	readonly abstract additionalOutputs: any[]; // TODO: enum
+  readonly abstract additionalOutputs: any[]; // TODO: enum
 	protected portsIn: PortModel[];
 	protected portsOut: PortModel[];
 
@@ -39,15 +39,15 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		return []; // TODO
 	}
 
-	doClone(lookupTable: {}, clone: any): void {
+	doClone(lookupTable: {}, clone: any) {
 		clone.portsIn = [];
 		clone.portsOut = [];
 		super.doClone(lookupTable, clone);
 	}
 
-	removePort(port: PortModel): void {
+	removePort(port: PortModel) {
 		super.removePort(port);
-		if (port.getOptions().in) {
+		if (port.in) {
 			this.portsIn.splice(this.portsIn.indexOf(port), 1);
 		} else {
 			this.portsOut.splice(this.portsOut.indexOf(port), 1);
@@ -56,7 +56,7 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 
 	addPort<T extends PortModel>(port: T): T {
 		super.addPort(port);
-		if (port.getOptions().in) {
+		if (port.in) {
 			if (this.portsIn.indexOf(port) === -1) {
 				this.portsIn.push(port);
 			}
@@ -68,12 +68,10 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		return port;
 	}
 
-	addInPort(label: string, after = true): PortModel {
-		const p = new PortModel({
+	addInPort<U extends NodeModel>(type: { new(): U, type: string }, after = true) {
+		const p = new PortModel(type.type, {
 			in: true,
-			name: label,
-			label: label,
-			alignment: PortModelAlignment.LEFT
+			label: type.type,
 		});
 		if (!after) {
 			this.portsIn.splice(0, 0, p);
@@ -81,12 +79,10 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		return this.addPort(p);
 	}
 
-	addOutPort(label: string, after = true): PortModel {
-		const p = new PortModel({
+	addOutPort<U extends NodeModel>(type: { new(): U, type: string }, after = true) {
+		const p = new PortModel(type.type, {
 			in: false,
-			name: label,
-			label: label,
-			alignment: PortModelAlignment.RIGHT
+			label: type.type,
 		});
 		if (!after) {
 			this.portsOut.splice(0, 0, p);
@@ -102,11 +98,11 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 	// 	return this.portsOut.map(p => p.getLinks()[0].getSourcePort().getNode() as T);
 	// }
 
-	getInPorts(): PortModel[] {
+	getInPorts() {
 		return this.portsIn;
 	}
 
-	getOutPorts(): PortModel[] {
+	getOutPorts() {
 		return this.portsOut;
 	}
 
@@ -122,7 +118,7 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
     return s;
 	}
 
-	deserialize(event: any): void {
+	deserialize(event: any) {
     super.deserialize(event);
     this.name = event.data.name;
     this.color = event.data.color;

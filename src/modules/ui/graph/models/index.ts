@@ -1,12 +1,28 @@
 import { NodeModel } from "./model";
 
 
+export class ImplementedEventModel extends NodeModel {
+  static readonly type = 'implementedEvent';
+  readonly defaultInputs = [];
+  readonly additionalInputs = [];
+  readonly defaultOutputs = [ImplementedEventModel];
+  readonly additionalOutputs = [];
+
+  constructor() {
+    super(false, CodeModel.type, 'untitled', 'blue');
+  }
+
+	public get outputs() {
+		return []; // TODO
+	}
+}
+
 export class CodeModel extends NodeModel {
-  static type = 'code';
-  readonly defaultInputs = ['code']; // TODO: enum
-  readonly additionalInputs = ['code'];
-  readonly defaultOutputs = ['code'];
-  readonly additionalOutputs = ['implementedEvent'];
+  static readonly type = 'code';
+  readonly defaultInputs = [CodeModel];
+  readonly additionalInputs = [CodeModel];
+  readonly defaultOutputs = [CodeModel];
+  readonly additionalOutputs = [ImplementedEventModel];
 
   constructor() {
     super(false, CodeModel.type, 'untitled', 'blue');
@@ -18,11 +34,11 @@ export class CodeModel extends NodeModel {
 }
 
 export class CodeGenModel extends NodeModel {
-  static type = 'codeGen';
-  readonly defaultInputs = ['code'];
-  readonly additionalInputs = ['code'];
-  readonly defaultOutputs = ['code'];
-  readonly additionalOutputs = ['implementedEvent'];
+  static readonly type = 'codeGen';
+  readonly defaultInputs = [CodeModel];
+  readonly additionalInputs = [CodeModel];
+  readonly defaultOutputs = [CodeModel];
+  readonly additionalOutputs = [CodeModel, ImplementedEventModel];
 
   constructor() {
     super(false, CodeGenModel.type, 'untitled', 'blue');
@@ -34,11 +50,11 @@ export class CodeGenModel extends NodeModel {
 }
 
 export class TestModel extends NodeModel {
-  static type = 'test';
-  readonly defaultInputs = ['code'];
-  readonly additionalInputs = ['code'];
-  readonly defaultOutputs = ['code'];
-  readonly additionalOutputs = ['implementedEvent'];
+  static readonly type = 'test';
+  readonly defaultInputs = [CodeModel];
+  readonly additionalInputs = [CodeModel];
+  readonly defaultOutputs = [CodeModel];
+  readonly additionalOutputs = [ImplementedEventModel];
 
   constructor() {
     super(false, TestModel.type, 'untitled', 'yellow');
@@ -50,11 +66,11 @@ export class TestModel extends NodeModel {
 }
 
 export class BuildModel extends NodeModel {
-  static type = 'build';
-  readonly defaultInputs = ['code'];
-  readonly additionalInputs = ['code'];
-  readonly defaultOutputs = ['code'];
-  readonly additionalOutputs = ['implementedEvent'];
+  static readonly type = 'build';
+  readonly defaultInputs = [CodeModel];
+  readonly additionalInputs = [CodeModel];
+  readonly defaultOutputs = [CodeModel];
+  readonly additionalOutputs = [ImplementedEventModel];
 
   constructor() {
     super(false, BuildModel.type, 'untitled', 'yellow');
@@ -66,11 +82,11 @@ export class BuildModel extends NodeModel {
 }
 
 export class ServiceModel extends NodeModel {
-  static type = 'service';
-  readonly defaultInputs = ['code'];
-  readonly additionalInputs = ['code'];
-  readonly defaultOutputs = ['code'];
-  readonly additionalOutputs = ['implementedEvent'];
+  static readonly type = 'service';
+  readonly defaultInputs = [CodeModel];
+  readonly additionalInputs = [CodeModel];
+  readonly defaultOutputs = [CodeModel];
+  readonly additionalOutputs = [ImplementedEventModel];
 
   constructor() {
     super(false, ServiceModel.type, 'untitled', 'green');
@@ -82,11 +98,11 @@ export class ServiceModel extends NodeModel {
 }
 
 export class ServiceHostModel extends NodeModel {
-  static type = 'serviceHost';
-  readonly defaultInputs = ['code'];
-  readonly additionalInputs = ['code'];
-  readonly defaultOutputs = ['code'];
-  readonly additionalOutputs = ['implementedEvent'];
+  static readonly type = 'serviceHost';
+  readonly defaultInputs = [CodeModel];
+  readonly additionalInputs = [CodeModel];
+  readonly defaultOutputs = [CodeModel];
+  readonly additionalOutputs = [ImplementedEventModel];
 
   constructor() {
     super(false, ServiceHostModel.type, 'untitled', 'green');
@@ -98,12 +114,12 @@ export class ServiceHostModel extends NodeModel {
 }
 
 export class ApiMapperModel extends NodeModel {
-  static type = 'apiMapper';
-  root = true;
-  readonly defaultInputs = ['code'];
-  readonly additionalInputs = ['code'];
-  readonly defaultOutputs = ['code'];
-  readonly additionalOutputs = ['implementedEvent'];
+  static readonly type = 'apiMapper';
+  static readonly root = true;
+  readonly defaultInputs = [CodeModel];
+  readonly additionalInputs = [CodeModel];
+  readonly defaultOutputs = [CodeModel];
+  readonly additionalOutputs = [ImplementedEventModel];
 
   constructor() {
     super(false, ApiMapperModel.type, 'untitled', 'purple');
@@ -115,12 +131,12 @@ export class ApiMapperModel extends NodeModel {
 }
 
 export class CodeContainerModel extends NodeModel {
-  static type = 'codeContainer';
-  readonly contains = ['code', 'codeGen'];
-  readonly defaultInputs = ['code'];
-  readonly additionalInputs = ['code'];
-  readonly defaultOutputs = ['code'];
-  readonly additionalOutputs = ['implementedEvent'];
+  static readonly type = 'codeContainer';
+  static readonly contains = ['code', 'codeGen'];
+  readonly defaultInputs = [CodeModel];
+  readonly additionalInputs = [CodeModel];
+  readonly defaultOutputs = [CodeModel];
+  readonly additionalOutputs = [ImplementedEventModel];
 
   constructor() {
     super(true, CodeContainerModel.type, 'untitled', 'blue');
@@ -132,13 +148,13 @@ export class CodeContainerModel extends NodeModel {
 }
 
 export class BuildContainerModel extends NodeModel {
-  static type = 'buildContainer';
+  static readonly type = 'buildContainer';
   static readonly root = true;
   static readonly contains = ['test', 'build', 'codeContainer'];
-  readonly defaultInputs = ['code'];
-  readonly additionalInputs = ['code'];
-  readonly defaultOutputs = ['code'];
-  readonly additionalOutputs = ['implementedEvent'];
+  readonly defaultInputs = [CodeModel];
+  readonly additionalInputs = [CodeModel];
+  readonly defaultOutputs = [CodeModel];
+  readonly additionalOutputs = [ImplementedEventModel];
 
   constructor() {
     super(true, BuildContainerModel.type, 'untitled', 'yellow');
@@ -150,13 +166,13 @@ export class BuildContainerModel extends NodeModel {
 }
 
 export class ServiceContainerModel extends NodeModel {
-  static type = 'serviceContainer';
+  static readonly type = 'serviceContainer';
   static readonly root = true;
   static readonly contains = ['service', 'serviceHost', 'apiMapper', 'serviceContainer'];
-  readonly defaultInputs = ['code'];
-  readonly additionalInputs = ['code'];
-  readonly defaultOutputs = ['code'];
-  readonly additionalOutputs = ['implementedEvent'];
+  readonly defaultInputs = [CodeModel];
+  readonly additionalInputs = [CodeModel];
+  readonly defaultOutputs = [CodeModel];
+  readonly additionalOutputs = [ImplementedEventModel];
 
   constructor() {
     super(true, ServiceContainerModel.type, 'untitled', 'green');

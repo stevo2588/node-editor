@@ -6,11 +6,6 @@ import { NodeModel } from './models/model';
 import { PortModel } from './models/port';
 
 
-export interface DefaultPortLabelProps {
-	port: PortModel;
-	engine: DiagramEngine;
-}
-
 export const PortLabel = styled.div`
   display: flex;
   margin-top: 1px;
@@ -100,18 +95,18 @@ const BodyContainer = styled.div`
 `;
 
 
-const NodePort = (props: DefaultPortLabelProps & { left: boolean }) => {
+const NodePort = (props: { port: PortModel; engine: DiagramEngine; left: boolean }) => {
   const port = (
     <PortWidget engine={props.engine} port={props.port}>
       <Port left={props.left} />
     </PortWidget>
   );
-  const label = <Label>{props.port.getOptions().label}</Label>;
+  const label = <Label>{props.port.label}</Label>;
 
   return (
     <PortLabel>
-      {props.port.getOptions().in ? port : label}
-      {props.port.getOptions().in ? label : port}
+      {props.port.in ? port : label}
+      {props.port.in ? label : port}
     </PortLabel>
   );
 }
@@ -126,12 +121,12 @@ export const NodeWidget = (props: BaseNodeProps) => {
   const addPortMenu = (input: boolean) => (
     <Menu>
       {(input ? (props.node.additionalInputs || []) : props.node.additionalOutputs).map((io: any) => (
-        <Menu.Item key="0" onClick={() => {
+        <Menu.Item key={io.type} onClick={() => {
           if (input) props.node.addInPort(io);
           else props.node.addOutPort(io);
           props.engine.repaintCanvas();
         }}>
-          <div>{io}</div>
+          <div>{io.type}</div>
         </Menu.Item>
       ))}
     </Menu>

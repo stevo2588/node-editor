@@ -8,12 +8,12 @@ import {
 } from '@projectstorm/react-diagrams-core';
 import {
 	DefaultLabelFactory,
-	DefaultPortFactory,
 } from '@projectstorm/react-diagrams-defaults';
 import { PathFindingLinkFactory } from '@projectstorm/react-diagrams-routing';
 import { SelectionBoxLayerFactory } from '@projectstorm/react-canvas-core';
 import NodeCanvas from './canvas';
 import { MiddlewareLinkFactory } from './link';
+import { PortFactory } from './port';
 import { NodeModel } from './models/model';
 
 
@@ -33,7 +33,7 @@ engine.getLayerFactories().registerFactory(new SelectionBoxLayerFactory());
 
 engine.getLabelFactories().registerFactory(new DefaultLabelFactory());
 engine.getLinkFactories().registerFactory(new PathFindingLinkFactory());
-engine.getPortFactories().registerFactory(new DefaultPortFactory());
+engine.getPortFactories().registerFactory(new PortFactory());
 
 
 const state = new DefaultDiagramState();
