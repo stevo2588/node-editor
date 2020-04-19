@@ -8,8 +8,13 @@ export class ImplementedEventModel extends NodeModel {
   readonly defaultOutputs = [ImplementedEventModel];
   readonly additionalOutputs = [];
 
+  model = { };
+
+	get schema() { return { }};
+	get displayType() { return 'Implemented Event' };
+
   constructor() {
-    super(false, CodeModel.type, 'untitled', 'blue');
+    super(false, ImplementedEventModel.type, 'untitled', 'blue');
   }
 
 	public get outputs() {
@@ -23,6 +28,19 @@ export class CodeModel extends NodeModel {
   readonly additionalInputs = [CodeModel];
   readonly defaultOutputs = [CodeModel];
   readonly additionalOutputs = [ImplementedEventModel];
+
+  model = {
+    location: '',
+  };
+
+	get schema() { return {
+    location: {
+      type: String,
+      label: 'File Path',
+    },
+  } }
+
+	get displayType() { return 'Code' };
 
   constructor() {
     super(false, CodeModel.type, 'untitled', 'blue');
@@ -40,6 +58,10 @@ export class CodeGenModel extends NodeModel {
   readonly defaultOutputs = [CodeModel];
   readonly additionalOutputs = [CodeModel, ImplementedEventModel];
 
+  model = { };
+	get schema() { return { }};
+	get displayType() { return 'Code Generator' };
+
   constructor() {
     super(false, CodeGenModel.type, 'untitled', 'blue');
   }
@@ -55,6 +77,10 @@ export class TestModel extends NodeModel {
   readonly additionalInputs = [CodeModel];
   readonly defaultOutputs = [CodeModel];
   readonly additionalOutputs = [ImplementedEventModel];
+
+  model = { };
+	get schema() { return { }};
+	get displayType() { return 'Test' };
 
   constructor() {
     super(false, TestModel.type, 'untitled', 'yellow');
@@ -72,6 +98,10 @@ export class BuildModel extends NodeModel {
   readonly defaultOutputs = [CodeModel];
   readonly additionalOutputs = [ImplementedEventModel];
 
+  model = { };
+	get schema() { return { }};
+	get displayType() { return 'Build' };
+
   constructor() {
     super(false, BuildModel.type, 'untitled', 'yellow');
   }
@@ -88,6 +118,10 @@ export class ServiceModel extends NodeModel {
   readonly defaultOutputs = [CodeModel];
   readonly additionalOutputs = [ImplementedEventModel];
 
+  model = { };
+	get schema() { return { }};
+	get displayType() { return 'Service' };
+
   constructor() {
     super(false, ServiceModel.type, 'untitled', 'green');
   }
@@ -103,6 +137,10 @@ export class ServiceHostModel extends NodeModel {
   readonly additionalInputs = [CodeModel];
   readonly defaultOutputs = [CodeModel];
   readonly additionalOutputs = [ImplementedEventModel];
+
+  model = { };
+	get schema() { return { }};
+	get displayType() { return 'Service Host' };
 
   constructor() {
     super(false, ServiceHostModel.type, 'untitled', 'green');
@@ -121,6 +159,10 @@ export class ApiMapperModel extends NodeModel {
   readonly defaultOutputs = [CodeModel];
   readonly additionalOutputs = [ImplementedEventModel];
 
+  model = { };
+	get schema() { return { }};
+	get displayType() { return 'API Mapper' };
+
   constructor() {
     super(false, ApiMapperModel.type, 'untitled', 'purple');
   }
@@ -137,6 +179,10 @@ export class CodeContainerModel extends NodeModel {
   readonly additionalInputs = [CodeModel];
   readonly defaultOutputs = [CodeModel];
   readonly additionalOutputs = [ImplementedEventModel];
+
+  model = { };
+	get schema() { return { }};
+	get displayType() { return 'Code Container' };
 
   constructor() {
     super(true, CodeContainerModel.type, 'untitled', 'blue');
@@ -156,6 +202,10 @@ export class BuildContainerModel extends NodeModel {
   readonly defaultOutputs = [CodeModel];
   readonly additionalOutputs = [ImplementedEventModel];
 
+  model = { };
+	get schema() { return { }};
+	get displayType() { return 'Build Container' };
+
   constructor() {
     super(true, BuildContainerModel.type, 'untitled', 'yellow');
   }
@@ -173,6 +223,10 @@ export class ServiceContainerModel extends NodeModel {
   readonly additionalInputs = [CodeModel];
   readonly defaultOutputs = [CodeModel];
   readonly additionalOutputs = [ImplementedEventModel];
+
+  model = { };
+	get schema() { return { }};
+	get displayType() { return 'Service Container' };
 
   constructor() {
     super(true, ServiceContainerModel.type, 'untitled', 'green');

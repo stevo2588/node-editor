@@ -14,42 +14,28 @@ export default ({ activeNodes }: { activeNodes: NodeModel[] }) => {
   const projectNodes = [];
   const integrationNodes = [];
 
+  const [form] = Form.useForm();
+
   return (
     <Sider collapsed={activeNodes.length <= 0} width={300} collapsedWidth={0} trigger={null} style={{ padding: '15px', marginRight: '-30px' }}>
-      <Form name="sidebar">
+      <Form name="sidebar" form={form}>
       {activeNodes.map(p => (
-        <Form.Item required key={p.getID()}>
-          <Typography.Title level={4} editable>
+        <React.Fragment key={p.getID()}>
+        <Typography.Title level={4}>{p.displayType}</Typography.Title>
+        <Form.Item required name="name">
+          <Typography.Text editable={{ onChange: (t) => p.setName(t) }}>
             {p.name}
-          </Typography.Title>
+          </Typography.Text>
         </Form.Item>
+        </React.Fragment>
       ))}
-      {!(projectNodes.length > 0 && integrationNodes.length > 0) ? (
-        <div>
-        {integrationNodes.length > 0 ? (
-          <>
-            <Form.Item>
-              <Button type="primary" htmlType="button">Generate Code</Button>
-            </Form.Item>
-            {integrationNodes.length === 1 && (
-            <Form.Item>
-              <Button>Edit Service</Button>
-            </Form.Item>
-            )}
-          </>
-        ) : null}
-        {projectNodes.length === 1 ? (
-          <>
-            <Form.Item>
-              <Button type="primary" htmlType="button">Generate Code</Button>
-            </Form.Item>
-            <Form.Item>
-              <Button>Open Project</Button>
-            </Form.Item>
-          </>
-        ) : null}
-        </div>
-      ) : null}
+      {activeNodes.length === 1
+        // @ts-ignore
+        ? Object.keys(activeNodes[0].schema).map(f => (
+          <Form.Item key={f}>
+            <Button type="primary" htmlType="button">{activeNodes[0].schema[f].label}</Button>
+          </Form.Item>
+      )) : null}
       </Form>
     </Sider>
   );

@@ -111,6 +111,7 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, u
 
     if (!cur) throw new Error('path invalid');
 
+    if (engine.getModel()) engine.getModel().clearSelection();
     engine.setModel(cur);
 
     let avail = [];

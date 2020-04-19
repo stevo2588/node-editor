@@ -10,16 +10,19 @@ export interface DefaultNodeModelOptions extends BasePositionModelOptions {
 
 export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: DefaultNodeModelOptions }> {
   graph?: DiagramModel;
-  // model: any;
+  abstract model: any;
   public path = '/';
 	public name: string;
 	public color: string;
-	readonly abstract defaultInputs: any[]; // TODO: enum
-	readonly abstract defaultOutputs: any[]; // TODO: enum
-	readonly abstract additionalInputs: any[]; // TODO: enum
-  readonly abstract additionalOutputs: any[]; // TODO: enum
+	readonly abstract defaultInputs: typeof NodeModel[];
+	readonly abstract defaultOutputs: typeof NodeModel[];
+	readonly abstract additionalInputs: typeof NodeModel[];
+  readonly abstract additionalOutputs: typeof NodeModel[];
 	protected portsIn: PortModel[];
 	protected portsOut: PortModel[];
+
+	abstract get schema(): any;
+	abstract get displayType(): string;
 
   constructor(isContainer: boolean, type: string, name: string, color: string) {
 		super({
@@ -37,6 +40,12 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 
 	public get outputs() {
 		return []; // TODO
+	}
+
+	setName(name: string) {
+		this.name = name;
+		// this.fireEvent({ name }, 'nameChanged');
+		this.fireEvent({}, 'repaintCanvas');
 	}
 
 	doClone(lookupTable: {}, clone: any) {
@@ -111,6 +120,7 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
       ...super.serialize(),
 			name: this.name,
 			color: this.color,
+			model: this.model,
     };
 
     if (this.graph) s.graph = this.graph.serialize();
@@ -121,7 +131,8 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 	deserialize(event: any) {
     super.deserialize(event);
     this.name = event.data.name;
-    this.color = event.data.color;
+		this.color = event.data.color;
+		this.model = event.data.model;
     if (event.data.graph) {
       this.graph = new DiagramModel();
       this.graph.deserializeModel(event.data.graph, event.engine);
