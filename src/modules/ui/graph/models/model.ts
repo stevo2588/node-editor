@@ -1,5 +1,5 @@
-import { NodeModel as Model, NodeModelGenerics, PortModelAlignment, DiagramModel } from '@projectstorm/react-diagrams-core';
-import { BasePositionModelOptions } from '@projectstorm/react-canvas-core';
+import { NodeModel as Model, NodeModelGenerics, DiagramModel, NodeModelListener } from '@projectstorm/react-diagrams-core';
+import { BasePositionModelOptions, BaseEntityEvent } from '@projectstorm/react-canvas-core';
 import { PortModel } from './port';
 
 
@@ -8,7 +8,12 @@ export interface DefaultNodeModelOptions extends BasePositionModelOptions {
 	color: string;
 }
 
-export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: DefaultNodeModelOptions }> {
+interface Listener extends NodeModelListener {
+	// @ts-ignore
+	modelChanged?(event: BaseEntityEvent<NodeModel> & { model: {} | any }): void;
+}
+
+export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: DefaultNodeModelOptions; LISTENER: Listener }> {
   graph?: DiagramModel;
   abstract model: any;
   public path = '/';
@@ -44,8 +49,7 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 
 	setName(name: string) {
 		this.name = name;
-		// this.fireEvent({ name }, 'nameChanged');
-		this.fireEvent({}, 'repaintCanvas');
+		this.fireEvent({ model: { name } }, 'modelChanged');
 	}
 
 	doClone(lookupTable: {}, clone: any) {

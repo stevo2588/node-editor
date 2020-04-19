@@ -62,6 +62,10 @@ const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => voi
     // n.clearListeners();
     n.registerListener({
       selectionChanged() { onUpdateActiveNodes(d.getSelectedEntities()); },
+      modelChanged() {
+        onUpdateActiveNodes(d.getSelectedEntities()); // maybe do something better
+        engine.repaintCanvas();
+      },
     });
 
     const containerNode = n as NodeModel;
