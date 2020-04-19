@@ -7,6 +7,7 @@ import { Layout, Button, Space } from 'antd';
 import { Breadcrumb } from 'antd';
 import { Link } from '@reach/router';
 import { navigate } from './router';
+import { DiagramModel } from '@projectstorm/react-diagrams';
 const { Header, Content, Footer } = Layout;
 
 const Container = styled.div`
@@ -18,6 +19,7 @@ const Container = styled.div`
 
 export default ({ path, graphPath = '', saveStatus, actions, ...rest }: { path: string, graphPath?: string, graphState: any, graph: Props['graph'], saveStatus: string, actions: { updateProject: (state: any) => void } }) => {
   const [selectedNodes, setSelectedNodes] = useState<NodeModel[]>([]);
+  const [activeDiagram, setActiveDiagram] = useState<DiagramModel>();
 
   return (
       <Layout style={{ height: '100vh', overflow: 'hidden' }}>
@@ -38,10 +40,17 @@ export default ({ path, graphPath = '', saveStatus, actions, ...rest }: { path: 
         <Layout>
           <Content>
             <Container>
-              <NodeEditor {...rest} graphPath={graphPath} navigate={path => { console.log(path); navigate(path); }} onUpdateActiveNodes={setSelectedNodes} updateProject={actions.updateProject} />
+              <NodeEditor
+                {...rest}
+                graphPath={graphPath}
+                navigate={path => { console.log(path); navigate(path); }}
+                onUpdateActiveNodes={setSelectedNodes}
+                onUpdateDiagram={setActiveDiagram}
+                updateProject={actions.updateProject}
+              />
             </Container>
           </Content>
-          <SideBar activeNodes={selectedNodes} />
+          <SideBar activeNodes={selectedNodes} diagram={activeDiagram} />
         </Layout>
         <Footer style={{ position: 'sticky', bottom: 0, zIndex: 1, width: '100%', padding: '5px 15px' }}>
           Save status: {saveStatus}

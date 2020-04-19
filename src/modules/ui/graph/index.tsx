@@ -23,6 +23,7 @@ export type Props = {
   graphPath: string;
   navigate: (path: string) => void;
   onUpdateActiveNodes: (nodes: any[]) => void;
+  onUpdateDiagram: (diagram: DiagramModel) => void;
   updateProject: (state: any) => void;
 }
 
@@ -70,7 +71,7 @@ const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => voi
   });
 };
 
-export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, updateProject }: Props) => {
+export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, onUpdateDiagram, updateProject }: Props) => {
   console.log(graphPath);
   const [loaded, setLoaded] = useState(false);
   const [loaded2, setLoaded2] = useState(false);
@@ -113,6 +114,7 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, u
 
     if (engine.getModel()) engine.getModel().clearSelection();
     engine.setModel(cur);
+    onUpdateDiagram(cur);
 
     let avail = [];
     if (curType && graph[curType].type?.contains) avail = graph[curType].type.contains || [];

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Layout, Button, Typography, Form } from 'antd';
 import { NodeModel } from './graph/models/model';
+import { DiagramModel } from '@projectstorm/react-diagrams';
 const { Sider } = Layout;
 
 
-export default ({ activeNodes }: { activeNodes: NodeModel[] }) => {
+export default ({ activeNodes, diagram }: { activeNodes: NodeModel[], diagram?: DiagramModel }) => {
   // const projectNodes = activeNodes
   //   .filter(n => n.getType() === 'project')
   //   .map(n => n as ProjectNodeModel);
@@ -14,10 +15,24 @@ export default ({ activeNodes }: { activeNodes: NodeModel[] }) => {
   const projectNodes = [];
   const integrationNodes = [];
 
+  useEffect(() => {
+    if (diagram && activeNodes.length <= 0) diagram.getNodes().forEach(n => n.setLocked(false));
+  }, [activeNodes])
+
   const [form] = Form.useForm();
 
+  if (!diagram) return null;
+
   return (
-    <Sider collapsed={activeNodes.length <= 0} width={300} collapsedWidth={0} trigger={null} style={{ padding: '15px', marginRight: '-30px' }}>
+    <Sider
+      onFocus={() => activeNodes.forEach(n => n.setLocked(true))}
+      onBlur={() => activeNodes.forEach(n => n.setLocked(false))}
+      collapsed={activeNodes.length <= 0}
+      width={300}
+      collapsedWidth={0}
+      trigger={null}
+      style={{ padding: '15px', marginRight: '-30px' }}
+    >
       <Form name="sidebar" form={form}>
       {activeNodes.map(p => (
         <React.Fragment key={p.getID()}>
