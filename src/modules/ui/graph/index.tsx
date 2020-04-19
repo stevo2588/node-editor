@@ -47,24 +47,17 @@ const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => voi
   // @ts-ignore
   d.path = path;
   d.registerListener({
-    // nodesUpdated() { setUpdated(updated+1); },
-    // linksUpdated() { console.log('updating links'); setUpdated(updated+1); },
     eventDidFire(event: any) {
       if (['offsetUpdated', 'zoomUpdated'].includes(event.function)) return;
-      // console.log(event.function);
       updateProject(rootDiagram); // must always update root diagram
     },
   });
-
-  // d.fireEvent({ function: 'navigateToParent' }, 'specialHappened');
 
   d.getNodes().forEach(n => {
     // n.clearListeners();
     n.registerListener({
       selectionChanged() { onUpdateActiveNodes(d.getSelectedEntities()); },
-      modelChanged() {
-        updateProject(rootDiagram); // must always update root diagram
-      },
+      modelChanged() { updateProject(rootDiagram); },
     });
 
     const containerNode = n as NodeModel;
@@ -75,7 +68,6 @@ const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => voi
 };
 
 export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, onUpdateDiagram, updateProject }: Props) => {
-  console.log(graphPath);
   const [loaded, setLoaded] = useState(false);
   const [loaded2, setLoaded2] = useState(false);
   const [availableNodes, setAvailableNodes] = useState<{ name: string, onAddNode: (model: { name: string }, position: { x: number, y: number }) => void }[]>([]);
