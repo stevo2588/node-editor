@@ -63,8 +63,7 @@ const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => voi
     n.registerListener({
       selectionChanged() { onUpdateActiveNodes(d.getSelectedEntities()); },
       modelChanged() {
-        onUpdateActiveNodes(d.getSelectedEntities()); // maybe do something better
-        engine.repaintCanvas();
+        updateProject(rootDiagram); // must always update root diagram
       },
     });
 
