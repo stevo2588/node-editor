@@ -3,7 +3,8 @@ import styled from '@emotion/styled';
 import NodeEditor, { Props } from './graph';
 import SideBar from './sidebar';
 import { NodeModel } from './graph/models/model';
-import { Layout, Button, Space } from 'antd';
+import { Layout, Space, Select, Avatar, Typography } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 import { Breadcrumb } from 'antd';
 import { Link } from '@reach/router';
 import { navigate } from './router';
@@ -24,7 +25,12 @@ export default ({ path, graphPath = '', saveStatus, actions, ...rest }: { path: 
   return (
       <Layout style={{ height: '100vh', overflow: 'hidden' }}>
         <Header>
-          <Space direction="horizontal">
+          <Space direction="horizontal" style={{ flex: 1 }}>
+            <Select defaultValue="dev" style={{ width: 120 }}>
+              <Select.Option value="dev">Dev</Select.Option>
+              <Select.Option value="stage">Stage</Select.Option>
+              <Select.Option value="prod">Prod</Select.Option>
+            </Select>
             <Breadcrumb>
               <Breadcrumb.Item>
                 <Link to="/graph">home</Link>
@@ -35,6 +41,9 @@ export default ({ path, graphPath = '', saveStatus, actions, ...rest }: { path: 
                 </Breadcrumb.Item>
               ))}
             </Breadcrumb>
+          </Space>
+          <Space style={{ float: 'right' }}>
+            <Avatar icon={<UserOutlined />} />
           </Space>
         </Header>
         <Layout>
