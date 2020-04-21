@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { promises as fs } from 'fs';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
+// declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: any;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -22,6 +23,7 @@ const createWindow = () => {
       contextIsolation: true, // protect against prototype pollution
       enableRemoteModule: false, // turn off remote
       preload: path.join(__dirname, "preload.js") // use a preload script
+      // preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     }
   });
 

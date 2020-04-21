@@ -1,20 +1,11 @@
 import React, { useEffect } from 'react';
-import { Layout, Button, Typography, Form } from 'antd';
+import { Layout, Button, Typography, Form, Input } from 'antd';
 import { NodeModel } from './graph/models/model';
 import { DiagramModel } from '@projectstorm/react-diagrams';
 const { Sider } = Layout;
 
 
 export default ({ activeNodes, diagram }: { activeNodes: NodeModel[], diagram?: DiagramModel }) => {
-  // const projectNodes = activeNodes
-  //   .filter(n => n.getType() === 'project')
-  //   .map(n => n as ProjectNodeModel);
-  // const integrationNodes = activeNodes
-  //   .filter(n => n.getType() === 'integration')
-  //   .map(n => n as IntegrationNodeModel);
-  const projectNodes = [];
-  const integrationNodes = [];
-
   useEffect(() => {
     if (diagram && activeNodes.length <= 0) diagram.getNodes().forEach(n => n.setLocked(false));
   }, [activeNodes])
@@ -33,7 +24,7 @@ export default ({ activeNodes, diagram }: { activeNodes: NodeModel[], diagram?: 
       trigger={null}
       style={{ padding: '15px', marginRight: '-30px' }}
     >
-      <Form name="sidebar" form={form}>
+      <Form name="sidebar" form={form} colon={false} layout="vertical" onFieldsChange={() => console.log('fields changed')} onValuesChange={() => console.log('values changed')}>
       {activeNodes.map(p => (
         <React.Fragment key={p.getID()}>
         <Typography.Title level={4}>{p.displayType}</Typography.Title>
@@ -45,10 +36,9 @@ export default ({ activeNodes, diagram }: { activeNodes: NodeModel[], diagram?: 
         </React.Fragment>
       ))}
       {activeNodes.length === 1
-        // @ts-ignore
         ? Object.keys(activeNodes[0].schema).map(f => (
-          <Form.Item key={f}>
-            <Button type="primary" htmlType="button">{activeNodes[0].schema[f].label}</Button>
+          <Form.Item key={f} label={activeNodes[0].schema[f].label} trigger="onBlur">
+            <Input defaultValue={activeNodes[0].model[f]} placeholder={activeNodes[0].schema[f].placeholder} />
           </Form.Item>
       )) : null}
       </Form>

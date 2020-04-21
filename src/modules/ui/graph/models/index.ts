@@ -14,7 +14,7 @@ export class ImplementedEventModel extends NodeModel {
 	get displayType() { return 'Implemented Event' };
 
   constructor() {
-    super(false, ImplementedEventModel.type, 'untitled', 'blue');
+    super(false, ImplementedEventModel.type, 'untitled', 'red');
   }
 
 	public get outputs() {
@@ -30,7 +30,7 @@ export class CodeModel extends NodeModel {
   readonly additionalOutputs = [ImplementedEventModel];
 
   model = {
-    location: '',
+    location: '/home/stevo',
   };
 
 	get schema() { return {
@@ -44,6 +44,7 @@ export class CodeModel extends NodeModel {
 
   constructor() {
     super(false, CodeModel.type, 'untitled', 'blue');
+    this.model.location = '/home/stevo';
   }
 
 	public get outputs() {

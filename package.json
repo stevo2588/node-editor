@@ -3,7 +3,7 @@
   "productName": "archie",
   "version": "1.0.0",
   "description": "Archie - software architecture tool",
-  "main": ".webpack/main",
+  "main": "./.webpack/main",
   "scripts": {
     "dev": "electron-forge start",
     "package": "electron-forge package",
