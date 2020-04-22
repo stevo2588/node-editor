@@ -23,6 +23,9 @@ import {
   BuildContainerModel,
   ServiceContainerModel,
   TestModel,
+  ImplementedEventModel,
+  ApiModel,
+  ArtifactModel,
 } from './modules/ui/graph/models';
 
 
@@ -46,6 +49,9 @@ const UI = hot(() => (
       CodeContainerModel,
       BuildContainerModel,
       ServiceContainerModel,
+      ImplementedEventModel,
+      ApiModel,
+      ArtifactModel,
     ]}
     mainApi={mainApi}
     load={load}

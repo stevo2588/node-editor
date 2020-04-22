@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Layout, Button, Typography, Form, Input } from 'antd';
 import { NodeModel } from './graph/models/model';
-import { DiagramModel } from '@projectstorm/react-diagrams';
+import { DiagramModel } from './graph/models/diagram';
 const { Sider } = Layout;
 
 

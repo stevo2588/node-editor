@@ -4,10 +4,10 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import React, { useState, useEffect } from 'react';
 import { safeDump as dumpYml, load as loadYml } from "js-yaml";
-import { DiagramModel, DefaultLinkModel } from "@projectstorm/react-diagrams";
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { NodeModel } from './graph/models/model';
 import { NodeWidget } from './graph/node';
+import { DiagramModel } from './graph/models/diagram';
 import { AbstractReactFactory } from '@projectstorm/react-canvas-core';
 
 

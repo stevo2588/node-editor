@@ -1,6 +1,7 @@
-import { NodeModel as Model, NodeModelGenerics, DiagramModel, NodeModelListener } from '@projectstorm/react-diagrams-core';
+import { NodeModel as Model, NodeModelGenerics, NodeModelListener } from '@projectstorm/react-diagrams-core';
 import { BasePositionModelOptions, BaseEntityEvent } from '@projectstorm/react-canvas-core';
 import { PortModel } from './port';
+import { DiagramModel } from './diagram';
 
 
 export interface DefaultNodeModelOptions extends BasePositionModelOptions {
@@ -14,7 +15,8 @@ interface Listener extends NodeModelListener {
 }
 
 export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: DefaultNodeModelOptions; LISTENER: Listener }> {
-  graph?: DiagramModel;
+	graph?: DiagramModel;
+	containerPortToModelMap: Record<string, string> = {};
   abstract model: any;
   public path = '/';
 	public name: string;
@@ -25,6 +27,7 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
   readonly abstract additionalOutputs: typeof NodeModel[];
 	protected portsIn: PortModel[];
 	protected portsOut: PortModel[];
+	isReadonly = false;
 
 	abstract get schema(): any;
 	abstract get displayType(): string;
@@ -46,6 +49,8 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 	public get outputs() {
 		return []; // TODO
 	}
+
+	abstract setAsIO(input: boolean): void;
 
 	setName(name: string) {
 		this.name = name;
@@ -70,6 +75,10 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		} else {
 			this.portsOut.splice(this.portsOut.indexOf(port), 1);
 		}
+
+		if (this.graph) {
+			this.graph.removeNodeById(this.containerPortToModelMap[port.getID()]);
+		}
 	}
 
 	addPort<T extends PortModel>(port: T): T {
@@ -91,9 +100,18 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 			in: true,
 			label: type.type,
 		});
+
+		if (this.graph) {
+			const n = new type();
+			n.isReadonly = true;
+			this.graph.addInputNode(n);
+			this.containerPortToModelMap[p.getID()] = n.getID();
+		}
+
 		if (!after) {
 			this.portsIn.splice(0, 0, p);
 		}
+
 		return this.addPort(p);
 	}
 
@@ -102,9 +120,18 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 			in: false,
 			label: type.type,
 		});
+
+		if (this.graph) {
+			const n = new type();
+			n.isReadonly = true;
+			this.graph.addOutputNode(n);
+			this.containerPortToModelMap[p.getID()] = n.getID();
+		}
+
 		if (!after) {
 			this.portsOut.splice(0, 0, p);
 		}
+
 		return this.addPort(p);
 	}
 
@@ -117,10 +144,28 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 	// }
 
 	getInPorts() {
+		// if (this.graph) {
+		// 	// @ts-ignore
+		// 	return this.graph.getInputNodes().map(n => new PortModel(n.constructor.type, {
+		// 		in: true,
+		// 		// @ts-ignore
+		// 		label: n.constructor.type,
+		// 	}));
+		// }
+
 		return this.portsIn;
 	}
 
 	getOutPorts() {
+		// if (this.graph) {
+		// 	// @ts-ignore
+		// 	return this.graph.getOutputNodes().map(n => new PortModel(n.constructor.type, {
+		// 		in: false,
+		// 		// @ts-ignore
+		// 		label: n.constructor.type,
+		// 	}));
+		// }
+
 		return this.portsOut;
 	}
 
@@ -132,7 +177,10 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 			model: this.model,
     };
 
-    if (this.graph) s.graph = this.graph.serialize();
+    if (this.graph) {
+			s.graph = this.graph.serialize();
+			s.containerPortToModelMap = this.containerPortToModelMap;
+		}
 
     return s;
 	}
@@ -144,7 +192,8 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		this.model = event.data.model;
     if (event.data.graph) {
       this.graph = new DiagramModel();
-      this.graph.deserializeModel(event.data.graph, event.engine);
+			this.graph.deserializeModel(event.data.graph, event.engine);
+			this.containerPortToModelMap = event.data.containerPortToModelMap;
     }
   }
 }

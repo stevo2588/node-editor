@@ -18,6 +18,11 @@ export class ImplementedEventModel extends NodeModel {
     super(false, ImplementedEventModel.type, 'untitled', 'red');
   }
 
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(ImplementedEventModel);
+    else this.addInPort(ImplementedEventModel);
+  }
+
 	public get outputs() {
 		return []; // TODO
 	}
@@ -40,6 +45,11 @@ export class ApiModel extends NodeModel {
     super(false, ApiModel.type, 'untitled', 'red');
   }
 
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(ApiModel);
+    else this.addInPort(ApiModel);
+  }
+
 	public get outputs() {
 		return []; // TODO
 	}
@@ -60,6 +70,11 @@ export class ArtifactModel extends NodeModel {
 
   constructor() {
     super(false, ArtifactModel.type, 'untitled', 'red');
+  }
+
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(ArtifactModel);
+    else this.addInPort(ArtifactModel);
   }
 
 	public get outputs() {
@@ -94,6 +109,11 @@ export class CodeModel extends NodeModel {
     super(false, CodeModel.type, 'untitled', 'blue');
   }
 
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(CodeModel);
+    else this.addInPort(CodeModel);
+  }
+
 	public get outputs() {
 		return []; // TODO
 	}
@@ -113,6 +133,11 @@ export class CodeGenModel extends NodeModel {
 
   constructor() {
     super(false, CodeGenModel.type, 'untitled', 'blue');
+  }
+
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(CodeGenModel);
+    else this.addInPort(CodeGenModel);
   }
 
 	public get outputs() {
@@ -136,6 +161,11 @@ export class TestModel extends NodeModel {
     super(false, TestModel.type, 'untitled', 'yellow');
   }
 
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(TestModel);
+    else this.addInPort(TestModel);
+  }
+
 	public get outputs() {
 		return []; // TODO
 	}
@@ -155,6 +185,11 @@ export class BuildModel extends NodeModel {
 
   constructor() {
     super(false, BuildModel.type, 'untitled', 'yellow');
+  }
+
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(BuildModel);
+    else this.addInPort(BuildModel);
   }
 
 	public get outputs() {
@@ -178,6 +213,11 @@ export class ServiceModel extends NodeModel {
     super(false, ServiceModel.type, 'untitled', 'green');
   }
 
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(ServiceModel);
+    else this.addInPort(ServiceModel);
+  }
+
 	public get outputs() {
 		return []; // TODO
 	}
@@ -197,6 +237,11 @@ export class ServiceHostModel extends NodeModel {
 
   constructor() {
     super(false, ServiceHostModel.type, 'untitled', 'green');
+  }
+
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(ServiceHostModel);
+    else this.addInPort(ServiceHostModel);
   }
 
 	public get outputs() {
@@ -221,6 +266,11 @@ export class ApiMapperModel extends NodeModel {
     super(false, ApiMapperModel.type, 'untitled', 'purple');
   }
 
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(ApiMapperModel);
+    else this.addInPort(ApiMapperModel);
+  }
+
 	public get outputs() {
 		return []; // TODO
 	}
@@ -241,6 +291,11 @@ export class CodeContainerModel extends NodeModel {
 
   constructor() {
     super(true, CodeContainerModel.type, 'untitled', 'blue');
+  }
+
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(CodeContainerModel);
+    else this.addInPort(CodeContainerModel);
   }
 
 	public get outputs() {
@@ -265,6 +320,11 @@ export class BuildContainerModel extends NodeModel {
     super(true, BuildContainerModel.type, 'untitled', 'yellow');
   }
 
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(BuildContainerModel);
+    else this.addInPort(BuildContainerModel);
+  }
+
 	public get outputs() {
 		return []; // TODO
 	}
@@ -286,6 +346,11 @@ export class ServiceContainerModel extends NodeModel {
 
   constructor() {
     super(true, ServiceContainerModel.type, 'untitled', 'green');
+  }
+
+  setAsIO(input: boolean) {
+    if (input) this.addOutPort(ServiceContainerModel);
+    else this.addInPort(ServiceContainerModel);
   }
 
 	public get outputs() {

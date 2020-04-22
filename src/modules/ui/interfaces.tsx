@@ -8,7 +8,7 @@ import { UserOutlined } from '@ant-design/icons';
 import { Breadcrumb } from 'antd';
 import { Link } from '@reach/router';
 import { navigate } from './router';
-import { DiagramModel } from '@projectstorm/react-diagrams';
+import { DiagramModel } from './graph/models/diagram';
 const { Header, Content, Footer } = Layout;
 
 const Container = styled.div`

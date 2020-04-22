@@ -4,7 +4,6 @@ import {
 	DiagramEngine,
 	LinkLayerFactory,
 	NodeLayerFactory,
-  DiagramModel,
 } from '@projectstorm/react-diagrams-core';
 import {
 	DefaultLabelFactory,
@@ -15,6 +14,7 @@ import NodeCanvas from './canvas';
 import { MiddlewareLinkFactory } from './link';
 import { PortFactory } from './port';
 import { NodeModel } from './models/model';
+import { DiagramModel } from './models/diagram';
 
 
 export type Props = {
@@ -44,7 +44,6 @@ engine.getStateMachine().pushState(state);
 const rootDiagram = new DiagramModel();
 
 const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => void, updateProject: (state: any) => void, path = '') => {
-  // @ts-ignore
   d.path = path;
   d.registerListener({
     eventDidFire(event: any) {
@@ -120,7 +119,7 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, o
         key: nodeType,
         name: graph[nodeType].type.displayType,
         onAddNode: ({ name }: { name: string }, { x, y }: { x: number, y: number }) => {
-          const curDiagram = engine.getModel();
+          const curDiagram = engine.getModel() as DiagramModel;
           // const node = new NodeModel(!!graph[nodeType].contains, nodeType, name, graph[nodeType].color);
           const node = graph[nodeType].factory.generateModel();
           node.setPosition(x, y);
@@ -128,7 +127,6 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, o
             selectionChanged() { onUpdateActiveNodes(curDiagram.getSelectedEntities()); },
           });
           if (graph[nodeType].type.contains) {
-            // @ts-ignore
             diagramInit(node.graph, onUpdateActiveNodes, updateProject, `${curDiagram.path}/${node.graph.getID()}`);
           }
           curDiagram.addNode(node);
