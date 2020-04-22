@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import NodeEditor, { Props } from './graph';
 import SideBar from './sidebar';
 import { NodeModel } from './graph/models/model';
-import { Layout, Space, Select, Avatar, Typography } from 'antd';
+import { Layout, Space, Select, Avatar, Typography, Button } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { Breadcrumb } from 'antd';
 import { Link } from '@reach/router';
@@ -18,7 +18,7 @@ const Container = styled.div`
   height: 100%;
 `;
 
-export default ({ path, graphPath = '', saveStatus, actions, ...rest }: { path: string, graphPath?: string, graphState: any, graph: Props['graph'], saveStatus: string, actions: { updateProject: (state: any) => void } }) => {
+export default ({ path, graphPath = '', saveStatus, actions, ...rest }: { path: string, graphPath?: string, graphState: any, graph: Props['graph'], saveStatus: string, actions: { updateProject: (state: any) => void,  traverseGraph: (state: any) => void } }) => {
   const [selectedNodes, setSelectedNodes] = useState<NodeModel[]>([]);
   const [activeDiagram, setActiveDiagram] = useState<DiagramModel>();
 
@@ -43,6 +43,7 @@ export default ({ path, graphPath = '', saveStatus, actions, ...rest }: { path: 
             </Breadcrumb>
           </Space>
           <Space style={{ float: 'right' }}>
+            <Button onClick={() => actions.traverseGraph(activeDiagram)}>Traverse Graph</Button>
             <Avatar icon={<UserOutlined />} />
           </Space>
         </Header>

@@ -77,6 +77,10 @@ async function loadFile(filename: string) {
   return fs.readFile(projFilename, 'utf8');
 };
 
+async function traverseGraph(graph: any) {
+  console.log(graph);
+};
+
 ipcMain.handle("toMain", async (event, ...args) => {
   const [func, ...params] = args;
 
@@ -85,6 +89,8 @@ ipcMain.handle("toMain", async (event, ...args) => {
       return saveFile(params[0], params[1]);
     case 'loadFile':
       return loadFile(params[0]);
+    case 'traverseGraph':
+      return traverseGraph(params[0]);
   
     default:
       break;

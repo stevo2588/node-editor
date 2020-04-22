@@ -93,6 +93,9 @@ export default ({ persistProject, graph, mainApi, load, validate }: { persistPro
           updateProject: (p: DiagramModel) => {
             setGraphState(p.serialize());
           },
+          traverseGraph: (p: DiagramModel) => {
+            mainApi.traverseGraph(p.serialize());
+          },
         },
         graph: graph
           .map((M: any) => ({ [M.type]: { type: M, factory: new NodeFactory(M) } }))

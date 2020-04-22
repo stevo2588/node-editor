@@ -14,4 +14,7 @@ export default {
   async loadFile(fileName: string) {
     return api.invoke("toMain", "loadFile", fileName);
   },
+  async traverseGraph(graph: any) {
+    return api.invoke("toMain", "traverseGraph", graph);
+  }
 };
