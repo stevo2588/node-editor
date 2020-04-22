@@ -126,7 +126,7 @@ export const NodeWidget = (props: BaseNodeProps) => {
           else props.node.addOutPort(io);
           props.engine.repaintCanvas();
         }}>
-          <div>{io.type}</div>
+          <div>{io.displayType}</div>
         </Menu.Item>
       ))}
     </Menu>

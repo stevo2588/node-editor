@@ -10,7 +10,11 @@ export default ({ activeNodes, diagram }: { activeNodes: NodeModel[], diagram?: 
     if (diagram && activeNodes.length <= 0) diagram.getNodes().forEach(n => n.setLocked(false));
   }, [activeNodes])
 
-  const [form] = Form.useForm();
+  // const [form] = Form.useForm();
+
+  // useEffect(() => {
+  //   form.se
+  // })
 
   if (!diagram) return null;
 
@@ -24,24 +28,33 @@ export default ({ activeNodes, diagram }: { activeNodes: NodeModel[], diagram?: 
       trigger={null}
       style={{ padding: '15px', marginRight: '-30px' }}
     >
-      <Form name="sidebar" form={form} colon={false} layout="vertical" onFieldsChange={() => console.log('fields changed')} onValuesChange={() => console.log('values changed')}>
       {activeNodes.map(p => (
         <React.Fragment key={p.getID()}>
         <Typography.Title level={4}>{p.displayType}</Typography.Title>
-        <Form.Item required name="name">
           <Typography.Text editable={{ onChange: (t) => p.setName(t) }}>
             {p.name}
           </Typography.Text>
-        </Form.Item>
+        {activeNodes.length === 1
+          ? (
+          <Form
+            name="sidebar"
+            // form={form}
+            colon={false}
+            layout="vertical"
+            onFieldsChange={() => console.log('fields changed')}
+            onValuesChange={() => console.log('values changed')}
+            onFinish={values => p.setModel(values)}
+            initialValues={p.model}
+          >
+            {Object.keys(p.schema).map(f => (
+              <Form.Item name={f} key={f} label={p.schema[f].label}>
+                <Input placeholder={p.schema[f].placeholder} />
+              </Form.Item>
+            ))}
+          </Form>
+          ) : null}
         </React.Fragment>
       ))}
-      {activeNodes.length === 1
-        ? Object.keys(activeNodes[0].schema).map(f => (
-          <Form.Item key={f} label={activeNodes[0].schema[f].label} trigger="onBlur">
-            <Input defaultValue={activeNodes[0].model[f]} placeholder={activeNodes[0].schema[f].placeholder} />
-          </Form.Item>
-      )) : null}
-      </Form>
     </Sider>
   );
 };

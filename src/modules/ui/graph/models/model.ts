@@ -52,6 +52,11 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		this.fireEvent({ model: { name } }, 'modelChanged');
 	}
 
+	setModel(model: Record<string, any>) {
+		this.model = model;
+		this.fireEvent({ model }, 'modelChanged');
+	}
+
 	doClone(lookupTable: {}, clone: any) {
 		clone.portsIn = [];
 		clone.portsOut = [];

@@ -118,7 +118,7 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, o
     const availNodes = avail
       .map((nodeType: string) => ({
         key: nodeType,
-        name: nodeType,
+        name: graph[nodeType].type.displayType,
         onAddNode: ({ name }: { name: string }, { x, y }: { x: number, y: number }) => {
           const curDiagram = engine.getModel();
           // const node = new NodeModel(!!graph[nodeType].contains, nodeType, name, graph[nodeType].color);
