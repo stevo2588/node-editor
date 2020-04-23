@@ -78,7 +78,11 @@ async function loadFile(filename: string) {
 };
 
 async function traverseGraph(graph: any) {
-  console.log(graph);
+  const nodes = graph.layers.find((l: any) => l.type === 'diagram-nodes').models;
+  Object.values(nodes).forEach((n: any) => {
+    console.log(n.type);
+    if (n.graph) traverseGraph(n.graph);
+  });
 };
 
 ipcMain.handle("toMain", async (event, ...args) => {
