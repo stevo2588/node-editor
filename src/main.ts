@@ -1,6 +1,31 @@
+// @ts-ignore
+global.Element = function(){};
+// @ts-ignore
+global.document = function(){};
+
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { promises as fs } from 'fs';
+import { DiagramModel } from './modules/ui/graph/models/diagram';
+import createEngine from './modules/ui/graph/engine';
+import {
+  CodeModel,
+  CodeGenModel,
+  BuildModel,
+  ServiceModel,
+  ServiceHostModel,
+  ApiMapperModel,
+  CodeContainerModel,
+  BuildContainerModel,
+  ServiceContainerModel,
+  TestModel,
+  ImplementedEventModel,
+  ApiModel,
+  ArtifactModel,
+} from './modules/ui/graph/models';
+import { AbstractModelFactory } from '@projectstorm/react-canvas-core';
+import { NodeModel } from './modules/ui/graph/models/model';
+
 declare const MAIN_WINDOW_WEBPACK_ENTRY: any;
 // declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: any;
 
@@ -77,13 +102,65 @@ async function loadFile(filename: string) {
   return fs.readFile(projFilename, 'utf8');
 };
 
-async function traverseGraph(graph: any) {
-  const nodes = graph.layers.find((l: any) => l.type === 'diagram-nodes').models;
-  Object.values(nodes).forEach((n: any) => {
-    console.log(n.type);
-    if (n.graph) traverseGraph(n.graph);
-  });
+async function compile(node: NodeModel, inputData: any[]) {
+  console.log(node);
+  console.log(inputData);
+  return { inputData, node };
+}
+
+async function compileNode(node: NodeModel): Promise<{ inputData: any[]; node: NodeModel; }> {
+  const inputs = node.getInPorts();
+  const getInputData = inputs.filter(i => Object.keys(i.getLinks()).length > 0).map(i => {
+		const inputModel = Object.values(i.getLinks())[0].getSourcePort().getNode() as NodeModel;
+    return compileNode(inputModel);
+  })
+  const inputData = await Promise.all(getInputData);
+  return compile(node, inputData);
 };
+
+export class NodeFactory extends AbstractModelFactory {
+  create: () => any;
+	constructor(type: { new(): any; type: string; }) {
+    super(type.type);
+    this.create = () => new type();
+  }
+	generateModel() {
+    return this.create();
+  }
+}
+
+// @ts-ignore
+const engine = createEngine([
+  CodeModel,
+  CodeGenModel,
+  TestModel,
+  BuildModel,
+  ServiceModel,
+  ServiceHostModel,
+  ApiMapperModel,
+  CodeContainerModel,
+  BuildContainerModel,
+  ServiceContainerModel,
+  ImplementedEventModel,
+  ApiModel,
+  ArtifactModel,
+].map((M: any) => new NodeFactory(M)));
+
+async function _traverseGraph(diagram: DiagramModel) {
+  const nodes = diagram.getNodeLayers().map(l => Object.values(l.getModels()).map(m => m as NodeModel)).reduce((a, b) => [...a, ...b], []);
+  const nodeEffects = nodes.map(async (n) => {
+    await n.codeEffect();
+
+    if (n.graph) await _traverseGraph(n.graph);
+  });
+  return Promise.all(nodeEffects);
+};
+
+async function traverseGraph(graph: any) {
+  const diagram = new DiagramModel();
+  diagram.deserializeModel(graph, engine);
+  return _traverseGraph(diagram);
+}
 
 ipcMain.handle("toMain", async (event, ...args) => {
   const [func, ...params] = args;

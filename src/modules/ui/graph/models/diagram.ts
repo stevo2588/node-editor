@@ -5,8 +5,10 @@ import { NodeModel } from './model';
 
 export class DiagramModel extends DM {
   path = '/';
+  containerNode?: NodeModel;
 	protected inputNodeIds: string[];
 	protected outputNodeIds: string[];
+  createNodeByType: (type: string) => NodeModel = () => { throw new Error('Not set'); };
 
 	constructor() {
     super();
@@ -28,16 +30,18 @@ export class DiagramModel extends DM {
     this.outputNodeIds = event.data.outputNodeIds;
   }
 
-	addInputNode(node: NodeModel) {
-    node.setAsIO(true);
-    const n = this.addNode(node);
+	addInputNode(type: string) {
+    const n = this.createNodeByType(type);
+    n.addOutPort(type);
+    this.addNode(n);
     this.inputNodeIds.push(n.getID());
     return n;
   }
 
-	addOutputNode(node: NodeModel) {
-    node.setAsIO(false);
-    const n = this.addNode(node);
+	addOutputNode(type: string) {
+    const n = this.createNodeByType(type);
+    n.addInPort(type);
+    this.addNode(n);
     this.outputNodeIds.push(n.getID());
     return n;
 	}

@@ -18,9 +18,11 @@ export class ImplementedEventModel extends NodeModel {
     super(false, ImplementedEventModel.type, 'untitled', 'red');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(ImplementedEventModel);
-    else this.addInPort(ImplementedEventModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -45,9 +47,11 @@ export class ApiModel extends NodeModel {
     super(false, ApiModel.type, 'untitled', 'red');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(ApiModel);
-    else this.addInPort(ApiModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -72,9 +76,11 @@ export class ArtifactModel extends NodeModel {
     super(false, ArtifactModel.type, 'untitled', 'red');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(ArtifactModel);
-    else this.addInPort(ArtifactModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -109,14 +115,15 @@ export class CodeModel extends NodeModel {
     super(false, CodeModel.type, 'untitled', 'blue');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(CodeModel);
-    else this.addInPort(CodeModel);
+  async codeEffect() {
+    console.log('code effect');
+    console.log(this.compiledData);
   }
 
-	public get outputs() {
-		return []; // TODO
-	}
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
+  }
 }
 
 export class CodeGenModel extends NodeModel {
@@ -135,9 +142,11 @@ export class CodeGenModel extends NodeModel {
     super(false, CodeGenModel.type, 'untitled', 'blue');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(CodeGenModel);
-    else this.addInPort(CodeGenModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -161,9 +170,11 @@ export class TestModel extends NodeModel {
     super(false, TestModel.type, 'untitled', 'yellow');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(TestModel);
-    else this.addInPort(TestModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -187,9 +198,11 @@ export class BuildModel extends NodeModel {
     super(false, BuildModel.type, 'untitled', 'yellow');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(BuildModel);
-    else this.addInPort(BuildModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -213,9 +226,11 @@ export class ServiceModel extends NodeModel {
     super(false, ServiceModel.type, 'untitled', 'green');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(ServiceModel);
-    else this.addInPort(ServiceModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -239,9 +254,11 @@ export class ServiceHostModel extends NodeModel {
     super(false, ServiceHostModel.type, 'untitled', 'green');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(ServiceHostModel);
-    else this.addInPort(ServiceHostModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -266,9 +283,11 @@ export class ApiMapperModel extends NodeModel {
     super(false, ApiMapperModel.type, 'untitled', 'purple');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(ApiMapperModel);
-    else this.addInPort(ApiMapperModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -293,9 +312,11 @@ export class CodeContainerModel extends NodeModel {
     super(true, CodeContainerModel.type, 'untitled', 'blue');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(CodeContainerModel);
-    else this.addInPort(CodeContainerModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -320,9 +341,11 @@ export class BuildContainerModel extends NodeModel {
     super(true, BuildContainerModel.type, 'untitled', 'yellow');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(BuildContainerModel);
-    else this.addInPort(BuildContainerModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {
@@ -348,9 +371,11 @@ export class ServiceContainerModel extends NodeModel {
     super(true, ServiceContainerModel.type, 'untitled', 'green');
   }
 
-  setAsIO(input: boolean) {
-    if (input) this.addOutPort(ServiceContainerModel);
-    else this.addInPort(ServiceContainerModel);
+  async codeEffect() {}
+
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+    // TODO
+    return { outputs: [], data: {} };
   }
 
 	public get outputs() {

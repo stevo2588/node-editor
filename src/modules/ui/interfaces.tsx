@@ -18,7 +18,17 @@ const Container = styled.div`
   height: 100%;
 `;
 
-export default ({ path, graphPath = '', saveStatus, actions, ...rest }: { path: string, graphPath?: string, graphState: any, graph: Props['graph'], saveStatus: string, actions: { updateProject: (state: any) => void,  traverseGraph: (state: any) => void } }) => {
+export default ({ path, graphPath = '', saveStatus, actions, ...rest }: {
+  path: string,
+  graphPath?: string,
+  graphState: any,
+  graph: Props['graph'],
+  saveStatus: string,
+  actions: {
+    updateProject: (state: any) => void,
+    traverseGraph: (state: any) => void,
+  },
+}) => {
   const [selectedNodes, setSelectedNodes] = useState<NodeModel[]>([]);
   const [activeDiagram, setActiveDiagram] = useState<DiagramModel>();
 

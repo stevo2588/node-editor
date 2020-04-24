@@ -5,12 +5,14 @@ import {
 } from '@projectstorm/react-diagrams-core';
 import { MiddlewareLinkModel } from './link';
 import { AbstractModelFactory, DeserializeEvent } from '@projectstorm/react-canvas-core';
+import { NodeModel } from './model';
 
 
 export class PortModel extends PM {
 	public in: boolean;
 	public label: string;
-	constructor(private portType: string, options: { label: string, in: boolean }) {
+	public value: any;
+	constructor(public portType: string, options: { label: string, in: boolean }) {
 		super({
 			name: options.label,
 			alignment: options.in ? PortModelAlignment.LEFT : PortModelAlignment.RIGHT,
@@ -27,8 +29,8 @@ export class PortModel extends PM {
 		super.deserialize(event);
 		this.in = event.data.in;
 		this.label = event.data.label;
-		// @ts-ignore
 		this.portType = event.data.portType;
+		this.value = event.data.value;
 	}
 
 	serialize() {
@@ -37,7 +39,24 @@ export class PortModel extends PM {
 			in: this.in,
 			label: this.label,
 			portType: this.portType,
+			value: this.value,
 		};
+	}
+
+	addLink(link: LinkModel) {
+		super.addLink(link);
+		if (this.in) {
+			console.log('new input');
+			(this.getNode() as NodeModel).onInputOrConfigChange();
+		}
+	}
+
+	removeLink(link: LinkModel) {
+		super.removeLink(link);
+		if (this.in) {
+			console.log('removed input');
+			(this.getNode() as NodeModel).onInputOrConfigChange();
+		}
 	}
 
 	// link<V extends LinkModel>(port: PortModel, factory?: AbstractModelFactory<V>): V {

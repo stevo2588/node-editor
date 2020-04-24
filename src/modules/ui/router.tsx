@@ -20,7 +20,17 @@ const rootPath = '/graph';
 const history = createHistory(createMemorySource(rootPath));
 export const navigate = (path: string) => history.navigate(path);
 
-export default ({ saveStatus, interfaces }: { saveStatus: string, interfaces: { graphState: any, graph: Props['graph'], actions: { updateProject: (state: any) => void, traverseGraph: (state: any) => void  } } }) => {
+export default ({ saveStatus, interfaces }: {
+  saveStatus: string,
+  interfaces: {
+    graphState: any,
+    graph: Props['graph'],
+    actions: {
+      updateProject: (state: any) => void,
+      traverseGraph: (state: any) => void,
+    },
+  }
+}) => {
   return (
     <Container>
       <LocationProvider history={history}>

@@ -122,8 +122,8 @@ export const NodeWidget = (props: BaseNodeProps) => {
     <Menu>
       {(input ? (props.node.additionalInputs || []) : props.node.additionalOutputs).map((io: any) => (
         <Menu.Item key={io.type} onClick={() => {
-          if (input) props.node.addInPort(io);
-          else props.node.addOutPort(io);
+          if (input) props.node.addInPort(io.type);
+          else props.node.addOutPort(io.type);
           props.engine.repaintCanvas();
         }}>
           <div>{io.displayType}</div>

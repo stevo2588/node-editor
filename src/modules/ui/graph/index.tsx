@@ -1,20 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import {
-	DefaultDiagramState,
-	DiagramEngine,
-	LinkLayerFactory,
-	NodeLayerFactory,
-} from '@projectstorm/react-diagrams-core';
-import {
-	DefaultLabelFactory,
-} from '@projectstorm/react-diagrams-defaults';
-import { PathFindingLinkFactory } from '@projectstorm/react-diagrams-routing';
-import { SelectionBoxLayerFactory } from '@projectstorm/react-canvas-core';
+import createEngine from './engine';
 import NodeCanvas from './canvas';
-import { MiddlewareLinkFactory } from './link';
-import { PortFactory } from './port';
 import { NodeModel } from './models/model';
 import { DiagramModel } from './models/diagram';
+import { DiagramEngine } from '@projectstorm/react-diagrams';
 
 
 export type Props = {
@@ -27,23 +16,12 @@ export type Props = {
   updateProject: (state: any) => void;
 }
 
-const engine = new DiagramEngine();
-engine.getLayerFactories().registerFactory(new NodeLayerFactory());
-engine.getLayerFactories().registerFactory(new LinkLayerFactory());
-engine.getLayerFactories().registerFactory(new SelectionBoxLayerFactory());
-
-engine.getLabelFactories().registerFactory(new DefaultLabelFactory());
-engine.getLinkFactories().registerFactory(new PathFindingLinkFactory());
-engine.getPortFactories().registerFactory(new PortFactory());
-
-
-const state = new DefaultDiagramState();
-state.dragNewLink.config.allowLooseLinks = false;
-engine.getStateMachine().pushState(state);
+let engine = new DiagramEngine();
 
 const rootDiagram = new DiagramModel();
 
 const diagramInit = (d: DiagramModel, onUpdateActiveNodes: (nodes: any[]) => void, updateProject: (state: any) => void, path = '') => {
+  d.createNodeByType = (type: string) => engine.getFactoryForNode(type).generateModel({}) as NodeModel;
   d.path = path;
   d.registerListener({
     eventDidFire(event: any) {
@@ -72,13 +50,12 @@ export default ({ graphState, graphPath, graph, navigate, onUpdateActiveNodes, o
   const [availableNodes, setAvailableNodes] = useState<{ name: string, onAddNode: (model: { name: string }, position: { x: number, y: number }) => void }[]>([]);
 
   useEffect(() => {
-    console.log('graph');
     console.log(graph);
-    for (const nodeType in graph) {
-      console.log(nodeType);
-      engine.getNodeFactories().registerFactory(graph[nodeType].factory);
-    }
-    engine.getLinkFactories().registerFactory(new MiddlewareLinkFactory());
+    // for (const nodeType in graph) {
+    //   console.log(nodeType);
+    //   engine.getNodeFactories().registerFactory(graph[nodeType].factory);
+    // }
+    engine = createEngine(Object.values(graph).map((v: any) => v.factory))
 
     engine.registerListener({
       navigateToDiagram(event: any) {
