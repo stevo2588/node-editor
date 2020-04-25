@@ -27,7 +27,10 @@ export default ({ saveStatus, interfaces }: {
     graph: Props['graph'],
     actions: {
       updateProject: (state: any) => void,
-      traverseGraph: (state: any) => void,
+      codeGen: (state: any) => void,
+      build: (state: any) => void,
+      provision: (state: any) => void,
+      deploy: (state: any) => void,
     },
   }
 }) => {

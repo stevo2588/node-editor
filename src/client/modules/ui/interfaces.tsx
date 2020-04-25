@@ -26,7 +26,10 @@ export default ({ path, graphPath = '', saveStatus, actions, ...rest }: {
   saveStatus: string,
   actions: {
     updateProject: (state: any) => void,
-    traverseGraph: (state: any) => void,
+    codeGen: (state: any) => void,
+    build: (state: any) => void,
+    provision: (state: any) => void,
+    deploy: (state: any) => void,
   },
 }) => {
   const [selectedNodes, setSelectedNodes] = useState<NodeModel[]>([]);
@@ -53,7 +56,10 @@ export default ({ path, graphPath = '', saveStatus, actions, ...rest }: {
             </Breadcrumb>
           </Space>
           <Space style={{ float: 'right' }}>
-            <Button onClick={() => actions.traverseGraph(activeDiagram)}>Traverse Graph</Button>
+            <Button onClick={() => actions.codeGen(activeDiagram)}>Code</Button>
+            <Button onClick={() => actions.build(activeDiagram)}>Build</Button>
+            <Button onClick={() => actions.provision(activeDiagram)}>Provision</Button>
+            <Button onClick={() => actions.deploy(activeDiagram)}>Deploy</Button>
             <Avatar icon={<UserOutlined />} />
           </Space>
         </Header>

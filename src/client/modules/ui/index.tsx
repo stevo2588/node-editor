@@ -77,8 +77,17 @@ export default ({ persistProject, graph, mainApi, load }: {
           updateProject: (p: DiagramModel) => {
             setGraphState(p.serialize());
           },
-          traverseGraph: (p: DiagramModel) => {
-            mainApi.traverseGraph(p.serialize());
+          codeGen: (p: DiagramModel) => {
+            mainApi.codeGen(p.serialize());
+          },
+          build: (p: DiagramModel) => {
+            mainApi.build(p.serialize());
+          },
+          provision: (p: DiagramModel) => {
+            mainApi.provision(p.serialize());
+          },
+          deploy: (p: DiagramModel) => {
+            mainApi.deploy(p.serialize());
           },
         },
         graph: graph

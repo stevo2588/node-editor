@@ -15,7 +15,16 @@ export default {
   async loadFile(fileName: string) {
     return api.invoke("toMain", "loadFile", fileName);
   },
-  async traverseGraph(graph: any) {
-    return api.invoke("toMain", "traverseGraph", graph);
-  }
+  async codeGen(graph: any) {
+    return api.invoke("toMain", "codeGen", graph);
+  },
+  async build(graph: any) {
+    return api.invoke("toMain", "build", graph);
+  },
+  async provision(graph: any) {
+    return api.invoke("toMain", "provision", graph);
+  },
+  async deploy(graph: any) {
+    return api.invoke("toMain", "deploy", graph);
+  },
 };

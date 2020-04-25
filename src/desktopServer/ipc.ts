@@ -65,7 +65,13 @@ export default class IpcServer {
           return saveFile(params[0], params[1], (loc: 'home'|'desktop') => this.app.getPath(loc));
         case 'loadFile':
           return loadFile(params[0], (loc: 'home'|'desktop') => this.app.getPath(loc));
-        case 'traverseGraph':
+        case 'codeGen':
+          return traverseGraph(params[0], engine);
+        case 'build':
+          return traverseGraph(params[0], engine);
+        case 'provision':
+          return traverseGraph(params[0], engine);
+        case 'deploy':
           return traverseGraph(params[0], engine);
       
         default:
