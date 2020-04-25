@@ -8,7 +8,7 @@ import {
 	PointModel,
 } from '@projectstorm/react-diagrams-core';
 import { DefaultLinkPointWidget, DefaultLinkSegmentWidget } from '@projectstorm/react-diagrams-defaults';
-import { MiddlewareLinkModel } from './models/link';
+import { MiddlewareLinkModel } from '../../../../modules/graph/link';
 
 
 interface MiddlewareLinkProps {

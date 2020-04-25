@@ -3,8 +3,9 @@ import {
 	PortModel as PM,
 	PortModelAlignment,
 } from '@projectstorm/react-diagrams-core';
+import { AbstractModelFactory, DeserializeEvent, GenerateModelEvent  } from '@projectstorm/react-canvas-core';
+import { DiagramEngine } from '@projectstorm/react-diagrams-core';
 import { MiddlewareLinkModel } from './link';
-import { AbstractModelFactory, DeserializeEvent } from '@projectstorm/react-canvas-core';
 import { NodeModel } from './model';
 
 
@@ -86,5 +87,23 @@ export class PortModel extends PM {
 			return factory.generateModel({});
 		}
 		return link || new MiddlewareLinkModel();
+	}
+}
+
+export class PortFactory extends AbstractModelFactory<PortModel, DiagramEngine> {
+  // create: () => T;
+	// constructor(type: { new(): T; type: string; }) {
+  //   super(type.type);
+  //   this.create = () => new type();
+  // }
+	constructor() {
+    super('default');
+	}
+
+	generateModel(event: GenerateModelEvent) {
+		return new PortModel('unknown', {
+			in: true,
+			label: 'unknown',
+		});
 	}
 }

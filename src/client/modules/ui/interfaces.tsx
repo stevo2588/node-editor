@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import NodeEditor, { Props } from './graph';
 import SideBar from './sidebar';
-import { NodeModel } from './graph/models/model';
+import { NodeModel } from '../../../modules/graph/model';
 import { Layout, Space, Select, Avatar, Typography, Button } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { Breadcrumb } from 'antd';
 import { Link } from '@reach/router';
 import { navigate } from './router';
-import { DiagramModel } from './graph/models/diagram';
+import { DiagramModel } from '../../../modules/graph/diagram';
 const { Header, Content, Footer } = Layout;
 
 const Container = styled.div`

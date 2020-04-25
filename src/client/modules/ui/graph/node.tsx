@@ -2,8 +2,8 @@ import React from 'react';
 import styled from '@emotion/styled';
 import { DiagramEngine, PortWidget } from '@projectstorm/react-diagrams-core';
 import { Dropdown, Menu, Button } from 'antd';
-import { NodeModel } from './models/model';
-import { PortModel } from './models/port';
+import { NodeModel } from '../../../../modules/graph/model';
+import { PortModel } from '../../../../modules/graph/port';
 
 
 export const PortLabel = styled.div`

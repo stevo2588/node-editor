@@ -1,6 +1,6 @@
 import React from 'react';
 import { DiagramEngine } from '@projectstorm/react-diagrams-core';
-import { NodeModel } from './models/model';
+import { NodeModel } from '../../../../modules/graph/model';
 import { NodeWidget } from './node';
 import { AbstractReactFactory } from '@projectstorm/react-canvas-core';
 

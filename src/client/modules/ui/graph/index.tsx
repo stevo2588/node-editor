@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import createEngine from './engine';
+import createEngine from '../../../../modules/graph/engine';
 import NodeCanvas from './canvas';
-import { NodeModel } from './models/model';
-import { DiagramModel } from './models/diagram';
+import { NodeModel } from '../../../../modules/graph/model';
+import { DiagramModel } from '../../../../modules/graph/diagram';
 import { DiagramEngine } from '@projectstorm/react-diagrams';
 
 

@@ -1,17 +1,13 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import * as serviceWorker from './service-worker';
+import * as serviceWorker from '../service-worker';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { hot } from "react-hot-loader/root";
 import { safeDump as dumpYml, load as loadYml } from "js-yaml";
-import { load, validate } from './modules/project';
-// import FileManager from './modules/fileManager';
 // import exampleProject from '../static/exampleProject.yml';
-import { generateCode } from 'spec-codegen/src/modules/generate';
-import plugins from 'spec-codegen/src/modules/plugins';
 import UIView from './modules/ui';
-import mainApi from "./mainApi";
+import archieApi from "./modules/archieApi";
 import {
   CodeModel,
   CodeGenModel,
@@ -26,14 +22,13 @@ import {
   ImplementedEventModel,
   ApiModel,
   ArtifactModel,
-} from './modules/ui/graph/models';
+} from '../modules/graph';
 
 
 const persistProject = async (p: any) => {
-  const res = await mainApi.saveFile('archie.yml', dumpYml(p, { skipInvalid: true }));
+  const res = await archieApi.saveFile('archie.yml', dumpYml(p, { skipInvalid: true }));
 };
 
-// generateCode('', plugins[0], fileManager);
 
 const UI = hot(() => (
   <UIView
@@ -53,9 +48,8 @@ const UI = hot(() => (
       ApiModel,
       ArtifactModel,
     ]}
-    mainApi={mainApi}
-    load={load}
-    validate={validate}
+    mainApi={archieApi}
+    load={loadYml}
   />
 ));
 

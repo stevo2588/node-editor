@@ -11,7 +11,7 @@ import {
 import { PathFindingLinkFactory } from '@projectstorm/react-diagrams-routing';
 import { SelectionBoxLayerFactory, AbstractReactFactory } from '@projectstorm/react-canvas-core';
 import { PortFactory } from './port';
-import { MiddlewareLinkFactory } from './link';
+import { MiddlewareLinkFactory } from '../../client/modules/ui/graph/link';
 
 
 export default (otherFactories: AbstractReactFactory<NodeModel, DiagramEngine>[]) => {

@@ -4,11 +4,13 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import React, { useState, useEffect } from 'react';
 import { safeDump as dumpYml, load as loadYml } from "js-yaml";
-import { DiagramModel } from './graph/models/diagram';
+import { DiagramModel } from '../../../modules/graph/diagram';
 import { NodeFactory } from './graph/factory';
 
 
-export default ({ persistProject, graph, mainApi, load, validate }: { persistProject: (p: any) => Promise<void>, graph: any, mainApi: any, load: any, validate: any }) => {
+export default ({ persistProject, graph, mainApi, load }: {
+  persistProject: (p: any) => Promise<void>, graph: any, mainApi: any, load: any,
+}) => {
   console.log('render');
   const [projectName, setProjectName] = useState(null);
   const [environments, setEnvironments] = useState({});
@@ -39,7 +41,7 @@ export default ({ persistProject, graph, mainApi, load, validate }: { persistPro
         console.log(`created new file from example project: ${res}`);
       }
       const project = load(projectContents);
-      const issues = validate(project);
+      // const issues = validate(project);
 
       setProjectName(project.name);
       setEnvironments(project.environments);

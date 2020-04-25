@@ -1,3 +1,4 @@
+// NOTE: `api` is exposed through preload script
 const { api } = window;
 
 
