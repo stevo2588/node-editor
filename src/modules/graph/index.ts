@@ -20,7 +20,7 @@ export class ImplementedEventModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }
@@ -49,7 +49,7 @@ export class ApiModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }
@@ -78,7 +78,7 @@ export class ArtifactModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }
@@ -120,7 +120,7 @@ export class CodeModel extends NodeModel {
     console.log(this.compiledData);
   }
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }
@@ -144,7 +144,7 @@ export class CodeGenModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }
@@ -172,7 +172,7 @@ export class TestModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }
@@ -200,7 +200,7 @@ export class BuildModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }
@@ -215,8 +215,8 @@ export class ServiceModel extends NodeModel {
   static readonly displayType = 'Service';
   readonly defaultInputs = [];
   readonly additionalInputs = [];
-  readonly defaultOutputs = [];
-  readonly additionalOutputs = [ImplementedEventModel, ApiModel];
+  readonly defaultOutputs = [ImplementedEventModel, ApiModel];
+  readonly additionalOutputs = [];
 
   model = { };
 	get schema() { return { }};
@@ -228,9 +228,9 @@ export class ServiceModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
-    // TODO
-    return { outputs: [], data: {} };
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
+    const api = { name: 'api' };
+    return { outputs: [{ type: ApiModel.type, value: api }], data: api };
   }
 
 	public get outputs() {
@@ -256,7 +256,7 @@ export class ServiceHostModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }
@@ -273,7 +273,7 @@ export class ApiMapperModel extends NodeModel {
   readonly defaultInputs = [];
   readonly additionalInputs = [ApiModel];
   readonly defaultOutputs = [];
-  readonly additionalOutputs = [ApiModel];
+  readonly additionalOutputs = [];
 
   model = { };
 	get schema() { return { }};
@@ -285,9 +285,12 @@ export class ApiMapperModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
-    return { outputs: [], data: {} };
+    return {
+      outputs: inputs.filter(i => i.value && i.type === ApiModel.type).map(i => ({ type: i.type, value: {} })),
+      data: {},
+    };
   }
 
 	public get outputs() {
@@ -314,7 +317,7 @@ export class CodeContainerModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }
@@ -343,7 +346,7 @@ export class BuildContainerModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }
@@ -373,7 +376,7 @@ export class ServiceContainerModel extends NodeModel {
 
   async codeEffect() {}
 
-  compile(inputs: { type: string, value: any }[], config: NodeModel['model']): { outputs: { type: string, value: any }[], data: any } {
+  compile(inputs: { type: string, value: any }[], config: NodeModel['model']) {
     // TODO
     return { outputs: [], data: {} };
   }

@@ -48,6 +48,8 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 			this.graph = new DiagramModel();
 			this.graph.containerNode = this;
 		}
+
+		this.onInputOrConfigChange();
 	}
 	
 	get isContainerOutput() {
@@ -129,18 +131,27 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 		this._compiledData = data;
 
     // attempt to update existing outputs and add any new ones
-    const outPorts = this.getOutPorts();
-    outputs.forEach((o, i) => {
+		const outPorts = this.getOutPorts();
+		let i = 0;
+    outputs.forEach((o) => {
 			const existingPort = outPorts[i];
 			let port: PortModel;
-			if (existingPort && existingPort.portType === o.type) { // update
+			if (!existingPort) {
+				port = this.addOutPort(o.type);
+			} else if (existingPort.portType === o.type) { // update
 				port = existingPort;
       } else { // replace
         this.removePort(existingPort);
 				port = this.addOutPort(o.type);
       }
 			port.value = o.value;
+			i++;
 		});
+		// remove any remaining ports
+		while (i < outPorts.length) {
+      this.removePort(outPorts[i]);
+			i++;
+		}
 
 		// trigger compile on connected nodes
 		this.getOutPorts().forEach(p => (
@@ -168,6 +179,8 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 	}
 
 	removePort(port: PortModel) {
+		Object.values(port.getLinks()).forEach(link => link.remove());
+
 		super.removePort(port);
 		if (port.in) {
 			this.portsIn.splice(this.portsIn.indexOf(port), 1);
@@ -248,7 +261,7 @@ export abstract class NodeModel extends Model<NodeModelGenerics & { OPTIONS: Def
 			name: this.name,
 			color: this.color,
 			model: this.model,
-			compiledData: this._compiledData,
+			compiledData: { ...this._compiledData },
     };
 
     if (this.graph) {
