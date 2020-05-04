@@ -1,0 +1,8 @@
+{
+  "name": "rust",
+  "version": "0.1.0",
+  "description": "Rust module",
+  "main": "lib/index.js",
+  "author": "Stephen A <stephen@creativelogic.me>",
+  "license": "MIT"
+}

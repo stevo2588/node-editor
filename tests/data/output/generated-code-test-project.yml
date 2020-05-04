@@ -1,8 +1,0 @@
-
-projects:
-  test-project-id:
-  - path: src/modules/snsInterface.ts
-    hash: f4ac4987
-  - path: src/handlers/getUser.ts
-    editable: true
-    template: getUserTemplate.ts

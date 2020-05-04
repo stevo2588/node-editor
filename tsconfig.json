@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2015",
     "allowJs": true,
-    "module": "commonjs",
+    "module": "esNext",
     "skipLibCheck": true,
     "jsx": "react",
     "outDir": "./.webpack",

@@ -31,7 +31,7 @@ module.exports = rules = [
     },
     {
         test: /\.js$/,
-        include: /node_modules\/@projectstorm/,
+        include: /node_modules/,
         loader: 'babel-loader',
         options: {
           presets: ['@babel/preset-env']
@@ -39,7 +39,7 @@ module.exports = rules = [
     },
     {
         test: /\.js$/,
-        include: /node_modules\/spec-codegen\/src/,
+        include: /node_modules\/src/,
         loader: 'babel-loader',
         options: {
           presets: ['@babel/preset-env', '@babel/preset-typescript']
