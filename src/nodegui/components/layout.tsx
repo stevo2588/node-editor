@@ -1,12 +1,13 @@
 import { Text, View, Button, useEventHandler } from "@nodegui/react-nodegui";
-import { QPushButtonSignals, QWidgetSignals, QMouseEvent, QPushButton } from "@nodegui/nodegui";
+import { QPushButtonSignals, QWidgetSignals, QMouseEvent } from "@nodegui/nodegui";
 import React, { useState } from "react";
 import open from "open";
+import { Bezier } from "./Bezier";
 
 
 // const NodePort = (props: { port: PortModel; engine: DiagramEngine; left: boolean }) => {
 const NodePort = ({ label, input, onPress, onRelease }: { label: string, input: boolean, onPress: () => void, onRelease: () => void }) => {
-  const handler = useEventHandler<QPushButton>({
+  const handler = useEventHandler<QPushButtonSignals>({
     MouseButtonPress: () => {
       console.log('port press!');
       onPress();
@@ -70,6 +71,7 @@ const Draggable = ({ onDrag }: { onDrag: (setPos: (pos: { x: number; y: number; 
           : null} */}
         </View>
         <View style={BodyContainer}>
+          <Bezier startPoint={{ x: 10, y: 10 }} endPoint={{ x: 50, y: 50 }} style={'width: 100px; height: 100px;'} />
         </View>
         <View style={PortsContainer}>
           {/* {props.node.getOutPorts().map((port: any) => <NodePort left={false} engine={props.engine} port={port} key={port.getID()} />)} */}
@@ -101,7 +103,7 @@ const Canvas = () => {
 
   return (
     <View style={graphStyle} on={handler}>
-      <Text style={textStyle} wordWrap={true}>Canvas</Text>
+      {/* <Text style={textStyle} wordWrap={true}>Canvas</Text> */}
       <Draggable onDrag={(setPos) => setPos({ x: position.x, y: position.y })} />
       <Draggable onDrag={(setPos) => setPos({ x: position.x, y: position.y })} />
       <Draggable onDrag={(setPos) => setPos({ x: position.x, y: position.y })} />
@@ -191,6 +193,7 @@ export const PortLabel = `
 `;
 
 export const Label = `
+  color: '#fff';
   padding: 0 5px;
   flex-grow: 1;
 `;
