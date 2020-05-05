@@ -5,7 +5,7 @@ import { Layout } from "./components/layout";
 import nodeguiIcon from "./assets/nodegui.jpg";
 import rustModule from '../../rust/native/nodejs';
 
-const minSize = { width: 500, height: 520 };
+const minSize = { width: 1500, height: 850 };
 const winIcon = new QIcon(nodeguiIcon);
 class App extends React.Component {
   render() {
@@ -17,7 +17,7 @@ class App extends React.Component {
         styleSheet={styleSheet}
       >
         <View style={containerStyle}>
-          <Text id="welcome-text">{rustModule()}</Text>
+          {/* <Text id="welcome-text">{rustModule()}</Text> */}
           <Layout />
         </View>
       </Window>
@@ -26,10 +26,26 @@ class App extends React.Component {
 }
 
 const containerStyle = `
-  flex: 1; 
+  flex: 1;
+  width: 1500px;
+  height: 850px;
 `;
 
 const styleSheet = `
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: auto;
+    padding: 2rem;
+  }
+
+  html, body, #root {
+    height: 100%;
+    display: flex;
+    flex-grow: 1;
+    padding: 0;
+    margin: 0;
+  }
+
   #welcome-text {
     font-size: 24px;
     padding-top: 20px;
