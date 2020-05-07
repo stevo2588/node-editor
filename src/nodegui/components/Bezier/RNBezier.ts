@@ -11,10 +11,6 @@ import { throwUnsupported } from '@nodegui/react-nodegui/dist/utils/helpers';
 import { NodeFrame } from "@nodegui/nodegui/dist/lib/QtWidgets/QFrame";
 
 
-const drawBezier = () => {
-
-};
-
 export interface BezierProps extends ViewProps<QWidgetSignals> {
   startPoint?: { x: number; y: number };
   endPoint?: { x: number; y: number };
@@ -27,15 +23,23 @@ const setBezierProps = (
   oldProps: BezierProps,
 ) => {
   const setter: BezierProps = {
-    set startPoint(point: { x: number; y: number }) {
-      // widget.setText('');
-      // widget.resize(200, 200);
+    set startPoint({ x, y }: { x: number; y: number }) {
+      // const startX = Math.min(x, newProps.endPoint?.x || x);
+      // const endX = Math.max(x, newProps.endPoint?.x || x);
+      // const startY = Math.min(y, newProps.endPoint?.y || y);
+      // const endY = Math.max(y, newProps.endPoint?.y || y);
+
+      // widget.setGeometry(startX, startY, endX - startX, endY - startY);
       widget.repaint();
     },
     
-    set endPoint(point: { x: number; y: number }) {
-      // widget.setText('');
-      // widget.resize(200, 200);
+    set endPoint({ x, y }: { x: number; y: number }) {
+      // const startX = Math.min(x, newProps.startPoint?.x || x);
+      // const endX = Math.max(x, newProps.startPoint?.x || x);
+      // const startY = Math.min(y, newProps.startPoint?.y || y);
+      // const endY = Math.max(y, newProps.startPoint?.y || y);
+
+      // widget.setGeometry(startX, startY, endX - startX, endY - startY);
       widget.repaint();
     },
   };
@@ -48,8 +52,8 @@ const setBezierProps = (
  * @ignore
  */
 export class RNBezier extends NodeFrame<QLabelSignals> implements RNWidget {
-// export class RNBezier extends QLabel implements RNWidget {
   native: NativeElement;
+  props?: BezierProps;
   constructor();
   constructor(parent: NodeWidget<any>);
   constructor(parent?: NodeWidget<any>) {
@@ -65,9 +69,10 @@ export class RNBezier extends NodeFrame<QLabelSignals> implements RNWidget {
   }
 
   setProps(newProps: BezierProps, oldProps: BezierProps): void {
+    this.props = newProps;
     setBezierProps(this, newProps, oldProps);
   }
-  
+
   appendInitialChild(child: NodeWidget<any>): void {
     throwUnsupported(this);
   }

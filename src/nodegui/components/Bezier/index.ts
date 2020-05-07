@@ -2,8 +2,6 @@ import { Fiber } from 'react-reconciler';
 import { registerComponent, ComponentConfig } from '@nodegui/react-nodegui/dist/components/config';
 import { AppContainer } from '@nodegui/react-nodegui/dist/reconciler';
 import {
-  FlexLayout,
-  PenStyle,
   QColor,
   QPainter,
   QPoint,
@@ -12,6 +10,23 @@ import {
 } from "@nodegui/nodegui";
 
 import { RNBezier, BezierProps } from './RNBezier';
+
+
+const drawLineSegment = (painter: QPainter, x1: number, y1: number, x2: number, y2: number, thickness: number) => {
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  painter.drawConvexPolygon([
+    new QPoint(x1 + thickness * Math.cos(angle + Math.PI / 2), y1 + thickness * Math.sin(angle + Math.PI / 2)),
+    new QPoint(x1 + thickness * Math.cos(angle - Math.PI / 2), y1 + thickness * Math.sin(angle - Math.PI / 2)),
+    new QPoint(x2 + thickness * Math.cos(angle - Math.PI / 2), y2 + thickness * Math.sin(angle - Math.PI / 2)),
+    new QPoint(x2 + thickness * Math.cos(angle + Math.PI / 2), y2 + thickness * Math.sin(angle + Math.PI / 2)),
+  ]);
+}
+
+const drawPolyLine = (painter: QPainter, points: { x: number; y: number }[], thickness: number) => {
+  for (let i = 1; i < points.length; i++) {
+    drawLineSegment(painter, points[i-1].x, points[i-1].y, points[i].x, points[i].y, thickness);
+  }
+}
 
 
 class ViewConfig extends ComponentConfig {
@@ -28,74 +43,44 @@ class ViewConfig extends ComponentConfig {
     workInProgress: Fiber,
   ): RNBezier {
     const widget = new RNBezier();
-    widget.setProps(newProps, { pos: { x: 250, y: 250 }, startPoint: {x:10,y:10}, endPoint: {x:20,y:20}});
+    widget.setProps(newProps, {});
 
-    // const center = new QWidget();
-    const layout = new FlexLayout();
-    const hourHand = [new QPoint(7, 8), new QPoint(-7, 8), new QPoint(0, -40)];
-    const minuteHand = [new QPoint(7, 8), new QPoint(-7, 8), new QPoint(0, -70)];
-    const secondHand = [new QPoint(4, 8), new QPoint(-4, 8), new QPoint(0, -70)];
-    const hourColor = new QColor(127, 0, 127);
-    const minuteColor = new QColor(0, 127, 127, 191);
-    const secondColor = new QColor(0, 0, 0);
+    const hourColor = new QColor(255, 255, 255);
 
-    widget.setLayout(layout);
-    widget.resize(200, 200);
-    const side = Math.min(widget.geometry().width(), widget.geometry().height());
-    console.log(side);
-
-    function repaint(): void {
-      widget.repaint();
-      setTimeout(repaint, 1000);
-    }
-
-    setTimeout(repaint, 1000);
-    widget.addEventListener(WidgetEventTypes.Paint, () => {
-      const time = new Date();
-
+    widget.addEventListener(WidgetEventTypes.Paint, (event) => {
       const painter = new QPainter(widget);
       painter.setRenderHint(RenderHint.Antialiasing);
-      painter.translate(widget.geometry().width() / 2, widget.geometry().height() / 2);
-      painter.scale(side / 200.0, side / 200.0);
 
-      painter.setPen(PenStyle.NoPen);
+      painter.setPen(hourColor);
       painter.setBrush(hourColor);
 
       painter.save();
-      painter.rotate(30.0 * (time.getHours() + time.getMinutes() / 60.0));
-      painter.drawConvexPolygon(hourHand);
-      painter.restore();
-
-      painter.setPen(hourColor);
-
-      for (let i = 0; i < 12; ++i) {
-        painter.drawLine(88, 0, 96, 0);
-        painter.rotate(30.0);
-      }
-
-      painter.setPen(PenStyle.NoPen);
-      painter.setBrush(minuteColor);
-
-      painter.save();
-      painter.rotate(6.0 * (time.getMinutes() + time.getSeconds() / 60.0));
-      painter.drawConvexPolygon(minuteHand);
-      painter.restore();
-
-      painter.setBrush(secondColor);
-      painter.setPen(PenStyle.NoPen);
-
-      painter.save();
-      painter.rotate(360 * (time.getSeconds() / 60.0));
-      painter.drawConvexPolygon(secondHand);
-      painter.restore();
-
-      painter.setPen(minuteColor);
-      for (let j = 0; j < 60; ++j) {
-        if (j % 5 != 0) {
-          painter.drawLine(92, 0, 96, 0);
+      const width = widget.geometry().width();
+      const height = widget.geometry().height();
+      if (widget.props?.startPoint && widget.props.endPoint) {
+        let x1;
+        let y1;
+        let x2;
+        let y2;
+        if (widget.props?.startPoint.x < widget.props?.endPoint.x) {
+          x1 = 8;
+          x2 = width - 8;
+        } else {
+          x1 = width - 8;
+          x2 = 8;
         }
-        painter.rotate(6.0);
+        if (widget.props?.startPoint.y < widget.props?.endPoint.y) {
+          y1 = 8;
+          y2 = height - 8;
+        } else {
+          y1 = height - 8;
+          y2 = 8;
+        }
+
+        drawPolyLine(painter, [{ x: x1, y: y1 }, { x: x2, y: y2 }], 4);
       }
+      painter.restore();
+
       painter.end();
     });
 

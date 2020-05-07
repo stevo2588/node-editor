@@ -1,11 +1,10 @@
+import React, { useState } from "react";
 import { Text, View, Button, useEventHandler } from "@nodegui/react-nodegui";
 import { QPushButtonSignals, QWidgetSignals, QMouseEvent } from "@nodegui/nodegui";
-import React, { useState } from "react";
 import open from "open";
-import { Bezier } from "./Bezier";
+import Link from "./Link";
 
 
-// const NodePort = (props: { port: PortModel; engine: DiagramEngine; left: boolean }) => {
 const NodePort = ({ label, input, onPress, onRelease }: { label: string, input: boolean, onPress: () => void, onRelease: () => void }) => {
   const handler = useEventHandler<QPushButtonSignals>({
     MouseButtonPress: () => {
@@ -34,18 +33,27 @@ const NodePort = ({ label, input, onPress, onRelease }: { label: string, input: 
 
 const Draggable = ({ onDrag }: { onDrag: (setPos: (pos: { x: number; y: number; }) => void) => void }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [portDragPosition, setPortDragPosition] = useState({ x: 0, y: 0 });
   const [portPressed, setPortPressed] = useState(false);
+  const [lastPress, setLastPress] = useState({ x: 0, y: 0 });
 
   const handler = useEventHandler<QWidgetSignals>({
     MouseMove: (nativeEvt: any) => {
       const mouseEvt = new QMouseEvent(nativeEvt);
       console.log("mouseMoved at: ", { x: mouseEvt.x(), y: mouseEvt.y() });
       if (!portPressed) onDrag((pos) => setPosition(pos));
+      else onDrag((pos) => setPortDragPosition(pos));
     },
+    MouseButtonPress: (nativeEvt: any) => {
+      const mouseEvt = new QMouseEvent(nativeEvt);
+      setLastPress({ x: mouseEvt.x(), y: mouseEvt.y() });
+    }
   }, [position, portPressed]);
 
   return (
+    <>
     <View style={Node + `left: ${position.x}; top: ${position.y};`} on={handler}>
+      <View style={'border-width: 4px; border-style: solid; border-color: "#1cd"; border-radius: 10px;'}>
       <View style={Title}>
         <Text style={TitleName}>Name</Text>
         {/* {props.node.graph ? <Config
@@ -71,7 +79,6 @@ const Draggable = ({ onDrag }: { onDrag: (setPos: (pos: { x: number; y: number; 
           : null} */}
         </View>
         <View style={BodyContainer}>
-          <Bezier startPoint={{ x: 10, y: 10 }} endPoint={{ x: 50, y: 50 }} style={'width: 100px; height: 100px;'} />
         </View>
         <View style={PortsContainer}>
           {/* {props.node.getOutPorts().map((port: any) => <NodePort left={false} engine={props.engine} port={port} key={port.getID()} />)} */}
@@ -84,29 +91,34 @@ const Draggable = ({ onDrag }: { onDrag: (setPos: (pos: { x: number; y: number; 
           : null} */}
         </View>
       </View>
-
+      </View>
     </View>
+    </>
   );
 };
 
 const Canvas = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [lastPress, setLastPress] = useState({ x: 0, y: 0 });
 
   const handler = useEventHandler<QWidgetSignals>({
     MouseMove: (nativeEvt: any) => {
       const mouseEvt = new QMouseEvent(nativeEvt);
-      // console.log("mouseMoved at: ", { x: mouseEvt.x(), y: mouseEvt.y() });
       setPosition({ x: mouseEvt.x() < 0 ? 0 : mouseEvt.x(), y: mouseEvt.y() < 0 ? 0 : mouseEvt.y() });
     },
+    MouseButtonPress: (nativeEvt: any) => {
+      const mouseEvt = new QMouseEvent(nativeEvt);
+      setLastPress({ x: mouseEvt.x(), y: mouseEvt.y() });
+    }
   }, [position]);
 
 
   return (
     <View style={graphStyle} on={handler}>
-      {/* <Text style={textStyle} wordWrap={true}>Canvas</Text> */}
       <Draggable onDrag={(setPos) => setPos({ x: position.x, y: position.y })} />
       <Draggable onDrag={(setPos) => setPos({ x: position.x, y: position.y })} />
       <Draggable onDrag={(setPos) => setPos({ x: position.x, y: position.y })} />
+      <Link start={lastPress} end={position} />
     </View>
   );
 }
@@ -134,7 +146,7 @@ export const Layout = () => {
           <Button
             style={btnStyle}
             on={btnHandler}
-            text={`Do something`}
+            text={`Compile Graph`}
           ></Button>
         </View>
       </View>
@@ -170,7 +182,7 @@ const draggableStyle = `
 `;
 
 const sideBarStyle = `
-  padding: 10px;
+  padding: 20px;
   background-color: '#333';
   width: 300px;
 `;
@@ -181,8 +193,8 @@ const textStyle = `
 `;
 
 const btnStyle = `
-  margin-horizontal: 20px;
-  height: 40px;
+  margin-top: 10px;
+  padding: 10px;
 `;
 
 export const PortLabel = `
@@ -213,7 +225,7 @@ export const Port = `
   border-style: solid;
   border-width: 2px;
   border-color: 'black';
-  background: rgb(140, 140, 140);
+  background-color: '#fff';
 `;
 
 // const Node = styled.div<{ background: string; selected: boolean }>`
@@ -222,15 +234,15 @@ export const Port = `
   // box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4);
 const Node = `
   position: absolute;
-  border-radius: 10px;
   font-family: sans-serif;
   color: white;
   overflow: visible;
   font-size: 11px;
-  border-style: 'solid';
+  border-radius: 10px;
+  border-style: solid;
   border-width: 5px;
   border-color: '#000';
-  background-color: 'blue';
+  background-color: '#222';
 `;
 
   // justify-items: center;
