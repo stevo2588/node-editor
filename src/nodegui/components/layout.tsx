@@ -52,7 +52,8 @@ const Draggable = ({ onDrag }: { onDrag: (setPos: (pos: { x: number; y: number; 
 
   return (
     <>
-    <View style={Node + `left: ${position.x}; top: ${position.y};`} on={handler}>
+    <View style={OuterNode + `left: ${position.x}; top: ${position.y};`} on={handler}>
+    <View style={Node}>
       <View style={'border-width: 4px; border-style: solid; border-color: "#1cd"; border-radius: 10px;'}>
       <View style={Title}>
         <Text style={TitleName}>Name</Text>
@@ -92,6 +93,7 @@ const Draggable = ({ onDrag }: { onDrag: (setPos: (pos: { x: number; y: number; 
         </View>
       </View>
       </View>
+    </View>
     </View>
     </>
   );
@@ -219,13 +221,10 @@ export const Label = `
   // }
 export const Port = `
   width: 20px;
-  height: 22px;
-  margin: 3px 1px;
-  border-radius: 8px;
-  border-style: solid;
-  border-width: 2px;
-  border-color: 'black';
-  background-color: '#fff';
+  height: 20px;
+  margin: 3px 3px;
+  border-radius: 6px;
+  background-color: rgb(255, 128, 128);
 `;
 
 // const Node = styled.div<{ background: string; selected: boolean }>`
@@ -233,7 +232,6 @@ export const Port = `
   // border: solid 2px ${p => (p.selected ? 'rgb(0,192,255)' : 'black')};
   // box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4);
 const Node = `
-  position: absolute;
   font-family: sans-serif;
   color: white;
   overflow: visible;
@@ -245,6 +243,12 @@ const Node = `
   background-color: '#222';
 `;
 
+const OuterNode = `
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 10px;
+`;
+
   // justify-items: center;
 const Title = `
   background: rgba(0, 0, 0, 0.3);
@@ -252,6 +256,7 @@ const Title = `
   border-top-right-radius: 10px;
   display: flex;
   white-space: nowrap;
+  margin: 5px;
 `;
 
 const TitleName = `

@@ -4,28 +4,41 @@ import { AppContainer } from '@nodegui/react-nodegui/dist/reconciler';
 import {
   QColor,
   QPainter,
-  QPoint,
   RenderHint,
-  WidgetEventTypes
+  WidgetEventTypes,
+  QPainterPath,
+  QPen,
+  PenStyle,
+  PenCapStyle
 } from "@nodegui/nodegui";
 
 import { RNBezier, BezierProps } from './RNBezier';
 
 
-const drawLineSegment = (painter: QPainter, x1: number, y1: number, x2: number, y2: number, thickness: number) => {
-  const angle = Math.atan2(y2 - y1, x2 - x1);
-  painter.drawConvexPolygon([
-    new QPoint(x1 + thickness * Math.cos(angle + Math.PI / 2), y1 + thickness * Math.sin(angle + Math.PI / 2)),
-    new QPoint(x1 + thickness * Math.cos(angle - Math.PI / 2), y1 + thickness * Math.sin(angle - Math.PI / 2)),
-    new QPoint(x2 + thickness * Math.cos(angle - Math.PI / 2), y2 + thickness * Math.sin(angle - Math.PI / 2)),
-    new QPoint(x2 + thickness * Math.cos(angle + Math.PI / 2), y2 + thickness * Math.sin(angle + Math.PI / 2)),
-  ]);
+const calcControl = (portAlignment: 'left'|'right'|'top'|'bottom', curvyness: number): { x: number, y: number } => {
+  if (portAlignment === 'right') {
+    return { x: curvyness, y: 0 };
+  } else if (portAlignment === 'left') {
+    return { x: -curvyness, y: 0 };
+  } else if (portAlignment === 'top') {
+    return { x: 0, y: -curvyness };
+  }
+  return { x: 0, y: curvyness };
 }
 
-const drawPolyLine = (painter: QPainter, points: { x: number; y: number }[], thickness: number) => {
-  for (let i = 1; i < points.length; i++) {
-    drawLineSegment(painter, points[i-1].x, points[i-1].y, points[i].x, points[i].y, thickness);
-  }
+const drawBezier = (painter: QPainter, x1: number, y1: number, x2: number, y2: number, thickness: number) => {
+  const painterPath: QPainterPath = new QPainterPath();
+  painterPath.moveTo(x1, y1);
+  const ctrl1 = calcControl('right', 75);
+  const ctrl2 = calcControl('left', 75);
+  painterPath.cubicTo(x1 + ctrl1.x, y1 + ctrl1.y, x2 + ctrl2.x, y2 + ctrl2.y, x2, y2);
+  const pen = new QPen();
+  pen.setStyle(PenStyle.SolidLine);
+  pen.setCapStyle(PenCapStyle.RoundCap);
+  pen.setColor(new QColor(255, 128, 128));
+  pen.setWidth(thickness);
+  painter.setPen(pen);
+  painter.drawPath(painterPath);
 }
 
 
@@ -45,16 +58,15 @@ class ViewConfig extends ComponentConfig {
     const widget = new RNBezier();
     widget.setProps(newProps, {});
 
-    const hourColor = new QColor(255, 255, 255);
-
     widget.addEventListener(WidgetEventTypes.Paint, (event) => {
+      const offset = 8;
+      const lineWidth = 6;
+      const halfLineWidth = lineWidth / 2;
+      const widthPadding = 16; // should be based on bezier curviness
+
       const painter = new QPainter(widget);
       painter.setRenderHint(RenderHint.Antialiasing);
 
-      painter.setPen(hourColor);
-      painter.setBrush(hourColor);
-
-      painter.save();
       const width = widget.geometry().width();
       const height = widget.geometry().height();
       if (widget.props?.startPoint && widget.props.endPoint) {
@@ -63,23 +75,22 @@ class ViewConfig extends ComponentConfig {
         let x2;
         let y2;
         if (widget.props?.startPoint.x < widget.props?.endPoint.x) {
-          x1 = 8;
-          x2 = width - 8;
+          x1 = offset + widthPadding;
+          x2 = width - (offset + widthPadding);
         } else {
-          x1 = width - 8;
-          x2 = 8;
+          x1 = width - (offset + widthPadding);
+          x2 = offset + widthPadding;
         }
         if (widget.props?.startPoint.y < widget.props?.endPoint.y) {
-          y1 = 8;
-          y2 = height - 8;
+          y1 = offset - halfLineWidth;
+          y2 = height - (offset + halfLineWidth);
         } else {
-          y1 = height - 8;
-          y2 = 8;
+          y1 = height - (offset + halfLineWidth);
+          y2 = offset - halfLineWidth; 
         }
 
-        drawPolyLine(painter, [{ x: x1, y: y1 }, { x: x2, y: y2 }], 4);
+        drawBezier(painter, x1, y1, x2, y2, lineWidth);
       }
-      painter.restore();
 
       painter.end();
     });

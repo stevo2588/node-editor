@@ -1,14 +1,13 @@
 import {
   NodeWidget,
   QWidgetSignals,
-  QLabelSignals,
   NativeElement,
 } from "@nodegui/nodegui";
 import addon from "@nodegui/nodegui/dist/lib/utils/addon";
 import { RNWidget } from '@nodegui/react-nodegui/dist/components/config';
 import { ViewProps, setViewProps } from '@nodegui/react-nodegui/dist/components/View/RNView';
 import { throwUnsupported } from '@nodegui/react-nodegui/dist/utils/helpers';
-import { NodeFrame } from "@nodegui/nodegui/dist/lib/QtWidgets/QFrame";
+import { QFrame } from "@nodegui/nodegui/dist/lib/QtWidgets/QFrame";
 
 
 export interface BezierProps extends ViewProps<QWidgetSignals> {
@@ -17,6 +16,9 @@ export interface BezierProps extends ViewProps<QWidgetSignals> {
   children?: string;
 }
 
+const offset = 8;
+const widthPadding = 16;
+
 const setBezierProps = (
   widget: RNBezier,
   newProps: BezierProps,
@@ -24,23 +26,25 @@ const setBezierProps = (
 ) => {
   const setter: BezierProps = {
     set startPoint({ x, y }: { x: number; y: number }) {
-      // const startX = Math.min(x, newProps.endPoint?.x || x);
-      // const endX = Math.max(x, newProps.endPoint?.x || x);
-      // const startY = Math.min(y, newProps.endPoint?.y || y);
-      // const endY = Math.max(y, newProps.endPoint?.y || y);
+      const startX = Math.min(x, newProps.endPoint?.x || x) - (offset + widthPadding);
+      const endX = Math.max(x, newProps.endPoint?.x || x) + (offset + widthPadding);
+      const startY = Math.min(y, newProps.endPoint?.y || y) - offset;
+      const endY = Math.max(y, newProps.endPoint?.y || y) + offset;
+      const width = endX - startX;
+      const height = endY - startY;
 
-      // widget.setGeometry(startX, startY, endX - startX, endY - startY);
-      widget.repaint();
+      widget.setGeometry(startX, startY, width, height);
     },
     
     set endPoint({ x, y }: { x: number; y: number }) {
-      // const startX = Math.min(x, newProps.startPoint?.x || x);
-      // const endX = Math.max(x, newProps.startPoint?.x || x);
-      // const startY = Math.min(y, newProps.startPoint?.y || y);
-      // const endY = Math.max(y, newProps.startPoint?.y || y);
+      const startX = Math.min(x, newProps.startPoint?.x || x) - (offset + widthPadding);
+      const endX = Math.max(x, newProps.startPoint?.x || x) + (offset + widthPadding);
+      const startY = Math.min(y, newProps.startPoint?.y || y) - offset;
+      const endY = Math.max(y, newProps.startPoint?.y || y) + offset;
+      const width = endX - startX;
+      const height = endY - startY;
 
-      // widget.setGeometry(startX, startY, endX - startX, endY - startY);
-      widget.repaint();
+      widget.setGeometry(startX, startY, width, height);
     },
   };
   
@@ -51,7 +55,7 @@ const setBezierProps = (
 /**
  * @ignore
  */
-export class RNBezier extends NodeFrame<QLabelSignals> implements RNWidget {
+export class RNBezier extends QFrame implements RNWidget {
   native: NativeElement;
   props?: BezierProps;
   constructor();
