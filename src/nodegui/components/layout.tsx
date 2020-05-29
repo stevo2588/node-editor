@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Text, View, Button, useEventHandler } from "@nodegui/react-nodegui";
-import { QPushButtonSignals, QWidgetSignals, QMouseEvent, WidgetEventTypes, WidgetAttribute, QDrag, NativeElement, QMimeData, DropAction, QDragEnterEvent, QDragMoveEvent, QDropEvent, QPoint } from "@nodegui/nodegui";
+import { QPushButtonSignals, QWidgetSignals, QMouseEvent, WidgetEventTypes, WidgetAttribute, QDrag, NativeElement, QMimeData, DropAction, QDragEnterEvent, QDragMoveEvent, QDropEvent, QPoint, MouseButton } from "@nodegui/nodegui";
 import open from "open";
 import Link from "./Link";
 
@@ -89,12 +89,13 @@ const NodePortOld = ({ label, input, onPress, onRelease }: { label: string, inpu
   );
 }
 
-const NodePort = React.memo(({ label, input, onPress, onRelease, onDrop, mouseState, dragPayload }: {
+const NodePort = React.memo(({ label, input, onPress, onRelease, onDrop, onRightClick, mouseState, dragPayload }: {
   label: string,
   input: boolean,
   onPress: (offset: { x: number; y: number }) => void,
   onRelease: (pos: { x: number; y: number }) => void,
   onDrop: (payload: any) => void,
+  onRightClick?: () => void,
   mouseState: { isDown: boolean, globalPos: { x: number, y: number } };
   dragPayload: any;
 }) => {
@@ -105,8 +106,6 @@ const NodePort = React.memo(({ label, input, onPress, onRelease, onDrop, mouseSt
     if (prevMouseState.current?.isDown && !mouseState.isDown) {
       const pos = portEl.current.mapFromGlobal(new QPoint(mouseState.globalPos.x, mouseState.globalPos.y));
       if (pos.x() > 0 && pos.x() < 20 && pos.y() > 0 && pos.y() < 20) {
-        console.log('TWAS ME!');
-        console.log(dragPayload);
         onDrop(dragPayload);
       }
     }
@@ -115,12 +114,15 @@ const NodePort = React.memo(({ label, input, onPress, onRelease, onDrop, mouseSt
   }, [mouseState])
 
   const handler = useEventHandler<QWidgetSignals>({
-    MouseButtonPress: async (native?: NativeElement) => {
+    MouseButtonPress: (nativeEvt: any) => {
       // const globalPos = portEl.current.mapToGlobal(new QPoint(portEl.current.pos().x, portEl.current.pos().y));
-      onPress({ x: 0, y: 0 }); // TODO: pass in offset from center
+      const mouseEvt = new QMouseEvent(nativeEvt);
+      if (mouseEvt.button() === MouseButton.RightButton) return;
+      else onPress({ x: 0, y: 0 }); // TODO: pass in offset from center
     },
     MouseButtonRelease: (nativeEvt: any) => {
       const mouseEvt = new QMouseEvent(nativeEvt);
+      if (onRightClick && mouseEvt.button() === MouseButton.RightButton) onRightClick();
       onRelease({ x: mouseEvt.globalX(), y: mouseEvt.globalY() });
     },
   }, [onPress, onRelease]);
@@ -136,7 +138,7 @@ const NodePort = React.memo(({ label, input, onPress, onRelease, onDrop, mouseSt
   );
 });
 
-const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDrag, onEndDrag, onPortPress, onPortRelease, onLink, onResize, mouseState, dragPayload }: {
+const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDrag, onEndDrag, onPortPress, onPortRelease, onLink, onUnlink, onResize, mouseState, dragPayload }: {
   id: string;
   position: { x: number; y: number };
   inputs: { index: number }[];
@@ -147,6 +149,7 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
   onPortPress: (payload?: any, offset?: { x: number, y: number }) => void;
   onPortRelease: (pos: { x: number, y: number }) => void;
   onLink: (input: { nodeId: string, portId: number }, output: { nodeId: string, portId: number }) => void;
+  onUnlink: (output: { nodeId: string, portId: number }) => void;
   onResize: (width: number, height: number) => void;
   mouseState: { isDown: boolean, globalPos: { x: number, y: number } };
   dragPayload: any;
@@ -156,10 +159,14 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
   const handler = useEventHandler<QWidgetSignals>({
     MouseMove: (nativeEvt: any) => {
       if (disableDrag) return;
+      const mouseEvt = new QMouseEvent(nativeEvt);
+      if (mouseEvt.button() === MouseButton.RightButton) return;
       onDrag();
     },
     MouseButtonRelease: (nativeEvt: any) => {
       if (disableDrag) return;
+      const mouseEvt = new QMouseEvent(nativeEvt);
+      if (mouseEvt.button() === MouseButton.RightButton) return;
       onEndDrag();
     },
     Resize: (nativeEvt: any) => {
@@ -171,8 +178,6 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
   //   console.log('Layout effect')
   //   console.log(`${draggableEl.current.geometry().width()} x ${draggableEl.current.geometry().height()}`);
   // }, []);
-
-  console.log(`render draggable ${id}`);
 
   return (
     <>
@@ -203,6 +208,7 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
               mouseState={mouseState}
               dragPayload={dragPayload}
               onDrop={(payload) => onLink({ nodeId: id, portId: p.index }, { nodeId: payload.nodeId, portId: payload.portId })}
+              // onRightClick={() => onUnlink({ })}
             />
           ))}
           {/* {props.node.additionalInputs?.length ?
@@ -224,6 +230,7 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
               mouseState={mouseState}
               dragPayload={dragPayload}
               onDrop={(payload) => onLink({ nodeId: payload.nodeId, portId: payload.portId }, { nodeId: id, portId: p.index })}
+              onRightClick={() => onUnlink({ nodeId: id, portId: p.index })}
             />
           ))}
           {/* {props.node.additionalOutputs?.length ?
@@ -257,13 +264,16 @@ const Canvas = ({ nodes, updateNode }: {
   const handler = useEventHandler<QWidgetSignals>({
     MouseMove: (nativeEvt: any) => {
       const mouseEvt = new QMouseEvent(nativeEvt);
+      if (mouseEvt.button() === MouseButton.RightButton) return;
+
       setPosition({ x: mouseEvt.x(), y: mouseEvt.y() });
       setGlobalPosition({ x: mouseEvt.globalX(), y: mouseEvt.globalY() });
-      console.log(`${mouseEvt.globalX()}, ${mouseEvt.globalY()}`);
       if (dragging) updateNode(dragging, { ...nodes[dragging], x: mouseEvt.x(), y: mouseEvt.y() });
     },
     MouseButtonPress: (nativeEvt: any) => {
       const mouseEvt = new QMouseEvent(nativeEvt);
+      if (mouseEvt.button() === MouseButton.RightButton) return;
+
       setMouseDown(true);
       setPosition({ x: mouseEvt.x(), y: mouseEvt.y() });
       setGlobalPosition({ x: mouseEvt.globalX(), y: mouseEvt.globalY() });
@@ -271,7 +281,8 @@ const Canvas = ({ nodes, updateNode }: {
       // setLastPress({ x: mouseEvt.globalX(), y: mouseEvt.globalY() });
     },
     MouseButtonRelease: (nativeEvt: any) => {
-      console.log('release from canvas')
+      const mouseEvt = new QMouseEvent(nativeEvt);
+      if (mouseEvt.button() === MouseButton.RightButton) return;
       setMouseDown(false);
     },
   }, [position, portPress, lastPress, globalPosition]);
@@ -306,7 +317,15 @@ const Canvas = ({ nodes, updateNode }: {
             obj.outputs[output.portId] = { index: output.portId, link: { nodeId: input.nodeId, inputIndex: input.portId } };
             updateNode(output.nodeId, obj);
           }}
-          onResize={(width, height) => console.log(size) as undefined || setSize({ ...size, [k]: { width, height } })}
+          onUnlink={(output: { nodeId: string, portId: number }) => {
+            const obj = {
+              ...nodes[output.nodeId],
+              outputs: nodes[output.nodeId].outputs,
+            };
+            obj.outputs[output.portId] = { index: output.portId };
+            updateNode(output.nodeId, obj);
+          }}
+          onResize={(width, height) => setSize({ ...size, [k]: { width, height } })}
           mouseState={{ isDown: mouseDown, globalPos: { x: globalPosition.x, y: globalPosition.y } }}
           dragPayload={dragPayload}
         />
@@ -318,6 +337,14 @@ const Canvas = ({ nodes, updateNode }: {
               key={`${k}-${i}`}
               start={{ x: nodes[k].x + size[k].width - 15, y: nodes[k].y + 77 + (i * 27) }}
               end={{ x: nodes[p.link.nodeId].x + 15, y: nodes[p.link.nodeId].y + 77 + (p.link.inputIndex * 27) }}
+              // onRightClick={() => {
+              //   const obj = {
+              //     ...nodes[k],
+              //     outputs: nodes[k].outputs,
+              //   };
+              //   obj.outputs[i] = { index: i };
+              //   updateNode(k, obj);
+              // }}
             />
           ) : null)
       ))).reduce((a, b) => [...a, ...b], [])}

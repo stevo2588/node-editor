@@ -70,9 +70,6 @@ class ViewConfig extends ComponentConfig {
 
       const width = widget.geometry().width();
       const height = widget.geometry().height();
-      console.log('PAINTING');
-      console.log(width);
-      console.log(height);
       if (widget.props?.startPoint && widget.props.endPoint) {
         let x1;
         let y1;
@@ -93,8 +90,6 @@ class ViewConfig extends ComponentConfig {
           y2 = offset - halfLineWidth; 
         }
 
-        console.log('DRAW BEZIER');
-        console.log(x1, y1, x2, y2, lineWidth);
         drawBezier(painter, x1, y1, x2, y2, lineWidth);
       }
 
