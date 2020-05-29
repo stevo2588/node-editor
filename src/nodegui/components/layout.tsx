@@ -89,11 +89,12 @@ const NodePortOld = ({ label, input, onPress, onRelease }: { label: string, inpu
   );
 }
 
-const NodePort = React.memo(({ label, input, onPress, onRelease, mouseState, dragPayload }: {
+const NodePort = React.memo(({ label, input, onPress, onRelease, onDrop, mouseState, dragPayload }: {
   label: string,
   input: boolean,
-  onPress: (payload: any, offset: { x: number; y: number }) => void,
+  onPress: (offset: { x: number; y: number }) => void,
   onRelease: (pos: { x: number; y: number }) => void,
+  onDrop: (payload: any) => void,
   mouseState: { isDown: boolean, globalPos: { x: number, y: number } };
   dragPayload: any;
 }) => {
@@ -106,6 +107,7 @@ const NodePort = React.memo(({ label, input, onPress, onRelease, mouseState, dra
       if (pos.x() > 0 && pos.x() < 20 && pos.y() > 0 && pos.y() < 20) {
         console.log('TWAS ME!');
         console.log(dragPayload);
+        onDrop(dragPayload);
       }
     }
 
@@ -115,7 +117,7 @@ const NodePort = React.memo(({ label, input, onPress, onRelease, mouseState, dra
   const handler = useEventHandler<QWidgetSignals>({
     MouseButtonPress: async (native?: NativeElement) => {
       // const globalPos = portEl.current.mapToGlobal(new QPoint(portEl.current.pos().x, portEl.current.pos().y));
-      onPress({ data: label }, { x: 0, y: 0 }); // TODO: pass in offset from center
+      onPress({ x: 0, y: 0 }); // TODO: pass in offset from center
     },
     MouseButtonRelease: (nativeEvt: any) => {
       const mouseEvt = new QMouseEvent(nativeEvt);
@@ -134,7 +136,7 @@ const NodePort = React.memo(({ label, input, onPress, onRelease, mouseState, dra
   );
 });
 
-const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDrag, onEndDrag, onPortPress, onPortRelease, onResize, mouseState, dragPayload }: {
+const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDrag, onEndDrag, onPortPress, onPortRelease, onLink, onResize, mouseState, dragPayload }: {
   id: string;
   position: { x: number; y: number };
   inputs: { index: number }[];
@@ -144,6 +146,7 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
   onEndDrag: () => void;
   onPortPress: (payload?: any, offset?: { x: number, y: number }) => void;
   onPortRelease: (pos: { x: number, y: number }) => void;
+  onLink: (input: { nodeId: string, portId: number }, output: { nodeId: string, portId: number }) => void;
   onResize: (width: number, height: number) => void;
   mouseState: { isDown: boolean, globalPos: { x: number, y: number } };
   dragPayload: any;
@@ -195,10 +198,11 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
               key={p.index}
               input
               label="input"
-              onPress={(payload, offset) => onPortPress(payload)}
+              onPress={(offset) => onPortPress({ nodeId: id, portId: p.index })}
               onRelease={(pos) => onPortRelease(pos)}
               mouseState={mouseState}
               dragPayload={dragPayload}
+              onDrop={(payload) => onLink({ nodeId: id, portId: p.index }, { nodeId: payload.nodeId, portId: payload.portId })}
             />
           ))}
           {/* {props.node.additionalInputs?.length ?
@@ -215,10 +219,11 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
               key={p.index}
               input={false}
               label="output"
-              onPress={(payload, offset) => onPortPress(payload)}
+              onPress={(offset) => onPortPress({ nodeId: id, portId: p.index })}
               onRelease={(pos) => onPortRelease(pos)}
               mouseState={mouseState}
               dragPayload={dragPayload}
+              onDrop={(payload) => onLink({ nodeId: payload.nodeId, portId: payload.portId }, { nodeId: id, portId: p.index })}
             />
           ))}
           {/* {props.node.additionalOutputs?.length ?
@@ -292,6 +297,14 @@ const Canvas = ({ nodes, updateNode }: {
             setGlobalPosition({ x: pos.x, y: pos.y });
             setPortPress(null);
             setDragPayload(null);
+          }}
+          onLink={(input: { nodeId: string, portId: number }, output: { nodeId: string, portId: number }) => {
+            const obj = {
+              ...nodes[output.nodeId],
+              outputs: nodes[output.nodeId].outputs,
+            };
+            obj.outputs[output.portId] = { index: output.portId, link: { nodeId: input.nodeId, inputIndex: input.portId } };
+            updateNode(output.nodeId, obj);
           }}
           onResize={(width, height) => console.log(size) as undefined || setSize({ ...size, [k]: { width, height } })}
           mouseState={{ isDown: mouseDown, globalPos: { x: globalPosition.x, y: globalPosition.y } }}
