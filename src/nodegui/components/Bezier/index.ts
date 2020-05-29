@@ -9,7 +9,8 @@ import {
   QPainterPath,
   QPen,
   PenStyle,
-  PenCapStyle
+  PenCapStyle,
+  WidgetAttribute
 } from "@nodegui/nodegui";
 
 import { RNBezier, BezierProps } from './RNBezier';
@@ -69,6 +70,9 @@ class ViewConfig extends ComponentConfig {
 
       const width = widget.geometry().width();
       const height = widget.geometry().height();
+      console.log('PAINTING');
+      console.log(width);
+      console.log(height);
       if (widget.props?.startPoint && widget.props.endPoint) {
         let x1;
         let y1;
@@ -89,11 +93,15 @@ class ViewConfig extends ComponentConfig {
           y2 = offset - halfLineWidth; 
         }
 
+        console.log('DRAW BEZIER');
+        console.log(x1, y1, x2, y2, lineWidth);
         drawBezier(painter, x1, y1, x2, y2, lineWidth);
       }
 
       painter.end();
     });
+
+    widget.setAttribute(WidgetAttribute.WA_TransparentForMouseEvents, true);
 
     return widget;
   }
@@ -109,14 +117,14 @@ class ViewConfig extends ComponentConfig {
     return;
   }
 
-  finalizeInitialChildren(
-    instance: RNBezier,
-    newProps: BezierProps,
-    rootContainerInstance: AppContainer,
-    context: any
-  ): boolean {
-    return true;
-  }
+  // finalizeInitialChildren(
+  //   instance: RNBezier,
+  //   newProps: BezierProps,
+  //   rootContainerInstance: AppContainer,
+  //   context: any
+  // ): boolean {
+  //   return true;
+  // }
   
   commitUpdate(
     instance: RNBezier,

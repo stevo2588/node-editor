@@ -1,26 +1,84 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Text, View, Button, useEventHandler } from "@nodegui/react-nodegui";
-import { QPushButtonSignals, QWidgetSignals, QMouseEvent } from "@nodegui/nodegui";
+import { QPushButtonSignals, QWidgetSignals, QMouseEvent, WidgetEventTypes, WidgetAttribute, QDrag, NativeElement, QMimeData, DropAction, QDragEnterEvent, QDragMoveEvent, QDropEvent, QPoint } from "@nodegui/nodegui";
 import open from "open";
 import Link from "./Link";
 
 
-const NodePort = ({ label, input, onPress, onRelease }: { label: string, input: boolean, onPress: () => void, onRelease: () => void }) => {
-  const handler = useEventHandler<QPushButtonSignals>({
-    MouseButtonPress: () => {
+// TODO: FUTURE -- use canvas or maybe QtGraphicsView for better performance
+
+const NodePortOld = ({ label, input, onPress, onRelease }: { label: string, input: boolean, onPress: () => void, onRelease: () => void }) => {
+  // const [enabled, setEnabled] = useState(true);
+  const portRef = useRef(null);
+
+  const handler = useEventHandler<QWidgetSignals>({
+    MouseButtonPress: async (native?: NativeElement) => {
       console.log('port press!');
-      onPress();
+      onPress(); // TODO: pass in offset from center
+      const data = new QMimeData();
+      data.setText('hello');
+      // @ts-ignore
+      const drag = new QDrag(portRef.current);
+      drag.setMimeData(data);
+      // something wrong with this?
+      await drag.exec(DropAction.CopyAction);
+      // setEnabled(false);
     },
-    MouseMove: (nativeEvt: any) => {
-      const mouseEvt = new QMouseEvent(nativeEvt);
-    },
+    // MouseMove: (nativeEvt: any) => {
+    //   const mouseEvt = new QMouseEvent(nativeEvt);
+    //   console.log(label);
+    // },
     MouseButtonRelease: () => {
       console.log('port release!');
+      console.log(label);
       onRelease();
     },
-  }, []);
+    DragEnter: (nativeEvt: any) => {
+      const dragEvt = new QDragEnterEvent(nativeEvt);
+      console.log('drag enter!');
+      if (dragEvt.source().objectName() === portRef.current.objectName()) {
+        console.log('equals this');
+        dragEvt.setDropAction(DropAction.CopyAction);
+        dragEvt.accept();
+      } else {
+        console.log('accept action');
+        dragEvt.acceptProposedAction();
+      }
+    },
+    DragMove: (nativeEvt: any) => {
+      const dragEvt = new QDragMoveEvent(nativeEvt);
+      console.log('drag move!');
+      if (dragEvt.source().objectName() === portRef.current.objectName()) {
+        console.log('equals this');
+        dragEvt.setDropAction(DropAction.CopyAction);
+        dragEvt.accept();
+      } else {
+        console.log('accept action');
+        dragEvt.acceptProposedAction();
+      }
+    },
+    // DragLeave: () => {
+    //   console.log('drag leave!');
+    // },
+    Drop: (nativeEvt: any) => {
+      const dragEvt = new QDropEvent(nativeEvt);
+      console.log('drop');
+      if (dragEvt.source().objectName() === portRef.current.objectName()) {
+        console.log('equals this');
+        dragEvt.setDropAction(DropAction.CopyAction);
+        dragEvt.accept();
+      } else {
+        console.log('accept action');
+        dragEvt.acceptProposedAction();
+        onRelease();
+      }
+    },
+  }, [onPress, onRelease]);
+  // }, []);
 
-  const port = <Button style={Port} on={handler} />;
+  // const port = <Button style={Port} mouseTracking attributes={{ [WidgetAttribute.WA_AcceptDrops]: true }} on={handler} />;
+  // const port = <View style={Port} />;
+  const port = <View ref={portRef} style={Port} attributes={{ [WidgetAttribute.WA_AcceptDrops]: true }} on={handler} />;
   const lbl = <Text style={Label}>{label}</Text>;
 
   return (
@@ -31,29 +89,92 @@ const NodePort = ({ label, input, onPress, onRelease }: { label: string, input: 
   );
 }
 
-const Draggable = ({ onDrag }: { onDrag: (setPos: (pos: { x: number; y: number; }) => void) => void }) => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [portDragPosition, setPortDragPosition] = useState({ x: 0, y: 0 });
-  const [portPressed, setPortPressed] = useState(false);
-  const [lastPress, setLastPress] = useState({ x: 0, y: 0 });
+const NodePort = React.memo(({ label, input, onPress, onRelease, mouseState, dragPayload }: {
+  label: string,
+  input: boolean,
+  onPress: (payload: any, offset: { x: number; y: number }) => void,
+  onRelease: (pos: { x: number; y: number }) => void,
+  mouseState: { isDown: boolean, globalPos: { x: number, y: number } };
+  dragPayload: any;
+}) => {
+  const portEl = useRef();
+  const prevMouseState = useRef<typeof mouseState>();
+
+  useEffect(() => {
+    if (prevMouseState.current?.isDown && !mouseState.isDown) {
+      const pos = portEl.current.mapFromGlobal(new QPoint(mouseState.globalPos.x, mouseState.globalPos.y));
+      if (pos.x() > 0 && pos.x() < 20 && pos.y() > 0 && pos.y() < 20) {
+        console.log('TWAS ME!');
+        console.log(dragPayload);
+      }
+    }
+
+    prevMouseState.current = mouseState;
+  }, [mouseState])
+
+  const handler = useEventHandler<QWidgetSignals>({
+    MouseButtonPress: async (native?: NativeElement) => {
+      // const globalPos = portEl.current.mapToGlobal(new QPoint(portEl.current.pos().x, portEl.current.pos().y));
+      onPress({ data: label }, { x: 0, y: 0 }); // TODO: pass in offset from center
+    },
+    MouseButtonRelease: (nativeEvt: any) => {
+      const mouseEvt = new QMouseEvent(nativeEvt);
+      onRelease({ x: mouseEvt.globalX(), y: mouseEvt.globalY() });
+    },
+  }, [onPress, onRelease]);
+
+  const port = <View style={Port} on={handler} ref={portEl} />;
+  const lbl = <Text style={Label}>{label}</Text>;
+
+  return (
+    <View style={PortLabel}>
+      {input ? port : lbl}
+      {input ? lbl : port}
+    </View>
+  );
+});
+
+const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDrag, onEndDrag, onPortPress, onPortRelease, onResize, mouseState, dragPayload }: {
+  id: string;
+  position: { x: number; y: number };
+  inputs: { index: number }[];
+  outputs: { index: number }[];
+  disableDrag: boolean;
+  onDrag: () => void;
+  onEndDrag: () => void;
+  onPortPress: (payload?: any, offset?: { x: number, y: number }) => void;
+  onPortRelease: (pos: { x: number, y: number }) => void;
+  onResize: (width: number, height: number) => void;
+  mouseState: { isDown: boolean, globalPos: { x: number, y: number } };
+  dragPayload: any;
+}) => {
+  const draggableEl = useRef();
 
   const handler = useEventHandler<QWidgetSignals>({
     MouseMove: (nativeEvt: any) => {
-      const mouseEvt = new QMouseEvent(nativeEvt);
-      console.log("mouseMoved at: ", { x: mouseEvt.x(), y: mouseEvt.y() });
-      if (!portPressed) onDrag((pos) => setPosition(pos));
-      else onDrag((pos) => setPortDragPosition(pos));
+      if (disableDrag) return;
+      onDrag();
     },
-    MouseButtonPress: (nativeEvt: any) => {
-      const mouseEvt = new QMouseEvent(nativeEvt);
-      setLastPress({ x: mouseEvt.x(), y: mouseEvt.y() });
-    }
-  }, [position, portPressed]);
+    MouseButtonRelease: (nativeEvt: any) => {
+      if (disableDrag) return;
+      onEndDrag();
+    },
+    Resize: (nativeEvt: any) => {
+      onResize(draggableEl.current.geometry().width(), draggableEl.current.geometry().height());
+    },
+  }, [disableDrag, onResize]);
+
+  // useLayoutEffect(() => {
+  //   console.log('Layout effect')
+  //   console.log(`${draggableEl.current.geometry().width()} x ${draggableEl.current.geometry().height()}`);
+  // }, []);
+
+  console.log(`render draggable ${id}`);
 
   return (
     <>
-    <View style={OuterNode + `left: ${position.x}; top: ${position.y};`} on={handler}>
-    <View style={Node}>
+    {/* <View style={OuterNode + `left: ${position.x}; top: ${position.y};`} on={handler}> */}
+    <View style={Node + `left: ${position.x}; top: ${position.y};`} on={handler} ref={draggableEl}>
       <View style={'border-width: 4px; border-style: solid; border-color: "#1cd"; border-radius: 10px;'}>
       <View style={Title}>
         <Text style={TitleName}>Name</Text>
@@ -69,10 +190,17 @@ const Draggable = ({ onDrag }: { onDrag: (setPos: (pos: { x: number; y: number; 
       </View>
       <View style={Content}>
         <View style={PortsContainer}>
-          {/* {props.node.getInPorts().map((port: any) => <NodePort left engine={props.engine} port={port} key={port.getID()} />)} */}
-          <NodePort input label="input" onPress={() => setPortPressed(true)} onRelease={() => setPortPressed(false)} />
-          <NodePort input label="input" onPress={() => setPortPressed(true)} onRelease={() => setPortPressed(false)} />
-          <NodePort input label="input" onPress={() => setPortPressed(true)} onRelease={() => setPortPressed(false)} />
+          {inputs.map(p => (
+            <NodePort
+              key={p.index}
+              input
+              label="input"
+              onPress={(payload, offset) => onPortPress(payload)}
+              onRelease={(pos) => onPortRelease(pos)}
+              mouseState={mouseState}
+              dragPayload={dragPayload}
+            />
+          ))}
           {/* {props.node.additionalInputs?.length ?
           <Dropdown overlay={addPortMenu(true)} trigger={['click']} placement="bottomRight">
             <Button size="small">+</Button>
@@ -82,9 +210,17 @@ const Draggable = ({ onDrag }: { onDrag: (setPos: (pos: { x: number; y: number; 
         <View style={BodyContainer}>
         </View>
         <View style={PortsContainer}>
-          {/* {props.node.getOutPorts().map((port: any) => <NodePort left={false} engine={props.engine} port={port} key={port.getID()} />)} */}
-          <NodePort input={false} label="output" onPress={() => setPortPressed(true)} onRelease={() => setPortPressed(false)} />
-          <NodePort input={false} label="output" onPress={() => setPortPressed(true)} onRelease={() => setPortPressed(false)} />
+          {outputs.map(p => (
+            <NodePort
+              key={p.index}
+              input={false}
+              label="output"
+              onPress={(payload, offset) => onPortPress(payload)}
+              onRelease={(pos) => onPortRelease(pos)}
+              mouseState={mouseState}
+              dragPayload={dragPayload}
+            />
+          ))}
           {/* {props.node.additionalOutputs?.length ?
             <Dropdown overlay={addPortMenu(false)} trigger={['click']} placement="bottomLeft">
               <Button size="small">+</Button>
@@ -94,39 +230,90 @@ const Draggable = ({ onDrag }: { onDrag: (setPos: (pos: { x: number; y: number; 
       </View>
       </View>
     </View>
-    </View>
+    {/* </View> */}
     </>
   );
-};
+});
 
-const Canvas = () => {
+const Canvas = ({ nodes, updateNode }: {
+  nodes: { [id: string]: { x: number, y: number, inputs: any[], outputs: any[] } };
+  updateNode: (id: string, data: { x: number; y: number, outputs: any[] }) => void;
+}) => {
+  const nodeEls = useRef();
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [globalPosition, setGlobalPosition] = useState({ x: 0, y: 0 });
+  const [mouseDown, setMouseDown] = useState(false);
   const [lastPress, setLastPress] = useState({ x: 0, y: 0 });
+  const [portPress, setPortPress] = useState<{ x: number, y: number }|null>(null);
+  const [dragPayload, setDragPayload] = useState<any>();
+  const [dragging, setDragging] = useState<string|null>(null);
+  const [size, setSize] = useState<{ [id: string]: { width: number; height: number }}>();
 
   const handler = useEventHandler<QWidgetSignals>({
     MouseMove: (nativeEvt: any) => {
       const mouseEvt = new QMouseEvent(nativeEvt);
-      setPosition({ x: mouseEvt.x() < 0 ? 0 : mouseEvt.x(), y: mouseEvt.y() < 0 ? 0 : mouseEvt.y() });
+      setPosition({ x: mouseEvt.x(), y: mouseEvt.y() });
+      setGlobalPosition({ x: mouseEvt.globalX(), y: mouseEvt.globalY() });
+      console.log(`${mouseEvt.globalX()}, ${mouseEvt.globalY()}`);
+      if (dragging) updateNode(dragging, { ...nodes[dragging], x: mouseEvt.x(), y: mouseEvt.y() });
     },
     MouseButtonPress: (nativeEvt: any) => {
       const mouseEvt = new QMouseEvent(nativeEvt);
+      setMouseDown(true);
+      setPosition({ x: mouseEvt.x(), y: mouseEvt.y() });
+      setGlobalPosition({ x: mouseEvt.globalX(), y: mouseEvt.globalY() });
       setLastPress({ x: mouseEvt.x(), y: mouseEvt.y() });
-    }
-  }, [position]);
-
+      // setLastPress({ x: mouseEvt.globalX(), y: mouseEvt.globalY() });
+    },
+    MouseButtonRelease: (nativeEvt: any) => {
+      console.log('release from canvas')
+      setMouseDown(false);
+    },
+  }, [position, portPress, lastPress, globalPosition]);
 
   return (
     <View style={graphStyle} on={handler}>
-      <Draggable onDrag={(setPos) => setPos({ x: position.x, y: position.y })} />
-      <Draggable onDrag={(setPos) => setPos({ x: position.x, y: position.y })} />
-      <Draggable onDrag={(setPos) => setPos({ x: position.x, y: position.y })} />
-      <Link start={lastPress} end={position} />
+      {Object.keys(nodes).map((k) =>
+        <Draggable
+          id={k}
+          key={k}
+          position={{ x: nodes[k].x, y: nodes[k].y }}
+          inputs={nodes[k].inputs}
+          outputs={nodes[k].outputs}
+          disableDrag={!!portPress}
+          onDrag={() => setDragging(k)}
+          onEndDrag={() => setDragging(null)}
+          onPortPress={(payload, offset) => {
+            setPortPress({ x: globalPosition.x, y: globalPosition.y });
+            setDragPayload(payload);
+          }}
+          onPortRelease={(pos) => {
+            setMouseDown(false);
+            setGlobalPosition({ x: pos.x, y: pos.y });
+            setPortPress(null);
+            setDragPayload(null);
+          }}
+          onResize={(width, height) => console.log(size) as undefined || setSize({ ...size, [k]: { width, height } })}
+          mouseState={{ isDown: mouseDown, globalPos: { x: globalPosition.x, y: globalPosition.y } }}
+          dragPayload={dragPayload}
+        />
+      )}
+      {Object.keys(nodes).map((k) => (
+        nodes[k].outputs.map((p, i) => (
+          (p.link && size && size[k]) ? (
+            <Link
+              key={`${k}-${i}`}
+              start={{ x: nodes[k].x + size[k].width - 15, y: nodes[k].y + 77 + (i * 27) }}
+              end={{ x: nodes[p.link.nodeId].x + 15, y: nodes[p.link.nodeId].y + 77 + (p.link.inputIndex * 27) }}
+            />
+          ) : null)
+      ))).reduce((a, b) => [...a, ...b], [])}
+      {portPress && <Link start={lastPress} end={position} />}
     </View>
   );
 }
 
 export const Layout = () => {
-  console.log('render layout')
   const btnHandler = useEventHandler<QPushButtonSignals>(
     {
       clicked: () => open("https://creativelogic.me").catch(console.log)
@@ -134,11 +321,17 @@ export const Layout = () => {
     []
   );
 
+  const [nodes, setNodes] = useState({
+    '1': { x: 20, y: 10, inputs: [{ index: 0 }], outputs: [{ index: 0 }, { index: 1, link: { nodeId: 2, inputIndex: 1 } }] },
+    '2': { x: 300, y: 200, inputs: [{ index: 0 }, { index: 1 }], outputs: [{ index: 0, link: { nodeId: 3, inputIndex: 2 } }] },
+    '3': { x: 700, y: 500, inputs: [{ index: 0 }, { index: 1 }, { index: 2 }], outputs: [{}] },
+  });
+
   return (
     <View style={containerStyle}>
-      <View style={headerStyle}><Text style={textStyle}>{`<h1>Node Editor<h1>`}</Text></View>
+      <View style={headerStyle}><Text style={textStyle}>{`<h1>Node Editor</h1>`}</Text></View>
       <View style={editorStyle}>
-        <Canvas />
+        <Canvas nodes={nodes} updateNode={(id: string, data: { x: number; y: number }) => setNodes({ ...nodes, [id]: data })} />
         <View style={sideBarStyle}>
           <Text style={textStyle} wordWrap={true}>
             {`
@@ -232,6 +425,7 @@ export const Port = `
   // border: solid 2px ${p => (p.selected ? 'rgb(0,192,255)' : 'black')};
   // box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4);
 const Node = `
+  position: absolute;
   font-family: sans-serif;
   color: white;
   overflow: visible;
