@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { Text, View, Button, useEventHandler } from "@nodegui/react-nodegui";
-import { QPushButtonSignals, QWidgetSignals, QMouseEvent, WidgetEventTypes, WidgetAttribute, QDrag, NativeElement, QMimeData, DropAction, QDragEnterEvent, QDragMoveEvent, QDropEvent, QPoint, MouseButton } from "@nodegui/nodegui";
+import { Text, View, Button, useEventHandler, ComboBox } from "@nodegui/react-nodegui";
+import { QPushButtonSignals, QWidgetSignals, QMouseEvent, WidgetEventTypes, WidgetAttribute, QDrag, NativeElement, QMimeData, DropAction, QDragEnterEvent, QDragMoveEvent, QDropEvent, QPoint, MouseButton, QComboBoxSignals } from "@nodegui/nodegui";
 import open from "open";
 import Link from "./Link";
 
@@ -138,11 +138,13 @@ const NodePort = React.memo(({ label, input, onPress, onRelease, onDrop, onRight
   );
 });
 
-const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDrag, onEndDrag, onPortPress, onPortRelease, onLink, onUnlink, onResize, mouseState, dragPayload }: {
+const Draggable = React.memo(({ id, position, inputs, outputs, additionalInputs, additionalOutputs, disableDrag, onDrag, onEndDrag, onPortPress, onPortRelease, onLink, onUnlink, onAddPort, onResize, mouseState, dragPayload }: {
   id: string;
   position: { x: number; y: number };
-  inputs: { index: number }[];
-  outputs: { index: number }[];
+  inputs: { index: number, value: string }[];
+  outputs: { index: number, value: string }[];
+  additionalInputs: string[];
+  additionalOutputs: string[];
   disableDrag: boolean;
   onDrag: () => void;
   onEndDrag: () => void;
@@ -150,6 +152,7 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
   onPortRelease: (pos: { x: number, y: number }) => void;
   onLink: (input: { nodeId: string, portId: number }, output: { nodeId: string, portId: number }) => void;
   onUnlink: (output: { nodeId: string, portId: number }) => void;
+  onAddPort: (input: boolean, type: string) => void;
   onResize: (width: number, height: number) => void;
   mouseState: { isDown: boolean, globalPos: { x: number, y: number } };
   dragPayload: any;
@@ -181,7 +184,6 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
 
   return (
     <>
-    {/* <View style={OuterNode + `left: ${position.x}; top: ${position.y};`} on={handler}> */}
     <View style={Node + `left: ${position.x}; top: ${position.y};`} on={handler} ref={draggableEl}>
       <View style={'border-width: 4px; border-style: solid; border-color: "#1cd"; border-radius: 10px;'}>
       <View style={Title}>
@@ -197,12 +199,12 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
         : null} */}
       </View>
       <View style={Content}>
-        <View style={PortsContainer}>
+        <View style={PortsContainer(true)}>
           {inputs.map(p => (
             <NodePort
               key={p.index}
               input
-              label="input"
+              label={p.value}
               onPress={(offset) => onPortPress({ nodeId: id, portId: p.index })}
               onRelease={(pos) => onPortRelease(pos)}
               mouseState={mouseState}
@@ -211,20 +213,19 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
               // onRightClick={() => onUnlink({ })}
             />
           ))}
-          {/* {props.node.additionalInputs?.length ?
-          <Dropdown overlay={addPortMenu(true)} trigger={['click']} placement="bottomRight">
-            <Button size="small">+</Button>
-          </Dropdown>
-          : null} */}
+          {additionalInputs.length ? (
+            <ComboBox on={{currentIndexChanged: (index) => index > 0 && onAddPort(true, 'TODO')}} items={[{ text: '-- Select Input --' }, ...additionalInputs.map(i => ({ text: i }))]} styleSheet={ComboBoxStyle} />
+          )
+          : null}
         </View>
         <View style={BodyContainer}>
         </View>
-        <View style={PortsContainer}>
+        <View style={PortsContainer(false)}>
           {outputs.map(p => (
             <NodePort
               key={p.index}
               input={false}
-              label="output"
+              label={p.value}
               onPress={(offset) => onPortPress({ nodeId: id, portId: p.index })}
               onRelease={(pos) => onPortRelease(pos)}
               mouseState={mouseState}
@@ -233,23 +234,31 @@ const Draggable = React.memo(({ id, position, inputs, outputs, disableDrag, onDr
               onRightClick={() => onUnlink({ nodeId: id, portId: p.index })}
             />
           ))}
-          {/* {props.node.additionalOutputs?.length ?
-            <Dropdown overlay={addPortMenu(false)} trigger={['click']} placement="bottomLeft">
-              <Button size="small">+</Button>
-            </Dropdown>
-          : null} */}
+          {additionalOutputs.length ? (
+            <ComboBox on={{currentIndexChanged: (index) => index > 0 && onAddPort(false, 'TODO')}} items={[{ text: '-- Select Output--' }, ...additionalOutputs.map(i => ({ text: i }))]} styleSheet={ComboBoxStyle} />
+          )
+          : null}
         </View>
       </View>
       </View>
     </View>
-    {/* </View> */}
     </>
   );
 });
 
 const Canvas = ({ nodes, updateNode }: {
-  nodes: { [id: string]: { x: number, y: number, inputs: any[], outputs: any[] } };
-  updateNode: (id: string, data: { x: number; y: number, outputs: any[] }) => void;
+  nodes: { [id: string]: {
+    x: number;
+    y: number;
+    inputs: { index: number; value: string }[];
+    outputs: { index: number; value: string; links?: { nodeId: string; inputIndex: number }[] }[]
+  } };
+  updateNode: (id: string, data: {
+    x: number;
+    y: number;
+    inputs: { index: number; value: string }[];
+    outputs: { index: number; value: string; links?: { nodeId: string; inputIndex: number }[] }[]
+  }) => void;
 }) => {
   const nodeEls = useRef();
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -296,6 +305,8 @@ const Canvas = ({ nodes, updateNode }: {
           position={{ x: nodes[k].x, y: nodes[k].y }}
           inputs={nodes[k].inputs}
           outputs={nodes[k].outputs}
+          additionalInputs={['test_input_01', 'test_input_02']}
+          additionalOutputs={['test_output']}
           disableDrag={!!portPress}
           onDrag={() => setDragging(k)}
           onEndDrag={() => setDragging(null)}
@@ -310,11 +321,20 @@ const Canvas = ({ nodes, updateNode }: {
             setDragPayload(null);
           }}
           onLink={(input: { nodeId: string, portId: number }, output: { nodeId: string, portId: number }) => {
+            if (nodes[output.nodeId].outputs.find(o => 
+              o.index === output.portId
+              && o.links?.find(l => l.nodeId === input.nodeId && l.inputIndex === input.portId)
+            )) return;
+
             const obj = {
               ...nodes[output.nodeId],
               outputs: nodes[output.nodeId].outputs,
             };
-            obj.outputs[output.portId] = { index: output.portId, link: { nodeId: input.nodeId, inputIndex: input.portId } };
+            obj.outputs[output.portId] = {
+              ...obj.outputs[output.portId],
+              index: output.portId,
+              links: [...(obj.outputs[output.portId].links || []), { nodeId: input.nodeId, inputIndex: input.portId }],
+            };
             updateNode(output.nodeId, obj);
           }}
           onUnlink={(output: { nodeId: string, portId: number }) => {
@@ -322,8 +342,17 @@ const Canvas = ({ nodes, updateNode }: {
               ...nodes[output.nodeId],
               outputs: nodes[output.nodeId].outputs,
             };
-            obj.outputs[output.portId] = { index: output.portId };
+            obj.outputs[output.portId] = { index: output.portId, value: obj.outputs[output.portId].value };
             updateNode(output.nodeId, obj);
+          }}
+          onAddPort={(input: boolean, type: string) => {
+            const obj = { ...nodes[k] };
+            if (input) {
+              obj.inputs.push({ index: obj.inputs.length, value: type });
+            } else {
+              obj.outputs.push({ index: obj.outputs.length, value: type });
+            }
+            updateNode(k, obj);
           }}
           onResize={(width, height) => setSize({ ...size, [k]: { width, height } })}
           mouseState={{ isDown: mouseDown, globalPos: { x: globalPosition.x, y: globalPosition.y } }}
@@ -332,21 +361,13 @@ const Canvas = ({ nodes, updateNode }: {
       )}
       {Object.keys(nodes).map((k) => (
         nodes[k].outputs.map((p, i) => (
-          (p.link && size && size[k]) ? (
+          (p.links && size && size[k]) ? p.links.map((link: any) => (
             <Link
-              key={`${k}-${i}`}
-              start={{ x: nodes[k].x + size[k].width - 15, y: nodes[k].y + 77 + (i * 27) }}
-              end={{ x: nodes[p.link.nodeId].x + 15, y: nodes[p.link.nodeId].y + 77 + (p.link.inputIndex * 27) }}
-              // onRightClick={() => {
-              //   const obj = {
-              //     ...nodes[k],
-              //     outputs: nodes[k].outputs,
-              //   };
-              //   obj.outputs[i] = { index: i };
-              //   updateNode(k, obj);
-              // }}
+              key={`${k}-${i}-${link.nodeId}-${link.inputIndex}`}
+              start={{ x: nodes[k].x + size[k].width - 15, y: nodes[k].y + 67 + (i * 27) }}
+              end={{ x: nodes[link.nodeId].x + 15, y: nodes[link.nodeId].y + 67 + (link.inputIndex * 27) }}
             />
-          ) : null)
+          )) : null)
       ))).reduce((a, b) => [...a, ...b], [])}
       {portPress && <Link start={lastPress} end={position} />}
     </View>
@@ -361,17 +382,22 @@ export const Layout = () => {
     []
   );
 
-  const [nodes, setNodes] = useState({
-    '1': { x: 20, y: 10, inputs: [{ index: 0 }], outputs: [{ index: 0 }, { index: 1, link: { nodeId: 2, inputIndex: 1 } }] },
-    '2': { x: 300, y: 200, inputs: [{ index: 0 }, { index: 1 }], outputs: [{ index: 0, link: { nodeId: 3, inputIndex: 2 } }] },
-    '3': { x: 700, y: 500, inputs: [{ index: 0 }, { index: 1 }, { index: 2 }], outputs: [{}] },
+  const [nodes, setNodes] = useState<{ [id: string]: {
+    x: number;
+    y: number;
+    inputs: { index: number; value: string }[];
+    outputs: { index: number; value: string; links?: { nodeId: string; inputIndex: number }[] }[];
+  }}>({
+    '1': { x: 20, y: 10, inputs: [{ index: 0, value: 'input_0' }], outputs: [{ index: 0, value: 'output_0' }, { index: 1, value: 'output_1', links: [{ nodeId: '2', inputIndex: 1 }] }] },
+    '2': { x: 300, y: 200, inputs: [{ index: 0, value: 'input_0' }, { index: 1, value: 'input_1' }], outputs: [{ index: 0, value: 'output_0', links: [{ nodeId: '3', inputIndex: 2 }] }] },
+    '3': { x: 700, y: 500, inputs: [{ index: 0, value: 'input_0' }, { index: 1, value: 'input_1' }, { index: 2, value: 'input_2' }], outputs: [{ index: 0, value: 'output_0' }] },
   });
 
   return (
     <View style={containerStyle}>
       <View style={headerStyle}><Text style={textStyle}>{`<h1>Node Editor</h1>`}</Text></View>
       <View style={editorStyle}>
-        <Canvas nodes={nodes} updateNode={(id: string, data: { x: number; y: number }) => setNodes({ ...nodes, [id]: data })} />
+        <Canvas nodes={nodes} updateNode={(id, data) => setNodes({ ...nodes, [id]: data })} />
         <View style={sideBarStyle}>
           <Text style={textStyle} wordWrap={true}>
             {`
@@ -477,12 +503,6 @@ const Node = `
   background-color: '#222';
 `;
 
-const OuterNode = `
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.1);
-  padding: 10px;
-`;
-
   // justify-items: center;
 const Title = `
   background: rgba(0, 0, 0, 0.3);
@@ -490,7 +510,6 @@ const Title = `
   border-top-right-radius: 10px;
   display: flex;
   white-space: nowrap;
-  margin: 5px;
 `;
 
 const TitleName = `
@@ -525,9 +544,10 @@ const Content = `
   flex-direction: row;
 `;
 
-const PortsContainer = `
+const PortsContainer = (input: boolean) => `
   display: flex;
   flex-direction: column;
+  align-items: flex-${input ? 'start' : 'end'};
 `;
 
 const BodyContainer = `
@@ -539,4 +559,27 @@ const BodyContainer = `
 
 const NodePortStyle = `
   flex-direction: column;
+`;
+
+const ComboBoxStyle = `
+QComboBox {
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 1px 18px 1px 3px;
+    width: 25em;
+    background-color: black;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 25px;
+
+    border-top-right-radius: 3px; /* same radius as the QComboBox */
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox::down-arrow {
+  image: url(/something);
+}
 `;
