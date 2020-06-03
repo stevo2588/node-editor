@@ -218,7 +218,7 @@ const Draggable = React.memo(({ id, position, inputs, outputs, additionalInputs,
             />
           ))}
           {additionalInputs.length ? (
-            <ComboBox on={{currentIndexChanged: (index) => index > 0 && onAddPort(true, 'TODO')}} items={[{ text: '-- Select Input --' }, ...additionalInputs.map(i => ({ text: i }))]} styleSheet={ComboBoxStyle} />
+            <ComboBox on={{currentIndexChanged: (index) => index > 0 && onAddPort(true, `input_${inputs.length}`)}} items={[{ text: '-- Select Input --' }, ...additionalInputs.map(i => ({ text: i }))]} styleSheet={ComboBoxStyle} />
           )
           : null}
         </View>
@@ -239,7 +239,7 @@ const Draggable = React.memo(({ id, position, inputs, outputs, additionalInputs,
             />
           ))}
           {additionalOutputs.length ? (
-            <ComboBox on={{currentIndexChanged: (index) => index > 0 && onAddPort(false, 'TODO')}} items={[{ text: '-- Select Output--' }, ...additionalOutputs.map(i => ({ text: i }))]} styleSheet={ComboBoxStyle} />
+            <ComboBox on={{currentIndexChanged: (index) => index > 0 && onAddPort(false, `input_${outputs.length}`)}} items={[{ text: '-- Select Output--' }, ...additionalOutputs.map(i => ({ text: i }))]} styleSheet={ComboBoxStyle} />
           )
           : null}
         </View>
