@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Text, View, Button, useEventHandler, ComboBox } from "@nodegui/react-nodegui";
-import { QPushButtonSignals, QWidgetSignals, QMouseEvent, WidgetEventTypes, WidgetAttribute, QDrag, NativeElement, QMimeData, DropAction, QDragEnterEvent, QDragMoveEvent, QDropEvent, QPoint, MouseButton, QComboBoxSignals } from "@nodegui/nodegui";
+import { QPushButtonSignals, QWidgetSignals, QMouseEvent, WidgetEventTypes, WidgetAttribute, QDrag, NativeElement, QMimeData, DropAction, QDragEnterEvent, QDragMoveEvent, QDropEvent, QPoint, MouseButton, QComboBoxSignals, QMenu, QAction, ContextMenuPolicy } from "@nodegui/nodegui";
 import open from "open";
 import Link from "./Link";
 
@@ -103,6 +103,10 @@ const NodePort = React.memo(({ label, input, onPress, onRelease, onDrop, onRight
   const prevMouseState = useRef<typeof mouseState>();
 
   useEffect(() => {
+    portEl.current.setContextMenuPolicy(ContextMenuPolicy.PreventContextMenu);
+  }, []);
+
+  useEffect(() => {
     if (prevMouseState.current?.isDown && !mouseState.isDown) {
       const pos = portEl.current.mapFromGlobal(new QPoint(mouseState.globalPos.x, mouseState.globalPos.y));
       if (pos.x() > 0 && pos.x() < 20 && pos.y() > 0 && pos.y() < 20) {
@@ -127,7 +131,7 @@ const NodePort = React.memo(({ label, input, onPress, onRelease, onDrop, onRight
     },
   }, [onPress, onRelease]);
 
-  const port = <View style={Port} on={handler} ref={portEl} />;
+  const port = <View  styleSheet={`QWidget {${Port}} QWidget::hover { background-color: blue; }`} on={handler} ref={portEl} />;
   const lbl = <Text style={Label}>{label}</Text>;
 
   return (
@@ -246,7 +250,7 @@ const Draggable = React.memo(({ id, position, inputs, outputs, additionalInputs,
   );
 });
 
-const Canvas = ({ nodes, updateNode }: {
+const Canvas = ({ nodes, updateNode, addNode }: {
   nodes: { [id: string]: {
     x: number;
     y: number;
@@ -259,8 +263,14 @@ const Canvas = ({ nodes, updateNode }: {
     inputs: { index: number; value: string }[];
     outputs: { index: number; value: string; links?: { nodeId: string; inputIndex: number }[] }[]
   }) => void;
+  addNode: (data: {
+    x: number;
+    y: number;
+    inputs: { index: number; value: string }[];
+    outputs: { index: number; value: string; links?: { nodeId: string; inputIndex: number }[] }[]
+  }) => void;
 }) => {
-  const nodeEls = useRef();
+  const canvasEl = useRef();
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [globalPosition, setGlobalPosition] = useState({ x: 0, y: 0 });
   const [mouseDown, setMouseDown] = useState(false);
@@ -269,6 +279,10 @@ const Canvas = ({ nodes, updateNode }: {
   const [dragPayload, setDragPayload] = useState<any>();
   const [dragging, setDragging] = useState<string|null>(null);
   const [size, setSize] = useState<{ [id: string]: { width: number; height: number }}>();
+
+  useEffect(() => {
+    canvasEl.current.setContextMenuPolicy(ContextMenuPolicy.CustomContextMenu);
+  }, []);
 
   const handler = useEventHandler<QWidgetSignals>({
     MouseMove: (nativeEvt: any) => {
@@ -294,10 +308,20 @@ const Canvas = ({ nodes, updateNode }: {
       if (mouseEvt.button() === MouseButton.RightButton) return;
       setMouseDown(false);
     },
+    customContextMenuRequested: (pos: { x: number, y: number }) => {
+      if (!canvasEl.current) return;
+      console.log(pos);
+      const ctxMenu = new QMenu(canvasEl.current);
+      const action = new QAction(canvasEl.current);
+      action.setText('something');
+      action.addEventListener('triggered', () => addNode({ x: 50, y: 50, inputs: [], outputs: [] }));
+      ctxMenu.addAction(action);
+      ctxMenu.exec(canvasEl.current.mapToGlobal(new QPoint(pos.x, pos.y)));
+    },
   }, [position, portPress, lastPress, globalPosition]);
 
   return (
-    <View style={graphStyle} on={handler}>
+    <View style={graphStyle} on={handler} ref={canvasEl}>
       {Object.keys(nodes).map((k) =>
         <Draggable
           id={k}
@@ -397,7 +421,11 @@ export const Layout = () => {
     <View style={containerStyle}>
       <View style={headerStyle}><Text style={textStyle}>{`<h1>Node Editor</h1>`}</Text></View>
       <View style={editorStyle}>
-        <Canvas nodes={nodes} updateNode={(id, data) => setNodes({ ...nodes, [id]: data })} />
+        <Canvas
+          nodes={nodes}
+          updateNode={(id, data) => setNodes({ ...nodes, [id]: data })}
+          addNode={(data) => setNodes({ ...nodes, [Object.keys(nodes).length + 1]: data })}
+        />
         <View style={sideBarStyle}>
           <Text style={textStyle} wordWrap={true}>
             {`
@@ -432,14 +460,6 @@ const editorStyle = `
 const graphStyle = `
   background-color: '#444';
   flex: 1;
-`;
-
-const draggableStyle = `
-  position: absolute;
-  width: 150px;
-  height: 50px;
-  background-color: '#334';
-  border-radius: 10px;
 `;
 
 const sideBarStyle = `
