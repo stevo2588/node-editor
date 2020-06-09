@@ -1,3 +1,5 @@
+// import { reducer as rustReducer } from '../../rust/native/nodejs';
+
 
 export type Node = {
   x: number;
@@ -35,6 +37,9 @@ export const reducer = (
     state: { [id: string]: Node },
     action: AddNodeAction | UpdateNodeAction | LinkNodesAction | UnlinkNodesAction | AddPortAction,
   ) => {
+  
+  // console.log(JSON.stringify(rustReducer(state, action)));
+
   switch (action.type) {
     case 'add_node':
       return { ...state, [Object.keys(state).length + 1]: action.data };

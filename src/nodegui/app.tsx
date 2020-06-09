@@ -3,7 +3,6 @@ import React from "react";
 import { QIcon } from "@nodegui/nodegui";
 import { Layout } from "./components/layout";
 import nodeguiIcon from "./assets/nodegui.jpg";
-import rustModule from '../../rust/native/nodejs';
 
 const minSize = { width: 1500, height: 850 };
 const winIcon = new QIcon(nodeguiIcon);

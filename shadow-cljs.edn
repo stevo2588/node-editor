@@ -1,0 +1,25 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src"]
+
+ :dependencies
+ [[reagent "1.0.0-alpha2"]]
+
+ :compiler-options {:optimizations :simple}
+
+ :builds
+  ; {:app {:target :npm-module
+  {:app {:target :node-script
+  ; {:app {:target :browser
+        ; :output-dir "out/js"
+        :output-to "out/main.js"
+        :asset-path "/assets"
+        :main nodegui-clj.hello-world.core/main!
+        ; :modules {:main {:entries [nodegui-clj.hello-world.core]}}
+
+        :devtools {:after-load nodegui-clj.hello-world.core/reload!}}}}
+        ;; start a development http server on http://localhost:8020
+        ; :devtools
+        ; {:http-root "out"
+        ;  :http-port 8020}
+        ; }}}
