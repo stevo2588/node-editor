@@ -10,10 +10,11 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
 extern {
-    fn alert(s: &str);
+  fn alert(s: &str);
 }
 
 #[wasm_bindgen]
-pub fn hello() -> String {
-    core::hello()
+pub fn reducer() -> String {
+  // core::reducer()
+  "TODO".to_string()
 }

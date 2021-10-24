@@ -1,3 +1,3 @@
 var addon = require('../index.node');
 
-module.exports = addon.hello;
+module.exports = { reducer: addon.reducer };
