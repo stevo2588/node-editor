@@ -53,7 +53,7 @@
     "native-addon-loader": "^2.0.1",
     "neon-cli": "^0.4.0",
     "node-loader": "^0.6.0",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "patch-package": "^6.2.2",
     "postinstall-postinstall": "^2.1.0",
     "react-hot-loader": "^4.12.19",
